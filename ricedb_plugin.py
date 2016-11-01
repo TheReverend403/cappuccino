@@ -128,7 +128,7 @@ class Plugin(object):
     def dotfile(self, mask, target, args):
         """View or add dotfiles
 
-            %%dotfiles [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
+            %%dotfile [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
         """
         yield self._generic_db(mask, target, args)
 
