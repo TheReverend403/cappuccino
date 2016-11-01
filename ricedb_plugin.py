@@ -67,6 +67,10 @@ class Plugin(object):
             self.db.set_user_value(mask.nick, mode, values)
             return '{0} updated!'.format(mode)
 
+        if args['--set']:
+            self.db.set_user_value(mask.nick, mode, args['<values>'])
+            return '{0} updated!'.format(mode)
+
         if args['--remove']:
             values = self.db.get_user_value(mask.nick, mode)
             if not values:
@@ -116,7 +120,7 @@ class Plugin(object):
     def dtop(self, mask, target, args):
         """View or add a desktop
 
-            %%dtop [(--add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
+            %%dtop [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
         """
         yield self._generic_db(mask, target, args)
 
@@ -124,7 +128,7 @@ class Plugin(object):
     def dotfile(self, mask, target, args):
         """View or add dotfiles
 
-            %%dotfiles [(--add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
+            %%dotfiles [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
         """
         yield self._generic_db(mask, target, args)
 
@@ -132,14 +136,14 @@ class Plugin(object):
     def distro(self, mask, target, args):
         """View or add a distro
 
-            %%distro [(--add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
+            %%distro [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
     def homescreen(self, mask, target, args):
-        """View or add a distro
+        """View or add a homescreen
 
-            %%distro [(--add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
+            %%homescreen [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
         """
         yield self._generic_db(mask, target, args)
