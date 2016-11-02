@@ -76,7 +76,7 @@ class Plugin(object):
             self.db.set_user_value(mask.nick, mode, values)
             return '{0} updated!'.format(mode)
 
-        if args['--remove']:
+        if args['--delete']:
             values = self.db.get_user_value(mask.nick, mode)
             if not values:
                 return 'You do not have any {0} to remove!'.format(mode)
@@ -122,7 +122,7 @@ class Plugin(object):
     def dtop(self, mask, target, args):
         """View or add a desktop
 
-            %%dtop [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user>]
+            %%dtop [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -130,7 +130,7 @@ class Plugin(object):
     def dotfiles(self, mask, target, args):
         """View or add dotfiles
 
-            %%dotfiles [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user>]
+            %%dotfiles [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -138,7 +138,7 @@ class Plugin(object):
     def distro(self, mask, target, args):
         """View or add a distro
 
-            %%distro [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user>]
+            %%distro [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -146,7 +146,7 @@ class Plugin(object):
     def homescreen(self, mask, target, args):
         """View or add a homescreen
 
-            %%homescreen [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user>]
+            %%homescreen [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
