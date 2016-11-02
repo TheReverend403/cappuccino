@@ -124,12 +124,6 @@ class Plugin(object):
         user = args['<user>'] or mask.nick
         values = self.db.get_user_value(user, mode)
         if values:
-            if args['index']:
-                index = int(args['index'])
-                try:
-                    return '{0} [{1}]'.format(values[index], user)
-                except IndexError:
-                    return 'Invalid index!'
             indexed_values = []
             for index, item in enumerate(values):
                 indexed_values.append('[{0}] {1}'.format(index, item))
@@ -141,7 +135,7 @@ class Plugin(object):
     def dtop(self, mask, target, args):
         """View or add a desktop
 
-            %%dtop [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
+            %%dtop [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -149,7 +143,7 @@ class Plugin(object):
     def dotfiles(self, mask, target, args):
         """View or add dotfiles
 
-            %%dotfiles [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
+            %%dotfiles [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -157,7 +151,7 @@ class Plugin(object):
     def distro(self, mask, target, args):
         """View or add a distro
 
-            %%distro [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
+            %%distro [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -165,7 +159,7 @@ class Plugin(object):
     def homescreen(self, mask, target, args):
         """View or add a homescreen
 
-            %%homescreen [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
+            %%homescreen [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
