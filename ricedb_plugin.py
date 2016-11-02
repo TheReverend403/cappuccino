@@ -1,3 +1,5 @@
+import platform
+
 from irc3.plugins.command import command
 import irc3
 from tinydb import TinyDB
@@ -186,3 +188,11 @@ class Plugin(object):
                     self.bot.log.info('Updating {0} for {1}'.format(db, user))
                     self.db.set_user_value(user, db, data[user])
         yield 'Updated database.'
+
+    @command(permission='view')
+    def bots(self, mask, target, args):
+        """Report in!
+
+            %%bots
+        """
+        yield 'Reporting in! [Python {0}]'.format(platform.python_version())
