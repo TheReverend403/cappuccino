@@ -45,7 +45,7 @@ def pluralise(value):
 
 @irc3.plugin
 class Plugin(object):
-    commands = ['dtop', 'distro', 'dotfile', 'homescreen']
+    commands = ['dtop', 'distro', 'dotfiles', 'homescreen']
 
     def __init__(self, bot):
         self.bot = bot
