@@ -14,6 +14,9 @@ ssl = true
 # sasl_username = ricedb
 # sasl_password = yourpassword
 
+# uncomment this if you have a nickserv account
+# nickserv_password = yourpassword
+
 includes =
     irc3.plugins.command
 #    irc3.plugins.uptime

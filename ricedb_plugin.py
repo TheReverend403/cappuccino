@@ -51,6 +51,15 @@ class Plugin(object):
         self.bot = bot
         self.db = Database('data.json')
 
+    @irc3.event(r':(?P<ns>\w+)!\w+@.+ NOTICE (?P<nick>.*) :This nickname is registered.*')
+    def login(self, ns, nick):
+        try:
+            password = self.bot.config['nickserv_password']
+        except KeyError:
+            self.bot.log.info('No NickServ password is set in config.ini!')
+        else:
+            self.bot.privmsg(ns, 'identify {0}'.format(password))
+
     def _generic_db(self, mask, target, args):
         mode = None
         for _command in self.commands:
