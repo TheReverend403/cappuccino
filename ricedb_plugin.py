@@ -17,12 +17,8 @@ class Database(object):
 
     def set_user_value(self, username, key, value):
         key = '_' + key
-        kwargs = {key: value}
-        self.storage.set(username, **kwargs)
-
-
-def pluralise(value):
-    return value if value.endswith('s') else value + 's'
+        data = {key: value}
+        self.storage.set(username, **data)
 
 
 @irc3.plugin
@@ -38,7 +34,7 @@ class Plugin(object):
         try:
             password = self.bot.config['nickserv_password']
         except KeyError:
-            self.bot.log.info('No NickServ password is set in config.ini!')
+            self.bot.log.warn('This nick is registered but no NickServ password is set in config.ini')
         else:
             self.bot.log.info('Authenticating with NickServ')
             self.bot.privmsg(ns, 'identify {0}'.format(password))
@@ -49,14 +45,14 @@ class Plugin(object):
 
     @irc3.event(r':\w+!.+@.+ NOTICE .* :Password incorrect.*')
     def login_failed(self):
-        self.bot.log.info('Failed to authenticate with NickServ due to an incorrect password')
+        self.bot.log.error('Failed to authenticate with NickServ due to an incorrect password')
 
     def _generic_db(self, mask, target, args):
         mode = None
         for _command in self.commands:
             try:
                 if args[_command]:
-                    mode = pluralise(_command)
+                    mode = _command if _command.endswith('s') else _command + 's'
             except KeyError:
                 pass
 
@@ -168,11 +164,11 @@ class Plugin(object):
             r = requests.get('https://api.joaquin-v.xyz/aigis/database.php?server={0}&db={1}'.format(
                 server, db_map[db]))
             data = r.json()
+            self.bot.log.info('Updating user database...')
             for user in data:
                 if data[user]:
-                    self.bot.log.info('Updating {0} for {1}'.format(db, user))
                     self.db.set_user_value(user, db, data[user])
-        yield 'Updated database.'
+        yield 'Database updated.'
 
     @command(permission='view')
     def bots(self, mask, target, args):
