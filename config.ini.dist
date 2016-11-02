@@ -18,6 +18,7 @@ ssl = true
 # nickserv_password = yourpassword
 
 includes =
+    irc3.plugins.storage
     irc3.plugins.command
 #    irc3.plugins.uptime
 #    irc3.plugins.ctcp
@@ -44,6 +45,8 @@ autojoins =
 # The bot will send $flood_rate messages per $flood_rate_delay seconds
 # Default to 1
 # flood_rate_delay = 5
+
+storage = json://data.json
 
 [irc3.plugins.command]
 # command plugin configuration

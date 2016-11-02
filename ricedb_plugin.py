@@ -2,43 +2,23 @@ import platform
 
 from irc3.plugins.command import command
 import irc3
-from tinydb import TinyDB
-from tinydb import where
 
 
 class Database(object):
-    def __init__(self, path):
-        self.tinydb = TinyDB(path)
+    def __init__(self, storage):
+        self.storage = storage
 
     def get_user_value(self, username, key):
         key = '_' + key
-        table = self.tinydb.table()
-        value = table.get(where('username') == username)
-        if not value:
-            return None
         try:
-            return value[key]
-        except KeyError:
+            return self.storage.get(username)[key]
+        except (KeyError, TypeError):
             return None
 
     def set_user_value(self, username, key, value):
-        self.insert_else_update_user(username, {key: value})
-
-    def insert_else_update_user(self, username, extra_params=None):
-        table = self.tinydb.table()
-        if not table.get(where('username') == username):
-            table.insert({
-                'username': username,
-            })
-        else:
-            table.update({
-                'username': username,
-            }, where('username') == username)
-        if extra_params is not None:
-            for k in extra_params:
-                if not k.startswith('_'):
-                    extra_params['_' + k] = extra_params.pop(k)
-            table.update(extra_params, where('username') == username)
+        key = '_' + key
+        kwargs = {key: value}
+        self.storage.set(username, **kwargs)
 
 
 def pluralise(value):
@@ -51,7 +31,7 @@ class Plugin(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.db = Database('data.json')
+        self.db = Database(bot.db)
 
     @irc3.event(r':(?P<ns>\w+)!.+@.+ NOTICE (?P<nick>.*) :This nickname is registered.*')
     def login_attempt(self, ns, nick):

@@ -1,5 +1,4 @@
 docopt==0.6.2
 irc3==0.9.6
 requests==2.11.1
-tinydb==3.2.1
 venusian==1.0
