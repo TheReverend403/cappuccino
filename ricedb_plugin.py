@@ -130,7 +130,10 @@ class Plugin(object):
                     return '{0} [{1}]'.format(values[index], user)
                 except IndexError:
                     return 'Invalid index!'
-            return '{0} [{1}]'.format(' | '.join(values), user)
+            indexed_values = []
+            for index, item in enumerate(values):
+                indexed_values[index] = '[{0}] {1}'.format(index, item)
+            return '{0} [{1}]'.format(' | '.join(indexed_values), user)
         else:
             return '{0} has no {1}'.format(user, mode)
 
