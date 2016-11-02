@@ -67,7 +67,7 @@ class Plugin(object):
 
     @irc3.event(r':\w+!.+@.+ NOTICE .* :Password incorrect.*')
     def login_failed(self):
-        self.bot.log.info('Failed to authenticate with NickServ (Wrong password?)')
+        self.bot.log.info('Failed to authenticate with NickServ due to an incorrect password')
 
     def _generic_db(self, mask, target, args):
         mode = None
