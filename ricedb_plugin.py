@@ -146,10 +146,10 @@ class Plugin(object):
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
-    def dotfile(self, mask, target, args):
+    def dotfiles(self, mask, target, args):
         """View or add dotfiles
 
-            %%dotfile [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
+            %%dotfiles [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
         """
         yield self._generic_db(mask, target, args)
 
