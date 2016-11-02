@@ -188,6 +188,7 @@ class Plugin(object):
                 server, db_map[db]))
             data = r.json()
             for user in data:
-                self.bot.log.info('Updating {0} for {1}'.format(db, user))
-                self.db.set_user_value(user, db, data[user])
+                if data[user]:
+                    self.bot.log.info('Updating {0} for {1}'.format(db, user))
+                    self.db.set_user_value(user, db, data[user])
         yield 'Updated database.'
