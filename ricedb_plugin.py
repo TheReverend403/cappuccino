@@ -132,7 +132,7 @@ class Plugin(object):
                     return 'Invalid index!'
             indexed_values = []
             for index, item in enumerate(values):
-                indexed_values[index] = '[{0}] {1}'.format(index, item)
+                indexed_values.append('[{0}] {1}'.format(index, item))
             return '{0} [{1}]'.format(' | '.join(indexed_values), user)
         else:
             return '{0} has no {1}'.format(user, mode)
