@@ -62,14 +62,14 @@ class Plugin(object):
 
         if args['--add']:
             values = self.db.get_user_value(mask.nick, mode) or args['<values>']
-            if mode == 'distro':
+            if mode == 'distros':
                 values = [' '.join(values)]
             self.db.set_user_value(mask.nick, mode, values)
             return '{0} updated!'.format(mode)
 
         if args['--set']:
             values = args['<values>']
-            if mode == 'distro':
+            if mode == 'distros':
                 values = [' '.join(values)]
             self.db.set_user_value(mask.nick, mode, values)
             return '{0} updated!'.format(mode)
