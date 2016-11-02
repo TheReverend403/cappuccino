@@ -168,3 +168,26 @@ class Plugin(object):
             %%homescreen [(--set <values>... | --add <values>... | --remove <indexes>... | --replace <index> <value>) | <user> [index]]
         """
         yield self._generic_db(mask, target, args)
+
+    @command(permission='admin')
+    def mirror_aigis(self, mask, target, args):
+        """Update local DB from Aigis' latest version
+
+            %%mirror_aigis
+        """
+        server = 'Rizon'
+        db_map = {
+            'dtops': 'desktops',
+            'homescreens': 'homescreens',
+            'dotfiles': 'gits'
+        }
+
+        import requests
+        for db in db_map:
+            r = requests.get('https://api.joaquin-v.xyz/aigis/database.php?server={0}&db={1}'.format(
+                server, db_map[db]))
+            data = r.json()
+            for user in data:
+                self.bot.log.info('Updating {0} for {1}'.format(db, user))
+                self.db.set_user_value(user, db, data[user])
+        yield 'Updated database.'
