@@ -147,7 +147,7 @@ class Plugin(object):
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view').
+    @command(permission='view')
     def homescreen(self, mask, target, args):
         """View or add a homescreen.
 
