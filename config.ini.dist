@@ -18,11 +18,8 @@ ssl = true
 # nickserv_password = yourpassword
 
 includes =
-    irc3.plugins.storage
-    irc3.plugins.command
-#    irc3.plugins.uptime
-#    irc3.plugins.ctcp
-    ricedb_plugin
+    plugins.botui
+    plugins.ricedb
 
 # the bot will join #ricedb_channel
 # ${hash} is replaced by the # char

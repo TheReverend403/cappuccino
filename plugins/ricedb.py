@@ -3,12 +3,14 @@ import platform
 from irc3.plugins.command import command
 import irc3
 
-"""Converts a zero-indexed value to a user-friendly value starting from 1"""
+
 def to_user_index(index):
+    """Converts a zero-indexed value to a user-friendly value starting from 1"""
     return index + 1
 
-"""Converts a user-supplied index to a value suitable for zero-indexed arrays"""
+
 def from_user_index(index):
+    """Converts a user-supplied index to a value suitable for zero-indexed arrays"""
     index = int(index)
     return index - 1 if index > 1 else 1
 
@@ -34,27 +36,14 @@ class Database(object):
 class Plugin(object):
     commands = ['dtop', 'distro', 'dotfiles', 'homescreen', 'selfie']
 
+    requires = [
+        'irc3.plugins.command',
+        'irc3.plugins.storage',
+    ]
+
     def __init__(self, bot):
         self.bot = bot
         self.db = Database(bot.db)
-
-    @irc3.event(r':(?P<ns>\w+)!.+@.+ NOTICE (?P<nick>.*) :This nickname is registered.*')
-    def login_attempt(self, ns, nick):
-        try:
-            password = self.bot.config['nickserv_password']
-        except KeyError:
-            self.bot.log.warn('This nick is registered but no NickServ password is set in config.ini')
-        else:
-            self.bot.log.info('Authenticating with NickServ')
-            self.bot.privmsg(ns, 'identify {0}'.format(password))
-
-    @irc3.event(r':\w+!.+@.+ NOTICE .* :Password accepted.*')
-    def login_succeeded(self):
-        self.bot.log.info('Authenticated with NickServ')
-
-    @irc3.event(r':\w+!.+@.+ NOTICE .* :Password incorrect.*')
-    def login_failed(self):
-        self.bot.log.error('Failed to authenticate with NickServ due to an incorrect password')
 
     def _generic_db(self, mask, target, args):
         mode = None
@@ -163,7 +152,7 @@ class Plugin(object):
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='admin')
+    @command(permission='admin', show_in_help_list=False)
     def mirror_aigis(self, mask, target, args):
         """Update local DB from Aigis' latest version.
 
@@ -187,11 +176,3 @@ class Plugin(object):
                 if data[user]:
                     self.db.set_user_value(user, db, data[user])
         yield 'Database updated.'
-
-    @command(permission='view')
-    def bots(self, mask, target, args):
-        """Report in!
-
-            %%bots
-        """
-        yield 'Reporting in! [Python {0}]'.format(platform.python_version())
