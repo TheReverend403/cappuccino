@@ -3,6 +3,15 @@ import platform
 from irc3.plugins.command import command
 import irc3
 
+"""Converts a zero-indexed value to a user-friendly value starting from 1"""
+def to_user_index(index):
+    return index + 1
+
+"""Converts a user-supplied index to a value suitable for zero-indexed arrays"""
+def from_user_index(index):
+    index = int(index)
+    return index - 1 if index > 0 else 0
+
 
 class Database(object):
     def __init__(self, storage):
@@ -79,7 +88,7 @@ class Plugin(object):
             indexes = args['<indexes>']
             deleted = []
             for index in indexes:
-                index = int(index)
+                index = from_user_index(index)
                 try:
                     deleted.append(values[index])
                     del values[index]
@@ -91,7 +100,7 @@ class Plugin(object):
             return 'Removed {0}!'.format(', '.join(deleted))
 
         if args['--replace']:
-            index = int(args['<index>'])
+            index = from_user_index(args['<index>'])
             value = args['<value>']
             values = self.db.get_user_value(mask.nick, mode)
             if not values:
@@ -109,7 +118,7 @@ class Plugin(object):
         if values:
             indexed_values = []
             for index, item in enumerate(values):
-                indexed_values.append('[{0}] {1}'.format(index, item))
+                indexed_values.append('[{0}] {1}'.format(to_user_index(index), item))
             return '{0} [{1}]'.format(' | '.join(indexed_values), user)
         else:
             return '{0} has no {1}'.format(user, mode)
