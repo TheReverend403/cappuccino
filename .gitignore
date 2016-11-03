@@ -91,3 +91,4 @@ ENV/
 
 config.ini
 data.json
+data/
