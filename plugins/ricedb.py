@@ -1,5 +1,3 @@
-import platform
-
 from irc3.plugins.command import command
 import irc3
 
