@@ -32,8 +32,8 @@ class Database(object):
 
 @irc3.plugin
 class Plugin(object):
-    commands = ['dtop', 'distro', 'dotfiles', 'homescreen', 'selfie']
 
+    commands = ['dtop', 'distro', 'dotfiles', 'homescreen', 'selfie']
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.storage',

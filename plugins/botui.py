@@ -6,6 +6,7 @@ import irc3
 
 @irc3.plugin
 class Plugin(object):
+
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.userlist'
