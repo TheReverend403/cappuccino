@@ -50,7 +50,7 @@ class Plugin(object):
 
         channel = args['<channel>']
         if args['<password>'] is not None:
-            channel += " %s" % args['<password>']
+            channel += ' %s' % args['<password>']
 
         self.bot.join(channel)
 
