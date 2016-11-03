@@ -69,22 +69,22 @@ class Plugin(object):
             values = self.db.get_user_value(mask.nick, mode) or []
             if mode == 'distros':
                 values = [' '.join(values)]
-            for value in args['<values>']:
+            for value in args['<value>']:
                 values.append(value)
             self.db.set_user_value(mask.nick, mode, values)
-            return '{0} updated!'.format(mode)
+            return '{0} updated.'.format(mode)
 
         if args['--set']:
-            values = args['<values>']
+            values = args['<value>']
             if mode == 'distros':
                 values = [' '.join(values)]
             self.db.set_user_value(mask.nick, mode, values)
-            return '{0} updated!'.format(mode)
+            return '{0} updated.'.format(mode)
 
         if args['--delete']:
             values = self.db.get_user_value(mask.nick, mode)
             if not values:
-                return 'You do not have any {0} to remove!'.format(mode)
+                return 'You do not have any {0} to remove.'.format(mode)
             indexes = args['<indexes>']
             deleted = []
             for index in indexes:
@@ -97,21 +97,21 @@ class Plugin(object):
             if not deleted:
                 return 'No {0} were removed. Maybe you supplied the wrong indexes?'.format(mode)
             self.db.set_user_value(mask.nick, mode, values)
-            return 'Removed {0}!'.format(', '.join(deleted))
+            return 'Removed {0}.'.format(', '.join(deleted))
 
         if args['--replace']:
             index = from_user_index(args['<index>'])
             value = args['<value>']
             values = self.db.get_user_value(mask.nick, mode)
             if not values:
-                return 'You do not have any {0} to replace!'.format(mode)
+                return 'You do not have any {0} to replace.'.format(mode)
             try:
                 old_value = values[index]
                 values[index] = value
                 self.db.set_user_value(mask.nick, mode, values)
                 return 'Replaced {0} with {1}'.format(old_value, value)
             except IndexError:
-                return 'Invalid index!'
+                return 'Invalid index.'
 
         user = args['<user>'] or mask.nick
         values = self.db.get_user_value(user, mode)
@@ -121,43 +121,43 @@ class Plugin(object):
                 indexed_values.append('[{0}] {1}'.format(to_user_index(index), item))
             return '{0} [{1}]'.format(' | '.join(indexed_values), user)
         else:
-            return '{0} has no {1}'.format(user, mode)
+            return '{0} has no {1}.'.format(user, mode)
 
     @command(permission='view')
     def dtop(self, mask, target, args):
-        """View or add a desktop
+        """View or add a desktop.
 
-            %%dtop [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%dtop [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
     def dotfiles(self, mask, target, args):
-        """View or add dotfiles
+        """View or add dotfiles.
 
-            %%dotfiles [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%dotfiles [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
     def distro(self, mask, target, args):
-        """View or add a distro
+        """View or add a distro.
 
-            %%distro [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%distro [(--set <value> | --add <value> | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view')
+    @command(permission='view').
     def homescreen(self, mask, target, args):
-        """View or add a homescreen
+        """View or add a homescreen.
 
-            %%homescreen [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%homescreen [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='admin')
     def mirror_aigis(self, mask, target, args):
-        """Update local DB from Aigis' latest version
+        """Update local DB from Aigis' latest version.
 
             %%mirror_aigis
         """
