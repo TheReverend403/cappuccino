@@ -32,7 +32,7 @@ class Database(object):
 
 @irc3.plugin
 class Plugin(object):
-    commands = ['dtop', 'distro', 'dotfiles', 'homescreen']
+    commands = ['dtop', 'distro', 'dotfiles', 'homescreen', 'selfie']
 
     def __init__(self, bot):
         self.bot = bot
@@ -155,6 +155,14 @@ class Plugin(object):
         """
         yield self._generic_db(mask, target, args)
 
+    @command(permission='view')
+    def selfie(self, mask, target, args):
+        """View or add a selfie.
+
+            %%selfie [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+        """
+        yield self._generic_db(mask, target, args)
+
     @command(permission='admin')
     def mirror_aigis(self, mask, target, args):
         """Update local DB from Aigis' latest version.
@@ -165,6 +173,7 @@ class Plugin(object):
         db_map = {
             'dtops': 'desktops',
             'homescreens': 'homescreens',
+            'selfies': 'selfies',
             'dotfiles': 'gits'
         }
 
