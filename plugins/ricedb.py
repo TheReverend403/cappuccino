@@ -10,7 +10,7 @@ def to_user_index(index):
 def from_user_index(index):
     """Converts a user-supplied index to a value suitable for zero-indexed arrays"""
     index = int(index)
-    return index - 1 if index > 1 else 1
+    return index - 1 if index >= 1 else index
 
 
 class Database(object):
