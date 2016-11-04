@@ -126,7 +126,7 @@ class Plugin(object):
 
             %%distro [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
-        args['<value>'] = [' '.join(args)]
+        args['<value>'] = [' '.join(args['<value>'])]
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
