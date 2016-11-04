@@ -1,3 +1,4 @@
+import inspect
 from irc3.plugins.command import command
 import irc3
 
@@ -31,7 +32,6 @@ class Database(object):
 @irc3.plugin
 class Plugin(object):
 
-    commands = ['dtop', 'distro', 'dotfiles', 'homescreen', 'selfie']
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.storage',
@@ -42,13 +42,9 @@ class Plugin(object):
         self.db = Database(self.bot.db)
 
     def _generic_db(self, mask, target, args):
-        mode = None
-        for _command in self.commands:
-            try:
-                if args[_command]:
-                    mode = _command if _command.endswith('s') else _command + 's'
-            except KeyError:
-                pass
+        # Get name of command _generic_db is being called from.
+        mode = inspect.stack()[1][3]
+        mode = mode if mode.endswith('s') else mode + 's'
 
         if args['--add']:
             values = self.db.get_user_value(mask.nick, mode) or []
