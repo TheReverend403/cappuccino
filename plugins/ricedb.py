@@ -39,7 +39,7 @@ class Plugin(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.db = Database(bot.db)
+        self.db = Database(self.bot.db)
 
     def _generic_db(self, mask, target, args):
         mode = None
@@ -52,8 +52,6 @@ class Plugin(object):
 
         if args['--add']:
             values = self.db.get_user_value(mask.nick, mode) or []
-            if mode == 'distros':
-                values = [' '.join(values)]
             for value in args['<value>']:
                 values.append(value)
             self.db.set_user_value(mask.nick, mode, values)
@@ -61,8 +59,6 @@ class Plugin(object):
 
         if args['--set']:
             values = args['<value>']
-            if mode == 'distros':
-                values = [' '.join(values)]
             self.db.set_user_value(mask.nick, mode, values)
             return '{0} updated.'.format(mode)
 
@@ -130,6 +126,7 @@ class Plugin(object):
 
             %%distro [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
+        args = [' '.join(args)]
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
