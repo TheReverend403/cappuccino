@@ -14,7 +14,6 @@ class Plugin(object):
         except KeyError:
             self.bot.log.warn('This nick is registered but no NickServ password is set in config.ini')
         else:
-            self.bot.log.info('Authenticating with NickServ')
             self.bot.privmsg(ns, 'identify {0}'.format(password))
 
     @irc3.event(r':\w+!.+@.+ NOTICE .* :Password accepted.*')
