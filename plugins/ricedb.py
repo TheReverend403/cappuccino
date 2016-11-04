@@ -163,11 +163,11 @@ class Plugin(object):
         }
 
         import requests
+        self.bot.log.info('Updating user database...')
         for db in db_map:
             r = requests.get('https://api.joaquin-v.xyz/aigis/database.php?server={0}&db={1}'.format(
                 server, db_map[db]))
             data = r.json()
-            self.bot.log.info('Updating user database...')
             if 'error_msg' in data:
                 self.bot.log.error(data['error_msg'])
                 return
