@@ -18,14 +18,12 @@ class Database(object):
         self.storage = storage
 
     def get_user_value(self, username, key):
-        key = '_' + key
         try:
             return self.storage.get(username)[key]
         except (KeyError, TypeError):
             return None
 
     def set_user_value(self, username, key, value):
-        key = '_' + key
         data = {key: value}
         self.storage.set(username, **data)
 
