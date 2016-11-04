@@ -3,6 +3,7 @@ import irc3
 
 @irc3.plugin
 class Plugin(object):
+
     def __init__(self, bot):
         self.bot = bot
         self.config = self.bot.config[__name__]

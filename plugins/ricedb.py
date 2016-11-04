@@ -15,6 +15,7 @@ def from_user_index(index):
 
 
 class Database(object):
+
     def __init__(self, storage):
         self.storage = storage
 
@@ -78,15 +79,15 @@ class Plugin(object):
 
         if args['--replace']:
             index = from_user_index(args['<index>'])
-            value = args['<value>']
+            replacement = args['<value>']
             values = self.db.get_user_value(mask.nick, mode)
             if not values:
                 return 'You do not have any {0} to replace.'.format(mode)
             try:
                 old_value = values[index]
-                values[index] = value
+                values[index] = replacement
                 self.db.set_user_value(mask.nick, mode, values)
-                return 'Replaced {0} with {1}'.format(old_value, value)
+                return 'Replaced {0} with {1}'.format(old_value, replacement)
             except IndexError:
                 return 'Invalid index.'
 
