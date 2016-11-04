@@ -1,6 +1,8 @@
 [bot]
 nick = ricedb
 username = ricedb
+# Server password, not nickserv
+password =
 
 host = irc.rizon.net
 port = 6697
