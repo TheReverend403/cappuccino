@@ -55,6 +55,8 @@ password =
 # set command char
 cmd = .
 
+antiflood = true
+
 # set guard policy
 guard = irc3.plugins.command.mask_based_policy
 
