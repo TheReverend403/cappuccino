@@ -170,6 +170,9 @@ class Plugin(object):
                 server, db_map[db]))
             data = r.json()
             self.bot.log.info('Updating user database...')
+            if 'error_msg' in data:
+                self.bot.log.error(data['error_msg'])
+                return
             for user in data:
                 if data[user]:
                     self.db.set_user_value(user, db, data[user])
