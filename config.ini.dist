@@ -46,6 +46,9 @@ autojoins =
 
 storage = json://data.json
 
+[plugins.nickserv]
+password =
+
 [irc3.plugins.command]
 # command plugin configuration
 
