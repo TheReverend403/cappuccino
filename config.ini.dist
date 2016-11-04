@@ -18,6 +18,7 @@ ssl = true
 # nickserv_password = yourpassword
 
 includes =
+    plugins.nickserv
     plugins.botui
     plugins.ricedb
 
