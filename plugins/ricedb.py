@@ -1,4 +1,6 @@
 import inspect
+
+import shlex
 from irc3.plugins.command import command
 import irc3
 
@@ -47,15 +49,22 @@ class Plugin(object):
         mode = inspect.stack()[1][3]
         mode = mode if mode.endswith('s') else mode + 's'
 
+        # Apply some sanity to the way docopt handles args with spaces.
+        if args['<values>']:
+            try:
+                args['<values>'] = shlex.split(' '.join(args['<values>']))
+            except ValueError:
+                pass
+
         if args['--add']:
             values = self.db.get_user_value(mask.nick, mode) or []
-            for value in args['<value>']:
+            for value in args['<values>']:
                 values.append(value)
             self.db.set_user_value(mask.nick, mode, values)
             return '{0} updated.'.format(mode)
 
         if args['--set']:
-            values = args['<value>']
+            values = args['<values>']
             self.db.set_user_value(mask.nick, mode, values)
             return '{0} updated.'.format(mode)
 
@@ -105,7 +114,7 @@ class Plugin(object):
     def dtop(self, mask, target, args):
         """View or add a desktop.
 
-            %%dtop [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%dtop [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -113,7 +122,7 @@ class Plugin(object):
     def dotfiles(self, mask, target, args):
         """View or add dotfiles.
 
-            %%dotfiles [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%dotfiles [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -121,16 +130,15 @@ class Plugin(object):
     def distro(self, mask, target, args):
         """View or add a distro.
 
-            %%distro [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%distro [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
-        args['<value>'] = [' '.join(args['<value>'])]
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
     def homescreen(self, mask, target, args):
         """View or add a homescreen.
 
-            %%homescreen [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%homescreen [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -138,7 +146,7 @@ class Plugin(object):
     def selfie(self, mask, target, args):
         """View or add a selfie.
 
-            %%selfie [(--set <value>... | --add <value>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%selfie [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
