@@ -51,6 +51,9 @@ storage = json://data.json
 [plugins.nickserv]
 password =
 
+[plugins.ricedb]
+lastfm_api_key =
+
 [irc3.plugins.command]
 # command plugin configuration
 

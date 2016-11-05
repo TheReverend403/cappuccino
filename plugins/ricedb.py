@@ -1,4 +1,6 @@
 import inspect
+
+import pylast
 import requests
 import shlex
 from irc3.plugins.command import command
@@ -41,6 +43,10 @@ class Plugin(object):
     def __init__(self, bot):
         self.bot = bot
         self.db = Database(self.bot.db)
+        try:
+            self.lastfm = pylast.LastFMNetwork(api_key=self.bot.config[__name__]['lastfm_api_key'])
+        except KeyError:
+            self.bot.log.warn('Missing last.fm API key')
 
     def _generic_db(self, mask, target, args):
         # Get name of command _generic_db is being called from.
@@ -174,3 +180,34 @@ class Plugin(object):
                 if data[user]:
                     self.db.set_user_value(user, db, data[user])
         yield 'Database updated.'
+
+    @command(name='np')
+    def now_playing(self, mask, target, args):
+        """View currently playing track info.
+
+            %%np [--set <username> | <username>]
+        """
+        if args['--set']:
+            lastfm_username = args['<username>']
+            try:
+                lastfm_username = self.lastfm.get_user(lastfm_username).get_name(properly_capitalized=True)
+            except pylast.WSError:
+                return 'No such last.fm user. Are you trying to trick me? :^)'
+            else:
+                self.db.set_user_value(mask.nick, 'lastfm', lastfm_username)
+                return 'last.fm username set.'
+
+        irc_username = args['<username>'] or mask.nick
+        lastfm_username = self.db.get_user_value(irc_username, 'lastfm')
+        if not lastfm_username:
+            if irc_username == mask.nick:
+                return 'You have no last.fm username set. Please set one with .np --set <username>'
+            return '{0} has no last.fm username set. Ask them to set one with .np --set <username>'.format(irc_username)
+
+        lastfm_user = self.lastfm.get_user(lastfm_username)
+        current_track = lastfm_user.get_now_playing()
+        if not current_track:
+            return '{0} is not listening to anything right now.'.format(irc_username)
+
+        trackinfo = '\x02{0}\x0f - \x02{1}\x0f'.format(current_track.get_artist().get_name(), current_track.get_title())
+        return '\x02{0}\x0f is now playing {1} | \x0302{2}'.format(irc_username, trackinfo, current_track.get_url())
