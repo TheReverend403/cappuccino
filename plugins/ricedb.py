@@ -1,5 +1,5 @@
 import inspect
-
+import requests
 import shlex
 from irc3.plugins.command import command
 import irc3
@@ -17,7 +17,6 @@ def from_user_index(index):
 
 
 class Database(object):
-
     def __init__(self, storage):
         self.storage = storage
 
@@ -34,7 +33,6 @@ class Database(object):
 
 @irc3.plugin
 class Plugin(object):
-
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.storage',
@@ -164,7 +162,6 @@ class Plugin(object):
             'dotfiles': 'gits'
         }
 
-        import requests
         self.bot.log.info('Updating user database...')
         for db in db_map:
             r = requests.get('https://api.joaquin-v.xyz/aigis/database.php?server={0}&db={1}'.format(
