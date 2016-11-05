@@ -7,6 +7,17 @@ from irc3.plugins.command import command
 import irc3
 
 
+@irc3.extend
+def color(text, colorvalue):
+    # TODO: Add constants for IRC colours.
+    return '\x030{0}{1}\x0f'.format(colorvalue, text)
+
+
+@irc3.extend
+def bold(text):
+    return '\x02{0}\x0f'.format(text)
+
+
 def to_user_index(index):
     """Converts a zero-indexed value to a user-friendly value starting from 1"""
     return index + 1
@@ -209,5 +220,7 @@ class Plugin(object):
         if not current_track:
             return '{0} is not listening to anything right now.'.format(irc_username)
 
-        trackinfo = '\x02{0}\x0f - \x02{1}\x0f'.format(current_track.get_artist().get_name(), current_track.get_title())
-        return '\x02{0}\x0f is now playing {1} | \x0302{2}'.format(irc_username, trackinfo, current_track.get_url())
+        trackinfo = '{0} - {1}'.format(
+            bold(current_track.get_artist().get_name()),
+            bold(current_track.get_title()))
+        return '{0} is now playing {1} | {2}'.format(irc_username, trackinfo, color(current_track.get_url(), 2))
