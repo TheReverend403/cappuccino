@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import irc3
 import requests
 from lxml import html
@@ -78,13 +76,11 @@ class Plugin(object):
         if target in self.history_buffer:
             self.history_buffer.pop(target)
         self.history_buffer.update({target: {mask.nick: data}})
-        pprint(self.history_buffer)
 
     @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
                 r'(?P<target>\S+) :\s*'
                 r's/((?P<search>\\/|[^/]+))/((?P<replacement>\\/|[^/]*))(?:/(\S+))?')
     def sed(self, mask, target, search, replacement):
-        self.bot.log.info('Would replace {0} with {1}'.format(search, replacement))
         if target in self.history_buffer:
             last_message = self.history_buffer.get(target)
             if not last_message:
