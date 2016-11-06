@@ -198,7 +198,7 @@ class Plugin(object):
                     self.db.set_user_value(user, db, data[user])
         yield 'Database updated.'
 
-    @command(name='np')
+    @command(name='np', permission='view')
     def now_playing(self, mask, target, args):
         """View currently playing track info.
 
@@ -227,7 +227,6 @@ class Plugin(object):
         if not current_track:
             return '{0} is not listening to anything right now.'.format(antiping(irc_username))
 
-        trackinfo = '{0} - {1}'.format(
-            bold(current_track.get_artist().get_name()),
-            bold(current_track.get_title()))
-        return '{0} is now playing {1} | {2}'.format(antiping(irc_username), trackinfo, color(current_track.get_url(), 2))
+        trackinfo = '{0} - {1}'.format(bold(current_track.get_artist().get_name()), bold(current_track.get_title()))
+        return '{0} is now playing {1} | {2}'.format(
+            antiping(irc_username), trackinfo, color(current_track.get_url(), 2))
