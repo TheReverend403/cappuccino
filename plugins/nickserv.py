@@ -6,12 +6,11 @@ class Plugin(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.config = self.bot.config[__name__]
 
-    @irc3.event(r':(?P<ns>\w+)!.+@.+ NOTICE (?P<nick>.*) :This nickname is registered.*')
-    def login_attempt(self, ns, nick):
+    @irc3.event(r':(?P<ns>\w+)!.+@.+ NOTICE .* :This nickname is registered.*')
+    def login_attempt(self, ns):
         try:
-            password = self.config['password']
+            password = self.bot.config[__name__]['password']
         except KeyError:
             self.bot.log.warn('This nick is registered but no nickserv password is set in config.ini')
         else:
