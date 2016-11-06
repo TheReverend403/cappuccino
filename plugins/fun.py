@@ -16,9 +16,8 @@ class Plugin(object):
 
             %%insult
         """
-        response = None
         try:
-            response = requests.get('http://www.insultgenerator.org')
+            response = requests.get('http://www.insultgenerator.org', headers={'Connection': 'close'})
         except requests.exceptions.RequestException as ex:
             self.bot.log.exception(ex)
             yield 'Error: {0}'.format(ex.strerror)
@@ -26,9 +25,6 @@ class Plugin(object):
             doc = html.fromstring(response.text)
             insult = ''.join(doc.xpath('//div[@class="wrap"]/text()')).strip()
             yield insult
-        finally:
-            if response is not None:
-                response.close()
 
     @command(name='wtc', permission='view')
     def whatthecommit(self, mask, target, args):
@@ -36,9 +32,8 @@ class Plugin(object):
 
             %%wtc
         """
-        response = None
         try:
-            response = requests.get('http://whatthecommit.com')
+            response = requests.get('http://whatthecommit.com', headers={'Connection': 'close'})
         except requests.exceptions.RequestException as ex:
             self.bot.log.exception(ex)
             yield 'Error: {0}'.format(ex.strerror)
@@ -46,9 +41,6 @@ class Plugin(object):
             doc = html.fromstring(response.text)
             commit_message = doc.xpath('//div[@id="content"]/p/text()')[0].strip()
             yield commit_message
-        finally:
-            if response is not None:
-                response.close()
 
     @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
                 r'(?P<target>\S+) :\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
