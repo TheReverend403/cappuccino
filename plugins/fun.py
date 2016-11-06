@@ -49,3 +49,9 @@ class Plugin(object):
         finally:
             if response is not None:
                 response.close()
+
+    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) (?P<event>(PRIVMSG|NOTICE)) '
+                r'(?P<target>\S+) :\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
+    def intensify(self, mask=None, event=None, target=None, data=None):
+        if event == 'PRIVMSG':
+            self.bot.privmsg(target, self.bot.bold('[{0} INTENSIFIES]'.format(data.strip().upper())))

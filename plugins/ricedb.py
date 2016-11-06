@@ -7,23 +7,6 @@ from irc3.plugins.command import command
 import irc3
 
 
-@irc3.extend
-def antiping(text):
-    """Adds zero-width spaces after each character in a string to avoid pinging users"""
-    return '\u200B'.join(text)
-
-
-@irc3.extend
-def color(text, colorvalue):
-    # TODO: Add constants for IRC colours.
-    return '\x030{0}{1}\x0f'.format(colorvalue, text)
-
-
-@irc3.extend
-def bold(text):
-    return '\x02{0}\x0f'.format(text)
-
-
 def to_user_index(index):
     """Converts a zero-indexed value to a user-friendly value starting from 1"""
     return index + 1
@@ -127,9 +110,9 @@ class Plugin(object):
             indexed_values = []
             for index, item in enumerate(values):
                 indexed_values.append('[{0}] {1}'.format(to_user_index(index), item))
-            return '{0} [{1}]'.format(' | '.join(indexed_values), antiping(user))
+            return '{0} [{1}]'.format(' | '.join(indexed_values), self.bot.antiping(user))
         else:
-            return '{0} has no {1}.'.format(antiping(user), mode)
+            return '{0} has no {1}.'.format(self.bot.antiping(user), mode)
 
     @command(permission='view')
     def dtop(self, mask, target, args):
@@ -220,13 +203,14 @@ class Plugin(object):
             if irc_username == mask.nick:
                 return 'You have no last.fm username set. Please set one with .np --set <username>'
             return '{0} has no last.fm username set. Ask them to set one with .np --set <username>'.format(
-                antiping(irc_username))
+                self.bot.antiping(irc_username))
 
         lastfm_user = self.lastfm.get_user(lastfm_username)
         current_track = lastfm_user.get_now_playing()
         if not current_track:
-            return '{0} is not listening to anything right now.'.format(antiping(irc_username))
+            return '{0} is not listening to anything right now.'.format(self.bot.antiping(irc_username))
 
-        trackinfo = '{0} - {1}'.format(bold(current_track.get_artist().get_name()), bold(current_track.get_title()))
+        trackinfo = '{0} - {1}'.format(
+            self.bot.bold(current_track.get_artist().get_name()), self.bot.bold(current_track.get_title()))
         return '{0} is now playing {1} | {2}'.format(
-            antiping(irc_username), trackinfo, color(current_track.get_url(), 2))
+            self.bot.antiping(irc_username), trackinfo, self.bot.color(current_track.get_url(), 2))
