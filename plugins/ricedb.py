@@ -18,23 +18,23 @@ def from_user_index(index):
     return index - 1 if index >= 1 else index
 
 
-class Database(object):
-    def __init__(self, storage):
-        self.storage = storage
+@irc3.extend
+def get_user_value(bot, username, key):
+    try:
+        return bot.db.get(username)[key]
+    except (KeyError, TypeError):
+        return None
 
-    def get_user_value(self, username, key):
-        try:
-            return self.storage.get(username)[key]
-        except (KeyError, TypeError):
-            return None
 
-    def set_user_value(self, username, key, value):
-        data = {key: value}
-        self.storage.set(username, **data)
+@irc3.extend
+def set_user_value(bot, username, key, value):
+    data = {key: value}
+    bot.db.set(username, **data)
 
 
 @irc3.plugin
 class Plugin(object):
+
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.storage',
@@ -42,7 +42,6 @@ class Plugin(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.db = Database(self.bot.db)
         try:
             self.lastfm = pylast.LastFMNetwork(api_key=self.bot.config[__name__]['lastfm_api_key'])
         except KeyError:
@@ -61,15 +60,15 @@ class Plugin(object):
                 pass
 
         if args['--add']:
-            values = self.db.get_user_value(mask.nick, mode) or []
+            values = self.bot.get_user_value(mask.nick, mode) or []
             for value in args['<values>']:
                 values.append(value)
-            self.db.set_user_value(mask.nick, mode, values)
+            self.bot.set_user_value(mask.nick, mode, values)
             return '{0} updated.'.format(mode)
 
         if args['--set']:
             values = args['<values>']
-            self.db.set_user_value(mask.nick, mode, values)
+            self.bot.set_user_value(mask.nick, mode, values)
             return '{0} updated.'.format(mode)
 
         if args['--delete']:
@@ -87,25 +86,25 @@ class Plugin(object):
                     pass
             if not deleted:
                 return 'No {0} were removed. Maybe you supplied the wrong indexes?'.format(mode)
-            self.db.set_user_value(mask.nick, mode, values)
+            self.bot.set_user_value(mask.nick, mode, values)
             return 'Removed {0}.'.format(', '.join(deleted))
 
         if args['--replace']:
             index = from_user_index(args['<index>'])
             replacement = args['<value>']
-            values = self.db.get_user_value(mask.nick, mode)
+            values = self.bot.get_user_value(mask.nick, mode)
             if not values:
                 return 'You do not have any {0} to replace.'.format(mode)
             try:
                 old_value = values[index]
                 values[index] = replacement
-                self.db.set_user_value(mask.nick, mode, values)
+                self.bot.set_user_value(mask.nick, mode, values)
                 return 'Replaced {0} with {1}'.format(old_value, replacement)
             except IndexError:
                 return 'Invalid index.'
 
         user = args['<user>'] or mask.nick
-        values = self.db.get_user_value(user, mode)
+        values = self.bot.get_user_value(user, mode)
         if values:
             indexed_values = []
             for index, item in enumerate(values):
@@ -178,7 +177,7 @@ class Plugin(object):
                 return
             for user in data:
                 if data[user]:
-                    self.db.set_user_value(user, db, data[user])
+                    self.bot.set_user_value(user, db, data[user])
         yield 'Database updated.'
 
     @command(name='np', permission='view')
@@ -194,11 +193,11 @@ class Plugin(object):
             except pylast.WSError:
                 return 'No such last.fm user. Are you trying to trick me? :^)'
             else:
-                self.db.set_user_value(mask.nick, 'lastfm', lastfm_username)
+                self.bot.set_user_value(mask.nick, 'lastfm', lastfm_username)
                 return 'last.fm username set.'
 
         irc_username = args['<username>'] or mask.nick
-        lastfm_username = self.db.get_user_value(irc_username, 'lastfm')
+        lastfm_username = self.bot.get_user_value(irc_username, 'lastfm')
         if not lastfm_username:
             if irc_username == mask.nick:
                 return 'You have no last.fm username set. Please set one with .np --set <username>'
