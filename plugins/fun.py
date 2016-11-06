@@ -50,8 +50,28 @@ class Plugin(object):
             if response is not None:
                 response.close()
 
-    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) (?P<event>(PRIVMSG|NOTICE)) '
+    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
                 r'(?P<target>\S+) :\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
-    def intensify(self, mask=None, event=None, target=None, data=None):
-        if event == 'PRIVMSG':
-            self.bot.privmsg(target, self.bot.bold('[{0} INTENSIFIES]'.format(data.strip().upper())))
+    def intensify(self, mask=None, target=None, data=None):
+        self.bot.privmsg(target, self.bot.bold('[{0} INTENSIFIES]'.format(data.strip().upper())))
+
+    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
+                r'(?P<target>\S+) :\s*wew$')
+    def wew(self, mask=None, target=None):
+        self.bot.privmsg(target, self.bot.bold('w e w l a d'))
+
+    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
+                r'(?P<target>\S+) :\s*ayy+$')
+    def ayy(self, mask=None, target=None):
+        self.bot.privmsg(target, 'lmao')
+
+    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
+                r'(?P<target>\S+) :\s*(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)$')
+    def gravity(self, mask=None, target=None):
+        self.bot.privmsg(target,
+                         '{0}: A direction away from the center of gravity of a celestial object.'.format(mask.nick))
+
+    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
+                r'(?P<target>\S+) :\s*same$')
+    def same(self, mask=None, target=None):
+        self.bot.privmsg(target, self.bot.bold('same'))
