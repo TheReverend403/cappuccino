@@ -1,3 +1,5 @@
+from pprint import pprint
+
 import irc3
 import requests
 from lxml import html
@@ -9,6 +11,7 @@ class Plugin(object):
 
     def __init__(self, bot):
         self.bot = bot
+        self.history_buffer = {}
 
     @command(permission='view')
     def insult(self, mask, target, args):
@@ -44,26 +47,48 @@ class Plugin(object):
 
     @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
                 r'(?P<target>\S+) :\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
-    def intensify(self, mask=None, target=None, data=None):
+    def intensify(self, mask, target, data):
         self.bot.privmsg(target, self.bot.bold('[{0} INTENSIFIES]'.format(data.strip().upper())))
 
     @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
                 r'(?P<target>\S+) :\s*wew$')
-    def wew(self, mask=None, target=None):
+    def wew(self, mask, target):
         self.bot.privmsg(target, self.bot.bold('w e w l a d'))
 
     @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
                 r'(?P<target>\S+) :\s*ayy+$')
-    def ayy(self, mask=None, target=None):
+    def ayy(self, mask, target):
         self.bot.privmsg(target, 'lmao')
 
     @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
                 r'(?P<target>\S+) :\s*(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)$')
-    def gravity(self, mask=None, target=None):
+    def gravity(self, mask, target):
         self.bot.privmsg(target,
                          '{0}: A direction away from the center of gravity of a celestial object.'.format(mask.nick))
 
     @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
                 r'(?P<target>\S+) :\s*same$')
-    def same(self, mask=None, target=None):
+    def same(self, mask, target):
         self.bot.privmsg(target, self.bot.bold('same'))
+
+    @irc3.event(irc3.rfc.PRIVMSG)
+    def chat_history(self, target, event, mask, data):
+        if event != 'PRIVMSG' or not target.is_channel or data.startswith('s/'):
+            return
+        if target in self.history_buffer:
+            self.history_buffer.pop(target)
+        self.history_buffer.update({target: {mask.nick: data}})
+        pprint(self.history_buffer)
+
+    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
+                r'(?P<target>\S+) :\s*'
+                r's/((?P<search>\\/|[^/]+))/((?P<replacement>\\/|[^/]*))(?:/(\S+))?')
+    def sed(self, mask, target, search, replacement):
+        self.bot.log.info('Would replace {0} with {1}'.format(search, replacement))
+        if target in self.history_buffer:
+            last_message = self.history_buffer.get(target)
+            if not last_message:
+                return
+            user, message = last_message.popitem()
+            message = message.replace(search, replacement)
+            self.bot.privmsg(target, '<{0}> {1}'.format(user, message))
