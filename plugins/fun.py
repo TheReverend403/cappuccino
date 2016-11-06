@@ -89,7 +89,6 @@ class Plugin(object):
         """
         search = search.replace(r'\/', '/')
         replacement = replacement.replace(r'\/', '/')
-        self.bot.log.info('s|{0}|{1}'.format(search, replacement))
         if target in self.history_buffer:
             last_message = self.history_buffer.get(target)
             if not last_message:
