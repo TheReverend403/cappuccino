@@ -23,6 +23,7 @@ includes =
     plugins.nickserv
     plugins.botui
     plugins.ricedb
+    plugins.fun
 
 # the bot will join #ricedb_channel
 # ${hash} is replaced by the # char
