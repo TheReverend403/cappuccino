@@ -1,3 +1,5 @@
+import re
+
 import irc3
 import requests
 from lxml import html
@@ -79,12 +81,35 @@ class Plugin(object):
 
     @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
                 r'(?P<target>\S+) :\s*'
-                r's/((?P<search>\\/|[^/]+))/((?P<replacement>\\/|[^/]*))(?:/(\S+))?')
-    def sed(self, mask, target, search, replacement):
+                r's/(?P<search>[^/]+)/(?P<replacement>[^/]*)(?:/(?P<flags>\S+))?')
+    def sed(self, mask, target, search, replacement, flags):
+        """
+            Sed-like search and replace.
+            Mostly borrowed from https://github.com/sopel-irc/sopel/blob/master/sopel/modules/find.py
+        """
+        search = search.replace(r'\/', '/')
+        replacement = replacement.replace(r'\/', '/')
+        self.bot.log.info('s|{0}|{1}'.format(search, replacement))
         if target in self.history_buffer:
             last_message = self.history_buffer.get(target)
             if not last_message:
                 return
-            user, message = last_message.popitem()
-            message = message.replace(search, replacement)
+
+            flags = flags or ''
+            # If g flag is given, replace all. Otherwise, replace once.
+            if 'g' in flags:
+                count = -1
+            else:
+                count = 1
+
+            # repl is a lambda function which performs the substitution. i flag turns
+            # off case sensitivity. re.U turns on unicode replacement.
+            if 'i' in flags:
+                regex = re.compile(re.escape(search), re.U | re.I)
+                repl = lambda s: re.sub(regex, replacement, s, count == 1)
+            else:
+                repl = lambda s: s.replace(search, replacement, count)
+
+            (user, message), = last_message.items()
+            message = repl(message)
             self.bot.privmsg(target, '<{0}> {1}'.format(user, message))
