@@ -21,6 +21,8 @@ class Editor(object):
             "Greetings World!"
             >>> print(editor.edit('Hello World!', 's/World!/World\./'))
             "Hello World."
+            >>> print(editor.edit('Hello, World'))
+            "Greetings, World"
         """
 
         self.command = command
