@@ -98,7 +98,7 @@ class Plugin(object):
                 max_len = 256
                 if len(new_message) > max_len:
                     self.bot.privmsg(target, '{0}: Output would be too large. ({1}/{2} characters)'.format(
-                        mask.nick, len(new_message), max_len))
+                        self.bot.antiping(mask.nick), len(new_message), max_len))
                     return
                 emphasised_meant = self.bot.bold('meant')
                 if mask.nick == user:
