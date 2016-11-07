@@ -1,4 +1,5 @@
 from subprocess import Popen, PIPE
+
 import irc3
 
 
@@ -50,12 +51,8 @@ class Editor(object):
             EditorException: Details of sed errors.
         """
         output = self._sed_wrapper(text, command or self.command)
-        if not output:
+        if not output or output == text:
             return text
-        # Prevent spam.
-        max_len = 512
-        if len(output) > max_len:
-            return 'Output would be too large. ({0}/{1} characters)'.format(len(output), max_len)
         return output
 
 
@@ -89,9 +86,24 @@ class Plugin(object):
             (user, message), = last_message.items()
             editor = Editor(sed)
             try:
-                message = editor.edit(message)
+                new_message = editor.edit(message)
             except EditorException as error:
                 self.bot.log.error(error)
                 self.bot.privmsg(target, '{0}: {1}'.format(mask.nick, error))
             else:
-                self.bot.privmsg(target, '<{0}> {1}'.format(user, message))
+                if new_message == message:
+                    self.bot.privmsg(target, '{0}: No modifications were made.'.format(mask.nick))
+                    return
+                # Prevent spam.
+                max_len = 256
+                if len(new_message) > max_len:
+                    self.bot.privmsg(target, '{0}: Output would be too large. ({1}/{2} characters)'.format(
+                        mask.nick, len(new_message), max_len))
+                    return
+                emphasised_meant = self.bot.bold('meant')
+                if mask.nick == user:
+                    self.bot.privmsg(target, '{0} {1} to say: {2}'.format(
+                        self.bot.antiping(mask.nick), emphasised_meant, new_message))
+                else:
+                    self.bot.privmsg(target, '{0} thinks {1} {2} to say: {3}'.format(
+                        self.bot.antiping(mask.nick), user, emphasised_meant, new_message))
