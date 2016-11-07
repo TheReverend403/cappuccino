@@ -52,6 +52,10 @@ class Editor(object):
         output = self._sed_wrapper(text, command or self.command)
         if not output:
             return text
+        # Prevent spam.
+        max_len = 512
+        if len(output) > max_len:
+            return 'Output would be too large. ({0}/{1} characters)'.format(len(output), max_len)
         return output
 
 
