@@ -174,7 +174,7 @@ class Plugin(object):
             data = r.json()
             if 'error_msg' in data:
                 self.bot.log.error(data['error_msg'])
-                return
+                continue
             for user in data:
                 if data[user]:
                     self.bot.set_user_value(user, db, data[user])
