@@ -10,27 +10,23 @@ class Editor(object):
     """
 
     def __init__(self, command):
+        """A wrapper around UNIX sed, for operating on strings with sed expressions.
+
+        Args:
+            command: Any valid sed s/ expression.
+
+        Example:
+            >>> editor = Editor('s/Hello/Greetings/')
+            >>> print(editor.edit('Hello World!'))
+            "Greetings World!"
+            >>> print(editor.edit('Hello World!', 's/World!/World\./'))
+            "Hello World."
+        """
+
         self.command = command
 
-    def sed_wrapper(self, text):
-        """Wrap sed to provide full ed-style line-editing.
-
-        Being the stream editor, open sed in a subprocess and communicate with it
-        using stdio, raising a sensible exception if the command call does not
-        succeed.
-
-        Note this wrapper deals with shell injection attempts:
-        >>> sed_wrapper('Hello, world!', 's/world/friends/; ls')
-        Traceback (most recent call last):
-           ...
-        EditorException: sed: -e expression #1, char 20: extra characters after command
-        >>> sed_wrapper('Hello, world!', '; ls')
-        Traceback (most recent call last):
-           ...
-        EditorException: sed: -e expression #1, char 4: extra characters after command
-        >>>
-        """
-        arguments = ['sed', self.command]
+    def _sed_wrapper(self, text, command=None):
+        arguments = ['sed', command or self.command]
         sed = Popen(arguments, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         sed.stdin.write(bytes(text.strip(), 'UTF-8'))
         sed.stdin.close()
@@ -40,52 +36,25 @@ class Editor(object):
             raise EditorException(sed.stderr.read().decode('UTF-8').strip().replace('sed: -e ', ''))
         return sed.stdout.read().decode('UTF-8').strip()
 
-    def edit(self, text):
-        r"""Edit given text using ed-style line editing, using system's sed command.
+    def edit(self, text, command=None):
+        """Run this Editor's sed command against :text.
 
-        Examples:
-        >>> edit('Hello, world!', 's/world/friends/')
-        u'Hello, friends!'
-        >>> edit('Hello, world!', 'bad_input')
-        Traceback (most recent call last):
-           ...
-        EditorException: sed: can't find label for jump to `ad_input'
-        >>>
-
-        Boring empty cases are handled gracefully:
-        >>> edit('Hello, world!', '')
-        u'Hello, world!'
-        >>> edit('', 's/world/friends/')
-        u''
-        >>> edit('', '')
-        u''
-        >>>
-
-        This is a full ed implementation:
-        >>> edit('Hello hello, world! HELLO!', 's/hello/greetings/gi')
-        u'greetings greetings, world! greetings!'
-        >>> edit('Hello, world!', r's/\(.*\)/You said, "\1"/')
-        u'You said, "Hello, world!"'
-        >>>
-
-        A note on backslash escaping for sed, remember that Python has it's own
-        escaping. For example, "backslash one" must either be \\1 or provided in a
-        raw string, r'\1'.
-
-        >>> edit('Hello, world!', 's/\\(.*\\)/\\U\\1/')
-        u'HELLO, WORLD!'
-        >>> edit('Hello, world!', r's/\(.*\)/\U\1/')
-        u'HELLO, WORLD!'
-        >>>
+        Args:
+            text: Text to run sed command against.
+            command: An optional command to use for this specific operation.
+        Returns:
+            Resulting text after sed operation.
+        Raises:
+            EditorException: Details of sed errors.
         """
-        output = self.sed_wrapper(text)
+        output = self._sed_wrapper(text, command or self.command)
         if not output:
             return text
         return output
 
 
-class EditorException(RuntimeError):
-    """An error occured while processing the editor command."""
+class EditorException(Exception):
+    """An error occurred while processing the editor command."""
 
 
 @irc3.plugin
