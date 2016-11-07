@@ -1,4 +1,5 @@
 import inspect
+import random
 
 import pylast
 import requests
@@ -111,7 +112,9 @@ class Plugin(object):
                 indexed_values.append('[{0}] {1}'.format(to_user_index(index), item))
             return '{0} [{1}]'.format(' | '.join(indexed_values), self.bot.antiping(user))
         else:
-            return '{0} no {1}.'.format(self.bot.antiping(user) + ' has' if user != mask.nick else 'You have', mode)
+            return '{0} no {1}.'.format(
+                self.bot.antiping(user) + ' has' if user != mask.nick else 'You have',
+                'reason to live' if random.random() <= 0.15 else mode)
 
     @command(permission='view')
     def dtop(self, mask, target, args):
