@@ -22,7 +22,7 @@ def bold(bot, text):
 
 
 @irc3.plugin
-class Plugin(object):
+class BotUI(object):
 
     requires = [
         'irc3.plugins.command',

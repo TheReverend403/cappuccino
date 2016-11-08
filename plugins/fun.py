@@ -5,7 +5,7 @@ from irc3.plugins.command import command
 
 
 @irc3.plugin
-class Plugin(object):
+class Fun(object):
 
     def __init__(self, bot):
         self.bot = bot
@@ -42,29 +42,24 @@ class Plugin(object):
             commit_message = doc.xpath('//div[@id="content"]/p/text()')[0].strip()
             yield commit_message
 
-    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
-                r'(?P<target>\S+) :\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
-    def intensify(self, mask, target, data):
+    @irc3.event(r'PRIVMSG (?P<target>#\S+) :\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
+    def intensify(self, target, data):
         self.bot.privmsg(target, self.bot.bold('[{0} INTENSIFIES]'.format(data.strip().upper())))
 
-    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
-                r'(?P<target>\S+) :\s*wew$')
+    @irc3.event(r'PRIVMSG (?P<target>#\S+) :\s*wew$')
     def wew(self, mask, target):
         self.bot.privmsg(target, self.bot.bold('w e w l a d'))
 
-    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
-                r'(?P<target>\S+) :\s*ayy+$')
+    @irc3.event(r'PRIVMSG (?P<target>#\S+) :\s*ayy+$')
     def ayy(self, mask, target):
         self.bot.privmsg(target, 'lmao')
 
-    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
-                r'(?P<target>\S+) :\s*(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)$')
+    @irc3.event(r'PRIVMSG (?P<target>#\S+) :\s*(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)$')
     def gravity(self, mask, target):
         self.bot.privmsg(target,
                          '{0}: A direction away from the center of gravity of a celestial object.'.format(mask.nick))
 
-    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
-                r'(?P<target>\S+) :\s*same$')
+    @irc3.event(r'PRIVMSG (?P<target>#\S+) :\s*same$')
     def same(self, mask, target):
         self.bot.privmsg(target, self.bot.bold('same'))
 

@@ -61,7 +61,7 @@ class EditorException(Exception):
 
 
 @irc3.plugin
-class Plugin(object):
+class Sed(object):
     def __init__(self, bot):
         self.bot = bot
         self.history_buffer = {}
@@ -74,9 +74,7 @@ class Plugin(object):
             self.history_buffer.pop(target)
         self.history_buffer.update({target: {mask.nick: data}})
 
-    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG '
-                r'(?P<target>\S+) :\s*'
-                r'(?P<sed>s/.+)')
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :\s*(?P<sed>s/.+)')
     def sed(self, mask, target, sed):
         if target in self.history_buffer:
             last_message = self.history_buffer.get(target)

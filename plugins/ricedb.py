@@ -34,7 +34,7 @@ def set_user_value(bot, username, key, value):
 
 
 @irc3.plugin
-class Plugin(object):
+class RiceDB(object):
 
     requires = [
         'irc3.plugins.command',
