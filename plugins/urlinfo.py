@@ -13,6 +13,7 @@ URL_FINDER = re.compile(r'(?:http|https)(?:://\S+)', re.IGNORECASE)
 
 # 640k
 MAX_BYTES = 655360
+MAX_TITLE_LENGTH = 150
 USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
 DEFAULT_HEADERS = {
     'User-Agent': USER_AGENT,
@@ -55,6 +56,14 @@ class UrlInfo(object):
     def __init__(self, bot):
         self.bot = bot
 
+    def _find_title(self, content):
+        title = html.fromstring(content).findtext('.//title')
+        if title:
+            title = ''.join(title.strip()[:MAX_TITLE_LENGTH])
+            if len(title) == MAX_TITLE_LENGTH:
+                title += '...'
+        return title or self.bot.color('No Title', 4)
+
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?P<data>.*https?://\S+).*')
     def on_url(self, target, data):
         urls = URL_FINDER.findall(data)
@@ -91,15 +100,12 @@ class UrlInfo(object):
                         continue
                     if not content:
                         continue
-                    title = html.fromstring(content).findtext('.//title')
-                    if title:
-                        title = ''.join(title.strip()[:150])
-                        if len(title) == 150:
-                            title += '...'
-                        self.bot.privmsg(target, '[ {0} ] {1} ({2})'.format(
-                            self.bot.color(hostname, 3),
-                            self.bot.bold(title),
-                            size_fmt(size)))
+                    title = self._find_title(content)
+                    self.bot.privmsg(target, '[ {0} ] {1} ({2})'.format(
+                        self.bot.color(hostname, 3),
+                        self.bot.bold(title),
+                        size_fmt(size)))
+
             except requests.RequestException as err:
                 if err.response and err.response.status_code and err.response.reason:
                     self.bot.privmsg(target, '[ {0} ] - {1} {2}'.format(
