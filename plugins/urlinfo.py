@@ -70,7 +70,7 @@ class UrlInfo(object):
         if len(urls) == 0:
             return
         for url in urls[-3:]:
-            self.bot.log.info('Parsing hostname for {0}'.format(url))
+            self.bot.log.debug('Parsing hostname for {0}'.format(url))
             hostname = urlparse(url).hostname
             try:
                 for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
@@ -81,7 +81,7 @@ class UrlInfo(object):
                 self.bot.log.warn(err)
                 continue
 
-            self.bot.log.info('Fetching page title for {0}'.format(url))
+            self.bot.log.debug('Fetching page title for {0}'.format(url))
             try:
                 with closing(requests.get(url, **REQUEST_PARAMS)) as response:
                     if not response.status_code == requests.codes.ok:
