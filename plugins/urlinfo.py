@@ -17,7 +17,7 @@ MAX_TITLE_LENGTH = 150
 USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
 DEFAULT_HEADERS = {
     'User-Agent': USER_AGENT,
-    'Accept-Language': 'en-GB, en-US, en'
+    'Accept-Language': 'en-GB,en-US,en;q=0.5'
 }
 
 REQUEST_PARAMS = {
