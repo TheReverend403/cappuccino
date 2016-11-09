@@ -25,13 +25,13 @@ class Fun(object):
             %%insult
         """
         try:
-            with closing(requests.get('http://www.insultgenerator.org', headers={'Connection': 'close'})) as response:
+            with closing(requests.get('http://www.insultgenerator.org')) as response:
                 doc = html.fromstring(response.text)
                 insult = ''.join(doc.xpath('//div[@class="wrap"]/text()')).strip()
                 yield insult
-        except requests.exceptions.RequestException as ex:
-            self.bot.log.exception(ex)
-            yield 'Error: {0}'.format(ex.strerror)
+        except requests.exceptions.RequestException as err:
+            self.bot.log.exception(err)
+            yield 'Error: {0}'.format(err.strerror)
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
     def intensify(self, target, data):

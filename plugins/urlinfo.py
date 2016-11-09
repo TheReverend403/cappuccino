@@ -15,16 +15,16 @@ URL_FINDER = re.compile(r'(?:http|https)(?:://\S+)', re.IGNORECASE)
 MAX_BYTES = 655360
 MAX_TITLE_LENGTH = 150
 USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
-DEFAULT_HEADERS = {
+REQUEST_HEADERS = {
     'User-Agent': USER_AGENT,
     'Accept-Language': 'en-GB,en-US,en;q=0.5'
 }
 
-REQUEST_PARAMS = {
+REQUEST_OPTIONS = {
     'timeout': 5,
     'stream': True,
     'allow_redirects': True,
-    'headers': DEFAULT_HEADERS
+    'headers': REQUEST_HEADERS
 }
 
 
@@ -82,7 +82,7 @@ class UrlInfo(object):
 
             self.bot.log.debug('Fetching page title for {0}'.format(url))
             try:
-                with closing(requests.get(url, **REQUEST_PARAMS)) as response:
+                with closing(requests.get(url, **REQUEST_OPTIONS)) as response:
                     if not response.status_code == requests.codes.ok:
                         response.raise_for_status()
                     try:
