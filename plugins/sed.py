@@ -29,7 +29,7 @@ class Editor(object):
         self.command = command
 
     def _sed_wrapper(self, text, command=None):
-        arguments = ['sed', command or self.command]
+        arguments = ['sed', '--posix', command or self.command]
         sed = Popen(arguments, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         sed.stdin.write(bytes(text.strip(), 'UTF-8'))
         sed.stdin.close()
