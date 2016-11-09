@@ -19,6 +19,13 @@ DEFAULT_HEADERS = {
     'Accept-Language': 'en-GB, en-US, en'
 }
 
+REQUEST_PARAMS = {
+    'timeout': 5,
+    'stream': True,
+    'allow_redirects': True,
+    'headers': DEFAULT_HEADERS
+}
+
 
 def size_fmt(num, suffix='B'):
     # https://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
@@ -67,7 +74,7 @@ class UrlInfo(object):
 
             self.bot.log.info('Fetching page title for {0}'.format(url))
             try:
-                with closing(requests.get(url, stream=True, headers=DEFAULT_HEADERS, allow_redirects=True)) as response:
+                with closing(requests.get(url, **REQUEST_PARAMS)) as response:
                     if not response.status_code == requests.codes.ok:
                         response.raise_for_status()
                     try:
@@ -93,6 +100,11 @@ class UrlInfo(object):
                             self.bot.color(hostname, 3),
                             self.bot.bold(title),
                             size_fmt(size)))
-
             except requests.RequestException as err:
-                self.bot.privmsg(target, '[ {0} ] - {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
+                if err.response and err.response.status_code and err.response.reason:
+                    self.bot.privmsg(target, '[ {0} ] - {1} {2}'.format(
+                        self.bot.color(hostname, 4),
+                        self.bot.bold(err.response.status_code),
+                        self.bot.bold(err.response.reason)))
+                else:
+                    self.bot.privmsg(target, '[ {0} ] - {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
