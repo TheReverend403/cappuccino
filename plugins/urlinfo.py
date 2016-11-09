@@ -40,7 +40,7 @@ def size_fmt(num, suffix='B'):
 def _read_stream(response):
     content = BytesIO()
     size = 0
-    chunk_size = 512  # Bytes
+    chunk_size = 32000
     for chunk in response.iter_content(chunk_size):
         content.write(chunk)
         if size > MAX_BYTES:
