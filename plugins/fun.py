@@ -27,7 +27,7 @@ class Fun(object):
         try:
             with closing(requests.get('http://www.insultgenerator.org')) as response:
                 doc = html.fromstring(response.text)
-                insult = ''.join(doc.xpath('//div[@class="wrap"]/text()')).strip()
+                insult = ''.join(doc.xpath('//div[@class="wrap"]//text()')).strip()
                 yield insult
         except requests.exceptions.RequestException as err:
             self.bot.log.exception(err)
