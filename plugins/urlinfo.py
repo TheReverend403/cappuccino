@@ -44,7 +44,6 @@ def _read_stream(response):
     for chunk in response.iter_content(chunk_size):
         content.write(chunk)
         if size > MAX_BYTES:
-            response.close()
             return size, None
         size += len(chunk)
 
