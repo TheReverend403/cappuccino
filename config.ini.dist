@@ -25,6 +25,7 @@ includes =
     plugins.ricedb
     plugins.fun
     plugins.sed
+    plugins.urlinfo
 
 # the bot will join #ricedb_channel
 # ${hash} is replaced by the # char
