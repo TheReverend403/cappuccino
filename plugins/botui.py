@@ -1,7 +1,7 @@
 import platform
 
-from irc3.plugins.command import command
 import irc3
+from irc3.plugins.command import command
 
 
 @irc3.extend
@@ -23,7 +23,6 @@ def bold(bot, text):
 
 @irc3.plugin
 class BotUI(object):
-
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.userlist'

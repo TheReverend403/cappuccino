@@ -1,11 +1,11 @@
 import inspect
-import random
-
-import pylast
-import requests
 import shlex
-from irc3.plugins.command import command
+
 import irc3
+import pylast
+import random
+import requests
+from irc3.plugins.command import command
 
 
 def to_user_index(index):
@@ -35,7 +35,6 @@ def set_user_value(bot, username, key, value):
 
 @irc3.plugin
 class RiceDB(object):
-
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.storage',

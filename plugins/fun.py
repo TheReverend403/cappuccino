@@ -2,8 +2,8 @@ from contextlib import closing
 
 import irc3
 import requests
-from lxml import html
 from irc3.plugins.command import command
+from lxml import html
 
 USER_AGENT = 'ricedb/fun.py (https://github.com/TheReverend403/ricedb)'
 DEFAULT_HEADERS = {
@@ -14,7 +14,6 @@ DEFAULT_HEADERS = {
 
 @irc3.plugin
 class Fun(object):
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -53,4 +52,3 @@ class Fun(object):
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :\s*same$')
     def same(self, target):
         self.bot.privmsg(target, self.bot.bold('same'))
-
