@@ -74,7 +74,7 @@ class Sed(object):
             self.history_buffer.pop(target)
         self.history_buffer.update({target: {mask.nick: data}})
 
-    @irc3.event(r'.*(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :\s*(?P<sed>s/.+)')
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :\s*(?P<sed>s/.+)')
     def sed(self, mask, target, sed):
         if target in self.history_buffer:
             last_message = self.history_buffer.get(target)
