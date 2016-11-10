@@ -93,10 +93,12 @@ class Sed(object):
                     self.bot.privmsg(target, '{0}: No modifications were made.'.format(mask.nick))
                     return
                 # Prevent spam.
-                max_len = 256
+                max_extra_chars = 32
+                max_len = len(message) + max_extra_chars
                 if len(new_message) > max_len:
-                    self.bot.privmsg(target, '{0}: Output would be too large. ({1}/{2} characters)'.format(
-                        self.bot.antiping(mask.nick), len(new_message), max_len))
+                    error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
+                    self.bot.privmsg(target, '{0}: {1}'.format(
+                        self.bot.antiping(mask.nick), self.bot.color(error_msg, 4)))
                     return
                 emphasised_meant = self.bot.bold('meant')
                 if mask.nick == user:
