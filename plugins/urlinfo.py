@@ -91,7 +91,7 @@ class UrlInfo(object):
                 title += '...'
         return title or self.bot.color('No Title', 4)
 
-    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?P<data>.*https?://\S+).*')
+    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
     def on_url(self, target, data):
         urls = URL_FINDER.findall(data)
         if len(urls) == 0:

@@ -37,23 +37,23 @@ class Fun(object):
             self.bot.log.exception(err)
             yield 'Error: {0}'.format(err.strerror)
 
-    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
+    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
     def intensify(self, target, data):
         self.bot.privmsg(target, self.bot.bold('[{0} INTENSIFIES]'.format(data.strip().upper())))
 
-    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :\s*wew$')
+    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*wew$')
     def wew(self, target):
         self.bot.privmsg(target, self.bot.bold('w e w l a d'))
 
-    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :\s*ayy+$')
+    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*ayy+$')
     def ayy(self, target):
         self.bot.privmsg(target, 'lmao')
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)\b')
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)\b')
     def gravity(self, mask, target):
         self.bot.privmsg(target,
                          '{0}: A direction away from the center of gravity of a celestial object.'.format(mask.nick))
 
-    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :\s*same$')
+    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*same$')
     def same(self, target):
         self.bot.privmsg(target, self.bot.bold('same'))
