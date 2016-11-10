@@ -1,4 +1,5 @@
 import irc3
+import os
 
 
 class UserDB(object):
@@ -9,6 +10,9 @@ class UserDB(object):
 
     def __init__(self, bot):
         self.bot = bot
+        if not os.path.exists('data'):
+            os.mkdir('data')
+            self.bot.log.info('Created data/ directory')
 
     @irc3.extend
     def get_user_value(self, username, key):
