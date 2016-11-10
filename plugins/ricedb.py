@@ -21,26 +21,13 @@ def from_user_index(index):
     return index - 1 if index >= 1 else index
 
 
-@irc3.extend
-def get_user_value(bot, username, key):
-    try:
-        return bot.db.get(username)[key]
-    except (KeyError, TypeError):
-        return None
-
-
-@irc3.extend
-def set_user_value(bot, username, key, value):
-    data = {key: value}
-    bot.db.set(username, **data)
-
-
 @irc3.plugin
 class RiceDB(object):
+
     requires = [
         'irc3.plugins.command',
-        'irc3.plugins.storage',
-        'plugins.formatting'
+        'plugins.formatting',
+        'plugins.userdb'
     ]
 
     def __init__(self, bot):
