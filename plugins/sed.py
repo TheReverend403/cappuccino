@@ -126,7 +126,7 @@ class Sed(object):
                     max_extra_chars = 32
                     max_len = len(message) + max_extra_chars
                     error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
-                    if len(new_message) > error_msg and len(new_message) > max_len:
+                    if len(new_message) > len(error_msg) and len(new_message) > max_len:
                         self.bot.privmsg(target, '{0}: {1}'.format(
                             self.bot.antiping(mask.nick), self.bot.color(error_msg, 4)))
                         return
