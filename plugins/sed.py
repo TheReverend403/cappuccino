@@ -67,7 +67,7 @@ class EditorException(Exception):
 
 
 class LastUpdatedOrderedDict(OrderedDict):
-    'Store items in the order the keys were last added'
+    """Store items in the order the keys were last updated."""
 
     def __setitem__(self, key, value, **kwargs):
         if key in self:
