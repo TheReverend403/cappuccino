@@ -6,6 +6,8 @@ import pylast
 import random
 import requests
 from irc3.plugins.command import command
+from pyshorteners import Shortener
+from pyshorteners.exceptions import UnknownShortenerException, ExpandingErrorException, ShorteningErrorException
 
 
 def to_user_index(index):
@@ -46,6 +48,7 @@ class RiceDB(object):
             self.lastfm = pylast.LastFMNetwork(api_key=self.bot.config[__name__]['lastfm_api_key'])
         except KeyError:
             self.bot.log.warn('Missing last.fm API key')
+        self.url_shortener = Shortener('Isgd', timeout=3)
 
     def _generic_db(self, mask, target, args):
         # Get name of command _generic_db is being called from.
@@ -211,7 +214,12 @@ class RiceDB(object):
         if not current_track:
             return '{0} is not listening to anything right now.'.format(self.bot.antiping(irc_username))
 
-        trackinfo = '{0} - {1}'.format(
+        track_info = '{0} - {1}'.format(
             self.bot.bold(current_track.get_artist().get_name()), self.bot.bold(current_track.get_title()))
+        track_url = current_track.get_url()
+        try:
+            track_url = self.url_shortener.short(current_track.get_url())
+        except (UnknownShortenerException, ShorteningErrorException, ExpandingErrorException) as err:
+            self.bot.log.warning('Exception occurred while shortening {0}: {1}', track_url, err)
         return '{0} is now playing {1} | {2}'.format(
-            self.bot.antiping(irc_username), trackinfo, self.bot.color(current_track.get_url(), 2))
+            self.bot.antiping(irc_username), track_info, self.bot.color(track_url, 2))

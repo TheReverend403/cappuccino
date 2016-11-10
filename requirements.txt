@@ -2,6 +2,7 @@ docopt==0.6.2
 irc3==0.9.6
 lxml==3.6.4
 pylast==1.6.0
+pyshorteners==0.6.0
 requests==2.11.1
 six==1.10.0
 venusian==1.0
