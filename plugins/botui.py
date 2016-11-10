@@ -83,7 +83,7 @@ class BotUI(object):
            %%quote <string>...
         """
         cmd = ' '.join(args['<string>'] or [])
-        yield 'Sending {}'.format(cmd)
+        self.bot.log.info('quote> {0}'.format(cmd))
         self.bot.send(cmd)
 
     @command(permission='admin', show_in_help_list=False)
