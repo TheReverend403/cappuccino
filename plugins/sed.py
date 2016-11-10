@@ -104,8 +104,7 @@ class Sed(object):
             return
         message = {mask.nick: data}
         if target in self.history_buffer:
-            if len(self.history_buffer[target]) > 0:
-                self.history_buffer[target].update(message)
+            self.history_buffer[target].update(message)
         else:
             self.history_buffer.update({target: FixedSizeFifo(message)})
 
