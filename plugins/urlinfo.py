@@ -78,7 +78,6 @@ class UrlInfo(object):
             pass
         if not title:
             content_disposition = response.headers.get('Content-Disposition')
-            print(content_disposition)
             if content_disposition:
                 title = re.findall('filename="?([^"]+)"?', content_disposition)
         if title:
