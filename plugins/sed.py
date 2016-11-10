@@ -67,7 +67,10 @@ class EditorException(Exception):
 
 
 class ChatHistoryFifo(OrderedDict):
-    """Store items in the order the keys were last updated."""
+    """
+    Store items in the order the keys were last updated.
+    Evicts the oldest entry when len > max_size.
+    """
     max_size = 20
 
     def __init__(self, *args, **kwds):
