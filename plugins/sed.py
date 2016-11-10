@@ -1,6 +1,9 @@
+import re
 from subprocess import Popen, PIPE
 
 import irc3
+
+SED_START = r's[#/\\.|,].+'
 
 
 class Editor(object):
@@ -73,21 +76,21 @@ class Sed(object):
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def chat_history(self, target, event, mask, data):
-        if event != 'PRIVMSG' or not target.is_channel or data.startswith('s/'):
+        if event != 'PRIVMSG' or not target.is_channel or re.match(r'^' + SED_START, data):
             return
         if target in self.history_buffer:
             self.history_buffer.pop(target)
         self.history_buffer.update({target: {mask.nick: data}})
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :\s*(?P<sed>s/.+)')
-    def sed(self, mask, target, sed):
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :\s*(?P<_sed>{0})'.format(SED_START))
+    def sed(self, mask, target, _sed):
         if target in self.history_buffer:
             last_message = self.history_buffer.get(target)
             if not last_message:
                 return
 
             (user, message), = last_message.items()
-            editor = Editor(sed)
+            editor = Editor(_sed)
             try:
                 new_message = editor.edit(message)
             except EditorException as error:
