@@ -66,9 +66,12 @@ class UrlInfo(object):
         try:
             title = html.fromstring(content).findtext('.//title')
         except ParserError:
+            pass
+        if not title:
             content_disposition = response.headers.get('Content-Disposition')
+            print(content_disposition)
             if content_disposition:
-                title = re.findall('filename="?(\S+)"?', content_disposition)
+                title = re.findall('filename="?([^"]+)"?', content_disposition)
         if title:
             title = ''.join(title[:MAX_TITLE_LENGTH])
             if len(title) == MAX_TITLE_LENGTH:
