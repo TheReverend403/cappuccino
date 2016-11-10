@@ -104,7 +104,7 @@ class Sed(object):
             if len(self.history_buffer[target]) > 0:
                 self.history_buffer[target].update(message)
         else:
-            self.history_buffer.update({target: ChatHistoryFifo(message, max_size=2)})
+            self.history_buffer.update({target: ChatHistoryFifo(message)})
         self.bot.log.debug(self.history_buffer)
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :\s*(?P<_sed>{0})'.format(SED_START))
