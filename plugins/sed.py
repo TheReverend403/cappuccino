@@ -95,8 +95,7 @@ class Sed(object):
     def sed(self, mask, target, _sed):
         if target in self.history_buffer:
             editor = Editor(_sed)
-            for _line in reversed(self.history_buffer[target]):
-                user, message = _line[0], _line[1]
+            for user, message in reversed(self.history_buffer[target]):
                 try:
                     new_message = editor.edit(message)
                 except EditorException as error:
