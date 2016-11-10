@@ -108,7 +108,6 @@ class Sed(object):
                 self.history_buffer[target].update(message)
         else:
             self.history_buffer.update({target: FixedSizeFifo(message)})
-        self.bot.log.debug(self.history_buffer)
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :\s*(?P<_sed>{0})'.format(SED_START))
     def sed(self, mask, target, _sed):
@@ -126,8 +125,8 @@ class Sed(object):
                     # Prevent spam.
                     max_extra_chars = 32
                     max_len = len(message) + max_extra_chars
-                    if len(new_message) > max_len:
-                        error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
+                    error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
+                    if len(new_message) > error_msg and len(new_message) > max_len:
                         self.bot.privmsg(target, '{0}: {1}'.format(
                             self.bot.antiping(mask.nick), self.bot.color(error_msg, 4)))
                         return
