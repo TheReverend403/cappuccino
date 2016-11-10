@@ -25,6 +25,7 @@ includes =
     plugins.nickserv
     plugins.botui
     plugins.ricedb
+    plugins.lastfm
     plugins.fun
     plugins.sed
     plugins.urlinfo
@@ -59,8 +60,8 @@ version = ricedb (https://github.com/TheReverend403/ricedb)
 [plugins.nickserv]
 password =
 
-[plugins.ricedb]
-lastfm_api_key =
+[plugins.lastfm]
+api_key =
 
 [irc3.plugins.command]
 # command plugin configuration
