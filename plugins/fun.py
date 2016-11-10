@@ -1,3 +1,4 @@
+import random
 from contextlib import closing
 
 import irc3
@@ -36,6 +37,23 @@ class Fun(object):
         except requests.exceptions.RequestException as err:
             self.bot.log.exception(err)
             yield 'Error: {0}'.format(err.strerror)
+
+    @command(permission='view')
+    def roll(self, mask, target, args):
+        """Roll some dice.
+
+            %%roll <amount> <die_faces>
+        """
+
+        dice_count, dice_size = int(args['<amount>']), int(args['<die_faces>'])
+        if not dice_count or not dice_size:
+            return 'Please supply numbers only.'
+        if dice_count < 1 or dice_count > 64 or dice_size < 4 or dice_size > 128:
+            return 'Invalid roll specification. Must be a minimum of {0} and a maximum of {1}'.format(
+                self.bot.bold('1 4'), self.bot.bold('64 128'))
+
+        rolls = [random.SystemRandom().randint(1, dice_size) for __ in range(dice_count)]
+        return '[{0}] = {1}'.format(', '.join(str(roll) for roll in rolls), self.bot.bold(sum(rolls)))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
     def intensify(self, target, data):

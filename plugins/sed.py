@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import re
 from subprocess import Popen, PIPE
 
