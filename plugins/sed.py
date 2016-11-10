@@ -66,7 +66,7 @@ class EditorException(Exception):
     """An error occurred while processing the editor command."""
 
 
-class ChatHistoryFifo(OrderedDict):
+class FixedSizeFifo(OrderedDict):
     """
     Store items in the order the keys were last updated.
     Evicts the oldest entry when len > max_size.
@@ -109,7 +109,7 @@ class Sed(object):
             if len(self.history_buffer[target]) > 0:
                 self.history_buffer[target].update(message)
         else:
-            self.history_buffer.update({target: ChatHistoryFifo(message)})
+            self.history_buffer.update({target: FixedSizeFifo(message)})
         self.bot.log.debug(self.history_buffer)
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :\s*(?P<_sed>{0})'.format(SED_START))
