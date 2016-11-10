@@ -87,7 +87,7 @@ class Sed(object):
         if target in self.history_buffer:
             self.history_buffer[target].append(line)
         else:
-            queue = collections.deque(maxlen=50)
+            queue = collections.deque(maxlen=25)
             queue.append(line)
             self.history_buffer.update({target: queue})
 
