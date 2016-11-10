@@ -100,7 +100,9 @@ class Sed(object):
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def chat_history(self, target, event, mask, data):
-        if event != 'PRIVMSG' or not target.is_channel or re.match(r'^' + SED_START, data):
+        # Strip ACTION data and just use the message.
+        data = data.replace('\x01ACTION ', '').replace('\x01', '')
+        if event != 'PRIVMSG' or not target.is_channel or re.match(r'^\s*' + SED_START, data):
             return
         message = {mask.nick: data}
         if target in self.history_buffer:
