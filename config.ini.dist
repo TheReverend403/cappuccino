@@ -26,6 +26,7 @@ includes =
     plugins.botui
     plugins.ricedb
     plugins.lastfm
+    plugins.crypto
     plugins.fun
     plugins.sed
     plugins.urlinfo
