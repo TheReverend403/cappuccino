@@ -119,6 +119,8 @@ class Sed(object):
                 except EditorException as error:
                     self.bot.log.error(error)
                     self.bot.privmsg(target, '{0}: {1}'.format(self.bot.antiping(mask.nick), error))
+                    # Don't even check the rest if the sed command is invalid.
+                    return
                 else:
                     if new_message == message:
                         continue
