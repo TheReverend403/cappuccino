@@ -49,7 +49,7 @@ class Fun(object):
     def ayy(self, target):
         self.bot.privmsg(target, 'lmao')
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup).*')
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)\b')
     def gravity(self, mask, target):
         self.bot.privmsg(target,
                          '{0}: A direction away from the center of gravity of a celestial object.'.format(mask.nick))
