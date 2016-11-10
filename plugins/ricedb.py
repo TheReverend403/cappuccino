@@ -40,6 +40,7 @@ class RiceDB(object):
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.storage',
+        'plugins.formatting'
     ]
 
     def __init__(self, bot):

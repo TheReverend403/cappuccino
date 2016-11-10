@@ -67,6 +67,11 @@ def _read_stream(response):
 
 @irc3.plugin
 class UrlInfo(object):
+
+    requires = [
+        'plugins.formatting'
+    ]
+
     def __init__(self, bot):
         self.bot = bot
 

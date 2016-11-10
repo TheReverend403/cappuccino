@@ -14,6 +14,11 @@ DEFAULT_HEADERS = {
 
 @irc3.plugin
 class Fun(object):
+
+    requires = [
+        'plugins.formatting'
+    ]
+
     def __init__(self, bot):
         self.bot = bot
 

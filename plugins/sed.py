@@ -62,6 +62,11 @@ class EditorException(Exception):
 
 @irc3.plugin
 class Sed(object):
+
+    requires = [
+        'plugins.formatting'
+    ]
+
     def __init__(self, bot):
         self.bot = bot
         self.history_buffer = {}
