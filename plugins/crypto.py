@@ -27,5 +27,3 @@ class Crypto(object):
                 hash_object = hashlib.new(algo)
                 hash_object.update(text)
                 return '{0}: {1}'.format(self.bot.antiping(mask.nick), hash_object.hexdigest())
-
-
