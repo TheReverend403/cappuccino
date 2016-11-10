@@ -8,11 +8,12 @@ import re
 import requests
 from io import BytesIO
 from lxml import html
+from lxml.etree import ParserError
 
 URL_FINDER = re.compile(r'(?:http|https)(?:://\S+)', re.IGNORECASE)
 
-# 640k
-MAX_BYTES = 655360
+# 1MB * N
+MAX_BYTES = 1048576 * 5
 MAX_TITLE_LENGTH = 150
 USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
 
@@ -28,6 +29,8 @@ REQUEST_OPTIONS = {
     'headers': REQUEST_HEADERS
 }
 
+VALID_CONTENT_TYPES = ['text', 'video', 'image', 'application']
+
 
 def size_fmt(num, suffix='B'):
     # https://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
@@ -41,12 +44,14 @@ def size_fmt(num, suffix='B'):
 def _read_stream(response):
     content = BytesIO()
     size = 0
-    chunk_size = 32000
+    chunk_size = int(MAX_BYTES / 32)
     for chunk in response.iter_content(chunk_size):
+        if not chunk:  # filter out keep-alive new chunks
+            continue
         content.write(chunk)
+        size += len(chunk)
         if size > MAX_BYTES:
             return size, None
-        size += len(chunk)
 
     return size, content.getvalue().decode('UTF-8', errors='ignore')
 
@@ -56,10 +61,16 @@ class UrlInfo(object):
     def __init__(self, bot):
         self.bot = bot
 
-    def _find_title(self, content):
-        title = html.fromstring(content).findtext('.//title')
+    def _find_title(self, response, content):
+        title = None
+        try:
+            title = html.fromstring(content).findtext('.//title')
+        except ParserError:
+            content_disposition = response.headers.get('Content-Disposition')
+            if content_disposition:
+                title = re.findall('filename="?(\S+)"?', content_disposition)
         if title:
-            title = ''.join(title.strip()[:MAX_TITLE_LENGTH])
+            title = ''.join(title[:MAX_TITLE_LENGTH])
             if len(title) == MAX_TITLE_LENGTH:
                 title += '...'
         return title or self.bot.color('No Title', 4)
@@ -71,7 +82,7 @@ class UrlInfo(object):
             return
         for url in urls[-3:]:
             self.bot.log.debug('Parsing hostname for {0}'.format(url))
-            hostname = urlparse(url).hostname
+            hostname = urlparse(url).hostname.replace('www.', '')
             try:
                 for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
                     ip = ipaddress.ip_address(sockaddr[0])
@@ -90,27 +101,27 @@ class UrlInfo(object):
                         content_type = response.headers.get('Content-Type').split(';')[0]
                     except IndexError:
                         return
-                    if content_type not in ['text/html']:
+                    if content_type.split('/')[0] not in VALID_CONTENT_TYPES:
                         return
                     size, content = _read_stream(response)
                     if size > MAX_BYTES:
-                        self.bot.privmsg(target, '[ {0} ] - {1}'.format(
-                            self.bot.color(hostname, 4), self.bot.bold('Response too large ({0} > {1})'.format(
-                                size_fmt(size), size_fmt(MAX_BYTES)))))
+                        self.bot.privmsg(target, '[ {0} ] {1}'.format(
+                            self.bot.color(hostname, 4),
+                            self.bot.bold('Response too large. Maximum size is {0}.'.format(size_fmt(MAX_BYTES)))))
                         continue
                     if not content:
                         continue
-                    title = self._find_title(content)
-                    self.bot.privmsg(target, '[ {0} ] {1} ({2})'.format(
+                    title = self._find_title(response, content)
+                    self.bot.privmsg(target, '[ {0} ] {1} ({2}) ({3})'.format(
                         self.bot.color(hostname, 3),
                         self.bot.bold(title),
-                        size_fmt(size)))
-
+                        size_fmt(size),
+                        content_type))
             except requests.RequestException as err:
-                if err.response and err.response.status_code and err.response.reason:
-                    self.bot.privmsg(target, '[ {0} ] - {1} {2}'.format(
+                if err.response is not None and err.response.reason is not None:
+                    self.bot.privmsg(target, '[ {0} ] {1} {2}'.format(
                         self.bot.color(hostname, 4),
                         self.bot.bold(err.response.status_code),
                         self.bot.bold(err.response.reason)))
                 else:
-                    self.bot.privmsg(target, '[ {0} ] - {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
+                    self.bot.privmsg(target, '[ {0} ] {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
