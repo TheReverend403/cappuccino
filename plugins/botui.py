@@ -6,6 +6,7 @@ from irc3.plugins.command import command
 
 @irc3.plugin
 class BotUI(object):
+
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.userlist'

@@ -7,6 +7,7 @@ from pyshorteners.exceptions import UnknownShortenerException, ExpandingErrorExc
 
 @irc3.plugin
 class LastFM(object):
+
     requires = [
         'irc3.plugins.command',
         'plugins.formatting',
