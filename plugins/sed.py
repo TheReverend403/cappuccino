@@ -1,3 +1,4 @@
+import collections
 import re
 from subprocess import Popen, PIPE
 
@@ -65,27 +66,6 @@ class EditorException(Exception):
     """An error occurred while processing the editor command."""
 
 
-class FixedSizeFifo(OrderedDict):
-    """
-    Store items in the order the keys were last updated.
-    Evicts the oldest entry when len > max_size.
-    """
-    max_size = 20
-
-    def __init__(self, *args, **kwds):
-        if 'max_size' in kwds:
-            self.max_size = kwds['max_size']
-            del kwds['max_size']
-        super().__init__(*args, **kwds)
-
-    def __setitem__(self, key, value, **kwargs):
-        if key in self:
-            del self[key]
-        OrderedDict.__setitem__(self, key, value, **kwargs)
-        if self.__len__() > self.max_size:
-            OrderedDict.popitem(self, last=False)
-
-
 @irc3.plugin
 class Sed(object):
 
@@ -103,17 +83,21 @@ class Sed(object):
         data = data.replace('\x01ACTION ', '').replace('\x01', '')
         if event != 'PRIVMSG' or not target.is_channel or SED_CHECKER.match(data):
             return
-        message = {mask.nick: data}
+        line = (mask.nick, data)
         if target in self.history_buffer:
-            self.history_buffer[target].update(message)
+            self.history_buffer[target].append(line)
         else:
-            self.history_buffer.update({target: FixedSizeFifo(message)})
+            queue = collections.deque(maxlen=50)
+            queue.append(line)
+            self.history_buffer.update({target: queue})
+        print(self.history_buffer)
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?P<_sed>{0})'.format(SED_PRIVMSG))
     def sed(self, mask, target, _sed):
         if target in self.history_buffer:
             editor = Editor(_sed)
-            for user, message in sorted(self.history_buffer[target].items(), reverse=True):
+            for _line in reversed(self.history_buffer[target]):
+                user, message = _line[0], _line[1]
                 try:
                     new_message = editor.edit(message)
                 except EditorException as error:
