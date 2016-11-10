@@ -95,10 +95,10 @@ class Sed(object):
                 new_message = editor.edit(message)
             except EditorException as error:
                 self.bot.log.error(error)
-                self.bot.privmsg(target, '{0}: {1}'.format(mask.nick, error))
+                self.bot.privmsg(target, '{0}: {1}'.format(self.bot.antiping(mask.nick), error))
             else:
                 if new_message == message:
-                    self.bot.privmsg(target, '{0}: No modifications were made.'.format(mask.nick))
+                    self.bot.privmsg(target, '{0}: No modifications were made.'.format(self.bot.antiping(mask.nick)))
                     return
                 # Prevent spam.
                 max_extra_chars = 32
