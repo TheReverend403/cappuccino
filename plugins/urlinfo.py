@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 import irc3
 import re
 import requests
+import time
 from io import BytesIO
 from lxml import html
 from lxml.etree import ParserError
@@ -16,6 +17,7 @@ URL_FINDER = re.compile(r'(?:http|https)(?:://\S+)', re.IGNORECASE)
 MAX_BYTES = 1048576 * 5
 MAX_TITLE_LENGTH = 150
 USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
+REQUEST_TIMEOUT = 5
 
 REQUEST_HEADERS = {
     'User-Agent': USER_AGENT,
@@ -23,13 +25,17 @@ REQUEST_HEADERS = {
 }
 
 REQUEST_OPTIONS = {
-    'timeout': 5,
+    'timeout': REQUEST_TIMEOUT,
     'stream': True,
     'allow_redirects': True,
     'headers': REQUEST_HEADERS
 }
 
 VALID_CONTENT_TYPES = ['text', 'video', 'image', 'application']
+
+
+class RequestTimeout(requests.RequestException):
+    pass
 
 
 def size_fmt(num, suffix='B'):
@@ -42,10 +48,13 @@ def size_fmt(num, suffix='B'):
 
 
 def _read_stream(response):
+    start_time = time.time()
     content = BytesIO()
     size = 0
     chunk_size = int(MAX_BYTES / 32)
     for chunk in response.iter_content(chunk_size):
+        if time.time() - start_time >= 5:
+            raise RequestTimeout('Request timed out.')
         if not chunk:  # filter out keep-alive new chunks
             continue
         content.write(chunk)
