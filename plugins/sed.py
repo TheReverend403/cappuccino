@@ -4,7 +4,8 @@ from subprocess import Popen, PIPE
 import irc3
 from collections import OrderedDict
 
-SED_START = r's[#/\\.|,].+'
+SED_PRIVMSG = r'\s*s[^A-Za-z0-9\s].+'
+SED_CHECKER = re.compile('^' + SED_PRIVMSG)
 
 
 class Editor(object):
@@ -100,7 +101,7 @@ class Sed(object):
     def chat_history(self, target, event, mask, data):
         # Strip ACTION data and just use the message.
         data = data.replace('\x01ACTION ', '').replace('\x01', '')
-        if event != 'PRIVMSG' or not target.is_channel or re.match(r'^\s*' + SED_START, data):
+        if event != 'PRIVMSG' or not target.is_channel or SED_CHECKER.match(data):
             return
         message = {mask.nick: data}
         if target in self.history_buffer:
@@ -108,7 +109,7 @@ class Sed(object):
         else:
             self.history_buffer.update({target: FixedSizeFifo(message)})
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :\s*(?P<_sed>{0})'.format(SED_START))
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?P<_sed>{0})'.format(SED_PRIVMSG))
     def sed(self, mask, target, _sed):
         if target in self.history_buffer:
             editor = Editor(_sed)
