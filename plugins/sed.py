@@ -66,13 +66,22 @@ class EditorException(Exception):
     """An error occurred while processing the editor command."""
 
 
-class LastUpdatedOrderedDict(OrderedDict):
+class ChatHistoryFifo(OrderedDict):
     """Store items in the order the keys were last updated."""
+    max_size = 20
+
+    def __init__(self, *args, **kwds):
+        if 'max_size' in kwds:
+            self.max_size = kwds['max_size']
+            del kwds['max_size']
+        super().__init__(*args, **kwds)
 
     def __setitem__(self, key, value, **kwargs):
         if key in self:
             del self[key]
         OrderedDict.__setitem__(self, key, value, **kwargs)
+        if self.__len__() > self.max_size:
+            OrderedDict.popitem(self, last=False)
 
 
 @irc3.plugin
@@ -90,14 +99,12 @@ class Sed(object):
     def chat_history(self, target, event, mask, data):
         if event != 'PRIVMSG' or not target.is_channel or re.match(r'^' + SED_START, data):
             return
-        message = LastUpdatedOrderedDict()
-        message[mask.nick] = data
+        message = {mask.nick: data}
         if target in self.history_buffer:
-            self.history_buffer[target].update(message)
-            if len(self.history_buffer[target]) > 20:
-                self.history_buffer.get(target).popitem(last=False)
+            if len(self.history_buffer[target]) > 0:
+                self.history_buffer[target].update(message)
         else:
-            self.history_buffer.update({target: message})
+            self.history_buffer.update({target: ChatHistoryFifo(message, max_size=2)})
         self.bot.log.debug(self.history_buffer)
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :\s*(?P<_sed>{0})'.format(SED_START))
