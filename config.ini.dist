@@ -1,6 +1,7 @@
 [bot]
 nick = ricedb
 username = ricedb
+realname = ricedb
 # Server password, not nickserv
 password =
 
@@ -20,6 +21,7 @@ ssl = true
 # nickserv_password = yourpassword
 
 includes =
+    irc3.plugins.ctcp
     plugins.nickserv
     plugins.botui
     plugins.ricedb
@@ -50,6 +52,9 @@ autojoins =
 # flood_rate_delay = 5
 
 storage = json://data.json
+
+[ctcp]
+version = ricedb (https://github.com/TheReverend403/ricedb)
 
 [plugins.nickserv]
 password =
