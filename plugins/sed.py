@@ -90,7 +90,6 @@ class Sed(object):
             queue = collections.deque(maxlen=50)
             queue.append(line)
             self.history_buffer.update({target: queue})
-        print(self.history_buffer)
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?P<_sed>{0})'.format(SED_PRIVMSG))
     def sed(self, mask, target, _sed):
