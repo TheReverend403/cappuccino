@@ -29,7 +29,7 @@ includes =
     plugins.sed
     plugins.urlinfo
 
-# the bot will join #ricedb_channel
+# the bot will join #null
 # ${hash} is replaced by the # char
 autojoins =
     ${hash}null
