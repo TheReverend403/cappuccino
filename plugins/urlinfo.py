@@ -1,15 +1,16 @@
 import ipaddress
 import socket
+import time
 from contextlib import closing
 from urllib.parse import urlparse
 
 import irc3
 import re
 import requests
-import time
 from io import BytesIO
 from lxml import html
 from lxml.etree import ParserError
+from requests import Session
 
 URL_FINDER = re.compile(r'(?:http|https)(?:://\S+)', re.IGNORECASE)
 
@@ -18,6 +19,7 @@ MAX_BYTES = 1048576 * 5
 MAX_TITLE_LENGTH = 150
 USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
 REQUEST_TIMEOUT = 5
+HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.I)
 
 REQUEST_HEADERS = {
     'User-Agent': USER_AGENT,
@@ -67,13 +69,14 @@ def _read_stream(response):
 
 @irc3.plugin
 class UrlInfo(object):
-
     requires = [
         'plugins.formatting'
     ]
 
     def __init__(self, bot):
         self.bot = bot
+        self.session = Session()
+        self.session.headers.update(REQUEST_HEADERS)
 
     def _find_title(self, response, content):
         title = None
@@ -96,9 +99,10 @@ class UrlInfo(object):
         urls = URL_FINDER.findall(data)
         if len(urls) == 0:
             return
+
         for url in urls[-3:]:
             self.bot.log.debug('Parsing hostname for {0}'.format(url))
-            hostname = urlparse(url).hostname.replace('www.', '')
+            hostname = HOSTNAME_CLEANUP_REGEX.sub('', urlparse(url).hostname)
             try:
                 for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
                     ip = ipaddress.ip_address(sockaddr[0])
@@ -110,7 +114,7 @@ class UrlInfo(object):
 
             self.bot.log.debug('Fetching page title for {0}'.format(url))
             try:
-                with closing(requests.get(url, **REQUEST_OPTIONS)) as response:
+                with closing(self.session.get(url, **REQUEST_OPTIONS)) as response:
                     if not response.status_code == requests.codes.ok:
                         response.raise_for_status()
                     try:
@@ -133,6 +137,7 @@ class UrlInfo(object):
                         self.bot.bold(title),
                         size_fmt(size),
                         content_type))
+
             except requests.RequestException as err:
                 if err.response is not None and err.response.reason is not None:
                     self.bot.privmsg(target, '[ {0} ] {1} {2}'.format(
