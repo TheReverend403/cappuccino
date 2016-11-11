@@ -1,3 +1,4 @@
+import cgi
 import ipaddress
 import socket
 import time
@@ -91,7 +92,7 @@ class UrlInfo(object):
         if not title:
             content_disposition = response.headers.get('Content-Disposition')
             if content_disposition:
-                title = re.findall('filename="?([^"]+)"?', content_disposition)
+                title = cgi.parse_header(content_disposition)[1]['filename']
         if title:
             title = ''.join(title[:MAX_TITLE_LENGTH])
             if len(title) == MAX_TITLE_LENGTH:
@@ -110,7 +111,7 @@ class UrlInfo(object):
             try:
                 for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
                     ip = ipaddress.ip_address(sockaddr[0])
-                    if not ip.is_global:
+                    if ip.is_private or ip.is_reserved or ip.is_link_local or ip.is_loopback:
                         continue
             except (socket.gaierror, ValueError) as err:
                 self.bot.log.warn(err)
