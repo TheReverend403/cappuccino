@@ -67,7 +67,7 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
     response_body_exception = ResponseBodyTooLarge(
         'Response body is too large. Maximum size is {0}.'.format(size_fmt(max_bytes)))
 
-    if content_size_header > max_bytes or downloaded_size > max_bytes:
+    if content_size_header > max_bytes:
         raise response_body_exception
 
     for chunk in response.iter_content(chunk_size):
