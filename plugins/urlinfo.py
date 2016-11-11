@@ -85,6 +85,7 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
 
 @irc3.plugin
 class UrlInfo(object):
+
     requires = [
         'plugins.formatting'
     ]
