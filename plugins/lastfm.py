@@ -55,7 +55,7 @@ class LastFM(object):
                                         self.bot.bold(current_track.get_title()))
         track_url = current_track.get_url()
         try:
-            track_url = self.url_shortener.short(current_track.get_url())
+            track_url = self.url_shortener.short(track_url)
         except (UnknownShortenerException, ShorteningErrorException, ExpandingErrorException) as err:
             self.bot.log.warning('Exception occurred while shortening {0}: {1}', track_url, err)
         return '{0} is now playing {1} | {2}'.format(
