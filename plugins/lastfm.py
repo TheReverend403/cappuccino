@@ -20,6 +20,7 @@ class LastFM(object):
             self.lastfm = pylast.LastFMNetwork(api_key=self.bot.config[__name__]['api_key'])
         except KeyError:
             self.bot.log.warn('Missing last.fm API key')
+            return
         self.url_shortener = Shortener('Isgd', timeout=3)
 
     @command(name='np', permission='view')
