@@ -118,7 +118,8 @@ class UrlInfo(object):
         if len(urls) == 0:
             return
 
-        for url in urls[-3:]:
+        # Only handle 1 URL until I get the hang of Python async.
+        for url in urls[-1:]:
             self.bot.log.debug('Fetching page title for {0}'.format(url))
             hostname = urlparse(url).hostname
             try:
@@ -139,17 +140,17 @@ class UrlInfo(object):
                     try:
                         content_type = response.headers.get('Content-Type').split(';')[0]
                     except IndexError:
-                        return
+                        continue
 
                     content_type_category = content_type.split('/')[0]
                     if content_type_category not in CONTENT_TYPES_AND_LIMITS:
-                        return
+                        continue
 
                     try:
                         size, content = _read_stream(response, CONTENT_TYPES_AND_LIMITS[content_type_category])
                     except ResponseBodyTooLarge as err:
                         self.bot.privmsg(target, '[ {0} ] {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
-                        return
+                        continue
 
                     if not content:
                         continue
@@ -167,5 +168,5 @@ class UrlInfo(object):
                         self.bot.color(hostname, 4),
                         self.bot.bold(err.response.status_code),
                         self.bot.bold(err.response.reason)))
-                    return
+                    continue
                 self.bot.privmsg(target, '[ {0} ] {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
