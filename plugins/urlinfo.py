@@ -106,7 +106,7 @@ class UrlInfo(object):
             try:
                 for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
                     ip = ipaddress.ip_address(sockaddr[0])
-                    if ip.is_private or ip.is_reserved or ip.is_link_local or ip.is_loopback:
+                    if not ip.is_global:
                         continue
             except (socket.gaierror, ValueError) as err:
                 self.bot.log.warn(err)
