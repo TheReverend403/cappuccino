@@ -15,8 +15,7 @@ from requests import Session
 
 URL_FINDER = re.compile(r'(?:http|https)(?:://\S+)', re.IGNORECASE)
 
-# 1MB * N
-MAX_BYTES = 1048576 * 5
+DEFAULT_MAX_BYTES = 1048576
 MAX_TITLE_LENGTH = 150
 USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
 REQUEST_TIMEOUT = 5
@@ -34,7 +33,12 @@ REQUEST_OPTIONS = {
     'headers': REQUEST_HEADERS
 }
 
-VALID_CONTENT_TYPES = ['text', 'video', 'image', 'application']
+CONTENT_TYPES_AND_LIMITS = {
+    'text': DEFAULT_MAX_BYTES,
+    'video': DEFAULT_MAX_BYTES * 10,
+    'image': DEFAULT_MAX_BYTES * 5,
+    'application': DEFAULT_MAX_BYTES * 10
+}
 
 
 class ResponseBodyTooLarge(requests.RequestException):
@@ -54,22 +58,29 @@ def size_fmt(num, suffix='B'):
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
-def _read_stream(response):
+def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
     start_time = time.time()
     content = BytesIO()
-    size = 0
-    chunk_size = int(MAX_BYTES / 64)
+    content_size_header = int(response.headers.get('Content-Length', 0))
+    downloaded_size = 0
+    chunk_size = int(max_bytes / 64)
+    response_body_exception = ResponseBodyTooLarge(
+        'Response body is too large. Maximum size is {0}.'.format(size_fmt(max_bytes)))
+
+    if content_size_header > max_bytes or downloaded_size > max_bytes:
+        raise response_body_exception
+
     for chunk in response.iter_content(chunk_size):
         if time.time() - start_time >= 5:
             raise RequestTimeout('Request timed out.')
         if not chunk:  # filter out keep-alive new chunks
             continue
         content.write(chunk)
-        size += len(chunk)
-        if size > MAX_BYTES:
-            raise ResponseBodyTooLarge('Response body is too large. Maximum size is {0}.'.format(size_fmt(MAX_BYTES)))
+        downloaded_size += len(chunk)
+        if downloaded_size > max_bytes:
+            raise response_body_exception
 
-    return size, content.getvalue().decode('UTF-8', errors='ignore')
+    return downloaded_size, content.getvalue().decode('UTF-8', errors='ignore')
 
 
 @irc3.plugin
@@ -129,11 +140,12 @@ class UrlInfo(object):
                     except IndexError:
                         return
 
-                    if content_type.split('/')[0] not in VALID_CONTENT_TYPES:
+                    content_type_category = content_type.split('/')[0]
+                    if content_type_category not in CONTENT_TYPES_AND_LIMITS:
                         return
 
                     try:
-                        size, content = _read_stream(response)
+                        size, content = _read_stream(response, CONTENT_TYPES_AND_LIMITS[content_type_category])
                     except ResponseBodyTooLarge as err:
                         self.bot.privmsg(target, '[ {0} ] {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
                         return
