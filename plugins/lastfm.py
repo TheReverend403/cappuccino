@@ -51,12 +51,14 @@ class LastFM(object):
         if not current_track:
             return '{0} is not listening to anything right now.'.format(self.bot.antiping(irc_username))
 
-        track_info = '{0} - {1}'.format(self.bot.bold(current_track.get_artist().get_name()),
-                                        self.bot.bold(current_track.get_title()))
         track_url = current_track.get_url()
         try:
             track_url = self.url_shortener.short(track_url)
         except (UnknownShortenerException, ShorteningErrorException, ExpandingErrorException) as err:
-            self.bot.log.warning('Exception occurred while shortening {0}: {1}', track_url, err)
-        return '{0} is now playing {1} | {2}'.format(
-            self.bot.antiping(irc_username), track_info, self.bot.color(track_url, 2))
+            self.bot.log.exception('Exception occurred while shortening {0}: {1}'.format(track_url, err))
+
+        track_info = '{0} - {1} | {2}'.format(
+            self.bot.bold(current_track.get_artist().get_name()),
+            self.bot.bold(current_track.get_title()),
+            self.bot.color(track_url, 2))
+        return '{0} is now playing {1}'.format(self.bot.antiping(irc_username), track_info)
