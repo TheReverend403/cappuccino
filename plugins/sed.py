@@ -126,3 +126,4 @@ class Sed(object):
                 return
             self.bot.privmsg(target, '{0} thinks {1} {2} to say: {3}'.format(
                 self.bot.antiping(mask.nick), user, emphasised_meant, new_message))
+            return
