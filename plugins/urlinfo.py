@@ -92,7 +92,8 @@ class UrlInfo(object):
         if not title:
             content_disposition = response.headers.get('Content-Disposition')
             if content_disposition:
-                title = cgi.parse_header(content_disposition)[1]['filename']
+                _, params = cgi.parse_header(content_disposition)
+                title = params['filename']
         if title:
             title = ''.join(title[:MAX_TITLE_LENGTH])
             if len(title) == MAX_TITLE_LENGTH:
