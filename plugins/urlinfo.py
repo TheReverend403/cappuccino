@@ -36,6 +36,10 @@ REQUEST_OPTIONS = {
 VALID_CONTENT_TYPES = ['text', 'video', 'image', 'application']
 
 
+class ResponseBodyTooLarge(requests.RequestException):
+    pass
+
+
 class RequestTimeout(requests.RequestException):
     pass
 
@@ -62,7 +66,7 @@ def _read_stream(response):
         content.write(chunk)
         size += len(chunk)
         if size > MAX_BYTES:
-            return size, None
+            raise ResponseBodyTooLarge('Response body is too large. Maximum size is {0}.'.format(size_fmt(MAX_BYTES)))
 
     return size, content.getvalue().decode('UTF-8', errors='ignore')
 
@@ -126,13 +130,11 @@ class UrlInfo(object):
                     if content_type.split('/')[0] not in VALID_CONTENT_TYPES:
                         return
 
-                    size, content = _read_stream(response)
-                    if size < MAX_BYTES:
-                        continue
-
-                    self.bot.privmsg(target, '[ {0} ] {1}'.format(
-                        self.bot.color(hostname, 4),
-                        self.bot.bold('Response too large. Maximum size is {0}.'.format(size_fmt(MAX_BYTES)))))
+                    try:
+                        size, content = _read_stream(response)
+                    except ResponseBodyTooLarge as err:
+                        self.bot.privmsg(target, '[ {0} ] {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
+                        return
 
                     if not content:
                         continue
