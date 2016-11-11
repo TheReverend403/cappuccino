@@ -103,22 +103,21 @@ class Sed(object):
                     self.bot.privmsg(target, '{0}: {1}'.format(self.bot.antiping(mask.nick), error))
                     # Don't even check the rest if the sed command is invalid.
                     return
+
+                if new_message == message:
+                    continue
+                # Prevent spam.
+                max_extra_chars = 32
+                max_len = len(message) + max_extra_chars
+                error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
+                if len(new_message) > len(error_msg) and len(new_message) > max_len:
+                    self.bot.privmsg(target, '{0}: {1}'.format(
+                        self.bot.antiping(mask.nick), self.bot.color(error_msg, 4)))
                 else:
-                    if new_message == message:
-                        continue
-                    # Prevent spam.
-                    max_extra_chars = 32
-                    max_len = len(message) + max_extra_chars
-                    error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
-                    if len(new_message) > len(error_msg) and len(new_message) > max_len:
-                        self.bot.privmsg(target, '{0}: {1}'.format(
-                            self.bot.antiping(mask.nick), self.bot.color(error_msg, 4)))
-                        return
                     emphasised_meant = self.bot.bold('meant')
                     if mask.nick == user:
                         self.bot.privmsg(target, '{0} {1} to say: {2}'.format(
                             self.bot.antiping(mask.nick), emphasised_meant, new_message))
-                    else:
-                        self.bot.privmsg(target, '{0} thinks {1} {2} to say: {3}'.format(
-                            self.bot.antiping(mask.nick), user, emphasised_meant, new_message))
-                    return
+                        return
+                    self.bot.privmsg(target, '{0} thinks {1} {2} to say: {3}'.format(
+                        self.bot.antiping(mask.nick), user, emphasised_meant, new_message))
