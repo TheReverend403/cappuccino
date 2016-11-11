@@ -101,8 +101,8 @@ class UrlInfo(object):
             return
 
         for url in urls[-3:]:
-            self.bot.log.debug('Parsing hostname for {0}'.format(url))
-            hostname = HOSTNAME_CLEANUP_REGEX.sub('', urlparse(url).hostname)
+            self.bot.log.debug('Fetching page title for {0}'.format(url))
+            hostname = urlparse(url).hostname
             try:
                 for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
                     ip = ipaddress.ip_address(sockaddr[0])
@@ -112,25 +112,31 @@ class UrlInfo(object):
                 self.bot.log.warn(err)
                 continue
 
-            self.bot.log.debug('Fetching page title for {0}'.format(url))
+            hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
             try:
                 with closing(self.session.get(url, **REQUEST_OPTIONS)) as response:
                     if not response.status_code == requests.codes.ok:
                         response.raise_for_status()
+
                     try:
                         content_type = response.headers.get('Content-Type').split(';')[0]
                     except IndexError:
                         return
+
                     if content_type.split('/')[0] not in VALID_CONTENT_TYPES:
                         return
+
                     size, content = _read_stream(response)
-                    if size > MAX_BYTES:
-                        self.bot.privmsg(target, '[ {0} ] {1}'.format(
-                            self.bot.color(hostname, 4),
-                            self.bot.bold('Response too large. Maximum size is {0}.'.format(size_fmt(MAX_BYTES)))))
+                    if size < MAX_BYTES:
                         continue
+
+                    self.bot.privmsg(target, '[ {0} ] {1}'.format(
+                        self.bot.color(hostname, 4),
+                        self.bot.bold('Response too large. Maximum size is {0}.'.format(size_fmt(MAX_BYTES)))))
+
                     if not content:
                         continue
+
                     title = self._find_title(response, content)
                     self.bot.privmsg(target, '[ {0} ] {1} ({2}) ({3})'.format(
                         self.bot.color(hostname, 3),
@@ -144,5 +150,5 @@ class UrlInfo(object):
                         self.bot.color(hostname, 4),
                         self.bot.bold(err.response.status_code),
                         self.bot.bold(err.response.reason)))
-                else:
-                    self.bot.privmsg(target, '[ {0} ] {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
+                    return
+                self.bot.privmsg(target, '[ {0} ] {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))

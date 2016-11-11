@@ -2,11 +2,9 @@ import inspect
 import shlex
 
 import irc3
-import pylast
 import random
 import requests
 from irc3.plugins.command import command
-from pyshorteners import Shortener
 
 
 def to_user_index(index):
@@ -22,7 +20,6 @@ def from_user_index(index):
 
 @irc3.plugin
 class RiceDB(object):
-
     requires = [
         'irc3.plugins.command',
         'plugins.formatting',
@@ -95,10 +92,10 @@ class RiceDB(object):
             for index, item in enumerate(values):
                 indexed_values.append('[{0}] {1}'.format(to_user_index(index), item))
             return '{0} [{1}]'.format(' | '.join(indexed_values), self.bot.antiping(user))
-        else:
-            return '{0} no {1}.'.format(
-                self.bot.antiping(user) + ' has' if user != mask.nick else 'You have',
-                'reason to live' if random.random() <= 0.15 else mode)
+
+        return '{0} no {1}.'.format(
+            self.bot.antiping(user) + ' has' if user != mask.nick else 'You have',
+            'reason to live' if random.random() <= 0.15 else mode)
 
     @command(permission='view')
     def dtop(self, mask, target, args):
@@ -158,10 +155,12 @@ class RiceDB(object):
         for db in db_map:
             r = requests.get('https://api.joaquin-v.xyz/aigis/database.php?server={0}&db={1}'.format(
                 server, db_map[db]))
+
             data = r.json()
             if 'error_msg' in data:
                 self.bot.log.error(data['error_msg'])
                 continue
+
             for user in data:
                 if data[user]:
                     self.bot.set_user_value(user, db, data[user])

@@ -31,7 +31,7 @@ class BotUI(object):
         """
 
         channel = args['<channel>']
-        if args['<password>'] is not None:
+        if args['<password>']:
             channel += ' %s' % args['<password>']
 
         self.bot.join(channel)
@@ -43,7 +43,7 @@ class BotUI(object):
             %%part [<channel>]
         """
 
-        if args['<channel>'] is not None:
+        if args['<channel>']:
             target = args['<channel>']
 
         self.bot.part(target)

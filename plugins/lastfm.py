@@ -51,8 +51,8 @@ class LastFM(object):
         if not current_track:
             return '{0} is not listening to anything right now.'.format(self.bot.antiping(irc_username))
 
-        track_info = '{0} - {1}'.format(
-            self.bot.bold(current_track.get_artist().get_name()), self.bot.bold(current_track.get_title()))
+        track_info = '{0} - {1}'.format(self.bot.bold(current_track.get_artist().get_name()),
+                                        self.bot.bold(current_track.get_title()))
         track_url = current_track.get_url()
         try:
             track_url = self.url_shortener.short(current_track.get_url())

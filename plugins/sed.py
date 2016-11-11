@@ -1,9 +1,8 @@
-import collections
-import re
 from subprocess import Popen, PIPE
 
+import collections
 import irc3
-from collections import OrderedDict
+import re
 
 SED_PRIVMSG = r'\s*s[^A-Za-z0-9\s].+'
 SED_CHECKER = re.compile('^' + SED_PRIVMSG)
@@ -68,7 +67,6 @@ class EditorException(Exception):
 
 @irc3.plugin
 class Sed(object):
-
     requires = [
         'plugins.formatting'
     ]
@@ -79,45 +77,52 @@ class Sed(object):
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def update_chat_history(self, target, event, mask, data):
-        # Strip ACTION data and just use the message.
-        data = data.replace('\x01ACTION ', '').replace('\x01', '')
         if event != 'PRIVMSG' or not target.is_channel or SED_CHECKER.match(data):
             return
+
+        # Strip ACTION data and just use the message.
+        data = data.replace('\x01ACTION ', '').replace('\x01', '')
         line = (mask.nick, data)
+
         if target in self.history_buffer:
             self.history_buffer[target].append(line)
-        else:
-            queue = collections.deque(maxlen=25)
-            queue.append(line)
-            self.history_buffer.update({target: queue})
+            return
+
+        queue = collections.deque(maxlen=25)
+        queue.append(line)
+        self.history_buffer.update({target: queue})
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?P<_sed>{0})'.format(SED_PRIVMSG))
     def sed(self, mask, target, _sed):
-        if target in self.history_buffer:
-            editor = Editor(_sed)
-            for user, message in reversed(self.history_buffer[target]):
-                try:
-                    new_message = editor.edit(message)
-                except EditorException as error:
-                    self.bot.log.error(error)
-                    self.bot.privmsg(target, '{0}: {1}'.format(self.bot.antiping(mask.nick), error))
-                    # Don't even check the rest if the sed command is invalid.
-                    return
+        if target not in self.history_buffer:
+            return
 
-                if new_message == message:
-                    continue
-                # Prevent spam.
-                max_extra_chars = 32
-                max_len = len(message) + max_extra_chars
-                error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
-                if len(new_message) > len(error_msg) and len(new_message) > max_len:
-                    self.bot.privmsg(target, '{0}: {1}'.format(
-                        self.bot.antiping(mask.nick), self.bot.color(error_msg, 4)))
-                else:
-                    emphasised_meant = self.bot.bold('meant')
-                    if mask.nick == user:
-                        self.bot.privmsg(target, '{0} {1} to say: {2}'.format(
-                            self.bot.antiping(mask.nick), emphasised_meant, new_message))
-                        return
-                    self.bot.privmsg(target, '{0} thinks {1} {2} to say: {3}'.format(
-                        self.bot.antiping(mask.nick), user, emphasised_meant, new_message))
+        editor = Editor(_sed)
+        for user, message in reversed(self.history_buffer[target]):
+            try:
+                new_message = editor.edit(message)
+            except EditorException as error:
+                self.bot.log.error(error)
+                self.bot.privmsg(target, '{0}: {1}'.format(self.bot.antiping(mask.nick), error))
+                # Don't even check the rest if the sed command is invalid.
+                return
+
+            if new_message == message:
+                continue
+
+            # Prevent spam.
+            max_extra_chars = 32
+            max_len = len(message) + max_extra_chars
+            error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
+            if len(new_message) > len(error_msg) and len(new_message) > max_len:
+                self.bot.privmsg(target, '{0}: {1}'.format(
+                    self.bot.antiping(mask.nick), self.bot.color(error_msg, 4)))
+                return
+
+            emphasised_meant = self.bot.bold('meant')
+            if mask.nick == user:
+                self.bot.privmsg(target, '{0} {1} to say: {2}'.format(
+                    self.bot.antiping(mask.nick), emphasised_meant, new_message))
+                return
+            self.bot.privmsg(target, '{0} thinks {1} {2} to say: {3}'.format(
+                self.bot.antiping(mask.nick), user, emphasised_meant, new_message))
