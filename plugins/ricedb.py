@@ -57,7 +57,7 @@ class RiceDB(object):
             return '{0} updated.'.format(mode)
 
         if args['--delete']:
-            values = self.db.get_user_value(mask.nick, mode)
+            values = self.bot.get_user_value(mask.nick, mode)
             if not values:
                 return 'You do not have any {0} to remove.'.format(mode)
             indexes = args['<indexes>']
