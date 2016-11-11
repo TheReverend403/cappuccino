@@ -107,7 +107,11 @@ class Sed(object):
                 # Don't even check the rest if the sed command is invalid.
                 return
 
-            if new_message == message:
+            if new_message is None or new_message == message:
+                continue
+
+            new_message = new_message.strip()
+            if not new_message:
                 continue
 
             # Prevent spam.
