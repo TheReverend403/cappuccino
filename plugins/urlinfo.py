@@ -21,7 +21,6 @@ USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
 REQUEST_TIMEOUT = 5
 HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.I)
 
-ORIGINAL_GETADDRINFO = socket.getaddrinfo
 FORCE_IPV4_HOSTNAMES = ['www.youtube.com', 'youtube.com', 'youtu.be']
 
 REQUEST_HEADERS = {
@@ -51,6 +50,8 @@ class ResponseBodyTooLarge(requests.RequestException):
 class RequestTimeout(requests.RequestException):
     pass
 
+original_getaddrinfo = socket.getaddrinfo
+
 
 def getaddrinfo_wrapper(host, port, family=0, type=0, proto=0, flags=0):
     """
@@ -59,9 +60,8 @@ def getaddrinfo_wrapper(host, port, family=0, type=0, proto=0, flags=0):
     go straight to the Python socket library and wrap it's getaddrinfo function transparently to return only
     IPv4 addresses for certain hosts.
     """
-    if host in FORCE_IPV4_HOSTNAMES:
-        return ORIGINAL_GETADDRINFO(host, port, socket.AF_INET, type, proto, flags)
-    return ORIGINAL_GETADDRINFO(host, port, family, type, proto, flags)
+    family = socket.AF_INET if host in FORCE_IPV4_HOSTNAMES else family
+    return original_getaddrinfo(host, port, family, type, proto, flags)
 
 
 def size_fmt(num, suffix='B'):
