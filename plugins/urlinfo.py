@@ -59,6 +59,9 @@ def getaddrinfo_wrapper(host, port, family=0, type=0, proto=0, flags=0):
     Because neither requests, urllib, or HTTPRequest provide a way to do that, it's necessary to bypass them and
     go straight to the Python socket library and wrap it's getaddrinfo function transparently to return only
     IPv4 addresses for certain hosts.
+
+    This function requires `socket.getaddrinfo = getaddrinfo_wrapper` somewhere early in a script's startup,
+    preferably before any network requests are made.
     """
     family = socket.AF_INET if host in FORCE_IPV4_HOSTNAMES else family
     return original_getaddrinfo(host, port, family, type, proto, flags)
