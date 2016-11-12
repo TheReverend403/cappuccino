@@ -52,14 +52,16 @@ class RequestTimeout(requests.RequestException):
     pass
 
 
-def force_ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+def getaddrinfo_wrapper(host, port, family=0, type=0, proto=0, flags=0):
     """
     Some sites like YouTube like to block certain IPv6 ranges, so forcing IPv4 is necessary to get info on those URLs.
     Because neither requests, urllib, or HTTPRequest provide a way to do that, it's necessary to bypass them and
-    go straight to the Python socket library, wrap it's getaddrinfo function to only return IPv4 addresses,
-    and then restore the original function as soon as possible to prevent any potential breakages.
+    go straight to the Python socket library and wrap it's getaddrinfo function transparently to return only
+    IPv4 addresses for certain hosts.
     """
-    return ORIGINAL_GETADDRINFO(host, port, socket.AF_INET, type, proto, flags)
+    if host in FORCE_IPV4_HOSTNAMES:
+        return ORIGINAL_GETADDRINFO(host, port, socket.AF_INET, type, proto, flags)
+    return ORIGINAL_GETADDRINFO(host, port, family, type, proto, flags)
 
 
 def size_fmt(num, suffix='B'):
@@ -98,7 +100,6 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
 
 @irc3.plugin
 class UrlInfo(object):
-
     requires = [
         'plugins.formatting'
     ]
@@ -107,6 +108,7 @@ class UrlInfo(object):
         self.bot = bot
         self.session = Session()
         self.session.headers.update(REQUEST_HEADERS)
+        socket.getaddrinfo = getaddrinfo_wrapper
 
     def _find_title(self, response, content):
         title = None
@@ -135,8 +137,6 @@ class UrlInfo(object):
         for url in urls[-1:]:
             self.bot.log.debug('Fetching page title for {0}'.format(url))
             hostname = urlparse(url).hostname
-            if hostname in FORCE_IPV4_HOSTNAMES:
-                socket.getaddrinfo = force_ipv4_getaddrinfo
             try:
                 for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
                     ip = ipaddress.ip_address(sockaddr[0])
@@ -149,9 +149,6 @@ class UrlInfo(object):
             hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
             try:
                 with closing(self.session.get(url, **REQUEST_OPTIONS)) as response:
-                    # Give socket it's original getaddrinfo back immediately after
-                    # the request to avoid potentially breaking other stuff.
-                    socket.getaddrinfo = ORIGINAL_GETADDRINFO
                     if not response.status_code == requests.codes.ok:
                         response.raise_for_status()
 
