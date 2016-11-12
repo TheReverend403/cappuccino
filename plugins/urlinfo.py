@@ -21,6 +21,9 @@ USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
 REQUEST_TIMEOUT = 5
 HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.I)
 
+ORIGINAL_GETADDRINFO = socket.getaddrinfo
+FORCE_IPV4_HOSTNAMES = ['www.youtube.com', 'youtube.com', 'youtu.be']
+
 REQUEST_HEADERS = {
     'User-Agent': USER_AGENT,
     'Accept-Language': 'en-GB,en-US,en;q=0.5'
@@ -47,6 +50,12 @@ class ResponseBodyTooLarge(requests.RequestException):
 
 class RequestTimeout(requests.RequestException):
     pass
+
+
+# Some sites like YouTube like to block certain IPv6 ranges,
+# so forcing IPv4 is necessary to get info on those URLs.
+def force_ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    return ORIGINAL_GETADDRINFO(host, port, socket.AF_INET, type, proto, flags)
 
 
 def size_fmt(num, suffix='B'):
@@ -122,6 +131,8 @@ class UrlInfo(object):
         for url in urls[-1:]:
             self.bot.log.debug('Fetching page title for {0}'.format(url))
             hostname = urlparse(url).hostname
+            if hostname in FORCE_IPV4_HOSTNAMES:
+                socket.getaddrinfo = force_ipv4_getaddrinfo
             try:
                 for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
                     ip = ipaddress.ip_address(sockaddr[0])
@@ -134,6 +145,9 @@ class UrlInfo(object):
             hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
             try:
                 with closing(self.session.get(url, **REQUEST_OPTIONS)) as response:
+                    # Give socket it's original getaddrinfo back immediately after
+                    # the request to avoid potentially breaking other stuff.
+                    socket.getaddrinfo = ORIGINAL_GETADDRINFO
                     if not response.status_code == requests.codes.ok:
                         response.raise_for_status()
 
