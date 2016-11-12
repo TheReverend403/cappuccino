@@ -52,9 +52,13 @@ class RequestTimeout(requests.RequestException):
     pass
 
 
-# Some sites like YouTube like to block certain IPv6 ranges,
-# so forcing IPv4 is necessary to get info on those URLs.
 def force_ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    """
+    Some sites like YouTube like to block certain IPv6 ranges, so forcing IPv4 is necessary to get info on those URLs.
+    Because neither requests, urllib, or HTTPRequest provide a way to do that, it's necessary to bypass them and
+    go straight to the Python socket library, wrap it's getaddrinfo function to only return IPv4 addresses,
+    and then restore the original function as soon as possible to prevent any potential breakages.
+    """
     return ORIGINAL_GETADDRINFO(host, port, socket.AF_INET, type, proto, flags)
 
 
