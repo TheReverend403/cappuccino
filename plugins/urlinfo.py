@@ -159,17 +159,13 @@ class UrlInfo(object):
                     if response.status_code != requests.codes.ok:
                         response.raise_for_status()
 
-                    try:
-                        content_type = response.headers.get('Content-Type').split(';')[0]
-                    except IndexError:
-                        continue
-
-                    content_type_category = content_type.split('/')[0]
-                    if content_type_category not in CONTENT_TYPES_AND_LIMITS:
+                    mimetype, _ = cgi.parse_header(response.headers.get('Content-Type'))
+                    maintype = mimetype.split('/')[0]
+                    if maintype not in CONTENT_TYPES_AND_LIMITS:
                         continue
 
                     try:
-                        size, content = _read_stream(response, CONTENT_TYPES_AND_LIMITS[content_type_category])
+                        size, content = _read_stream(response, CONTENT_TYPES_AND_LIMITS[maintype])
                     except ResponseBodyTooLarge as err:
                         self.bot.privmsg(target, '[ {0} ] {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
                         continue
@@ -179,7 +175,7 @@ class UrlInfo(object):
 
                 title = self._find_title(content, response.headers.get('Content-Disposition'))
                 self.bot.privmsg(target, '[ {0} ] {1} ({2}) ({3})'.format(
-                    self.bot.color(hostname, 3), self.bot.bold(title), size_fmt(size), content_type))
+                    self.bot.color(hostname, 3), self.bot.bold(title), size_fmt(size), mimetype))
 
             except requests.RequestException as err:
                 if err.response is not None and err.response.reason is not None:
