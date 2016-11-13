@@ -125,7 +125,7 @@ class UrlInfo(object):
                 _, params = cgi.parse_header(content_disposition)
                 title = params['filename']
         if title:
-            title = ''.join(title[:MAX_TITLE_LENGTH])
+            title = ''.join(title[:MAX_TITLE_LENGTH]).strip()
             if len(title) == MAX_TITLE_LENGTH:
                 title += '...'
         return title or self.bot.color('No Title', 4)
