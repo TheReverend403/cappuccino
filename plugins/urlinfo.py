@@ -156,7 +156,7 @@ class UrlInfo(object):
             hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
             try:
                 with closing(self.session.get(url, **REQUEST_OPTIONS)) as response:
-                    if not response.status_code == requests.codes.ok:
+                    if response.status_code != requests.codes.ok:
                         response.raise_for_status()
 
                     try:
