@@ -35,6 +35,8 @@ class LastFM(object):
                 lastfm_username = self.lastfm.get_user(lastfm_username).get_name(properly_capitalized=True)
             except pylast.WSError:
                 return 'No such last.fm user. Are you trying to trick me? :^)'
+            except pylast.NetworkError as err:
+                return err
             else:
                 self.bot.set_user_value(mask.nick, 'lastfm', lastfm_username)
                 return 'last.fm username set.'
@@ -47,19 +49,22 @@ class LastFM(object):
             return '{0} has no last.fm username set. Ask them to set one with .np --set <username>'.format(
                 self.bot.antiping(irc_username))
 
-        lastfm_user = self.lastfm.get_user(lastfm_username)
-        current_track = lastfm_user.get_now_playing()
-        if not current_track:
-            return '{0} is not listening to anything right now.'.format(self.bot.antiping(irc_username))
-
-        track_url = current_track.get_url()
         try:
-            track_url = self.url_shortener.short(track_url)
-        except (UnknownShortenerException, ShorteningErrorException, ExpandingErrorException) as err:
-            self.bot.log.exception('Exception occurred while shortening {0}: {1}'.format(track_url, err))
+            lastfm_user = self.lastfm.get_user(lastfm_username)
+            current_track = lastfm_user.get_now_playing()
+            if not current_track:
+                return '{0} is not listening to anything right now.'.format(self.bot.antiping(irc_username))
 
-        track_info = '{0} - {1} | {2}'.format(
-            self.bot.format(current_track.get_artist().get_name(), bold=True),
-            self.bot.format(current_track.get_title(), bold=True),
-            self.bot.format(track_url, color=self.bot.color.BLUE))
+            track_url = current_track.get_url()
+            try:
+                track_url = self.url_shortener.short(track_url)
+            except (UnknownShortenerException, ShorteningErrorException, ExpandingErrorException) as err:
+                self.bot.log.exception('Exception occurred while shortening {0}: {1}'.format(track_url, err))
+
+            track_info = '{0} - {1} | {2}'.format(
+                self.bot.format(current_track.get_artist().get_name(), bold=True),
+                self.bot.format(current_track.get_title(), bold=True),
+                self.bot.format(track_url, color=self.bot.color.BLUE))
+        except pylast.NetworkError as err:
+            return err
         return '{0} is now playing {1}'.format(self.bot.format(irc_username, antiping=True), track_info)
