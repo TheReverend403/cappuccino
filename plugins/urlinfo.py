@@ -136,7 +136,7 @@ class UrlInfo(object):
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
     def on_url(self, target, data):
         urls = URL_FINDER.findall(data)
-        if len(urls) == 0:
+        if not urls:
             return
 
         # Only handle 1 URL until I get the hang of Python async.
