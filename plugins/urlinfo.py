@@ -113,21 +113,21 @@ class UrlInfo(object):
         self.session.headers.update(REQUEST_HEADERS)
         socket.getaddrinfo = getaddrinfo_wrapper
 
-    def _find_title(self, response, content):
-        title = None
+    def _find_title(self, content, content_disposition=None):
+        title = ''
         try:
             title = html.fromstring(content).findtext('.//title')
-        except ParserError:
+        except ParserError as err:
+            self.bot.log.warn(err)
             pass
-        if not title:
-            content_disposition = response.headers.get('Content-Disposition')
-            if content_disposition:
-                _, params = cgi.parse_header(content_disposition)
-                title = params['filename']
-        if title:
-            title = ''.join(title[:MAX_TITLE_LENGTH]).strip()
-            if len(title) == MAX_TITLE_LENGTH:
-                title = title[:MAX_TITLE_LENGTH - 3] + '...'
+
+        if not title and content_disposition:
+            _, params = cgi.parse_header(content_disposition)
+            title = params['filename']
+
+        title = title.strip()
+        if len(title) > MAX_TITLE_LENGTH:
+            title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
         return title or self.bot.color('No Title', 4)
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
@@ -139,6 +139,7 @@ class UrlInfo(object):
         # Only handle 1 URL until I get the hang of Python async.
         for url in urls[-1:]:
             self.bot.log.debug('Fetching page title for {0}'.format(url))
+
             hostname = urlparse(url).hostname
             try:
                 for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
@@ -173,12 +174,9 @@ class UrlInfo(object):
                     if not content:
                         continue
 
-                title = self._find_title(response, content)
+                title = self._find_title(content, response.headers.get('Content-Disposition'))
                 self.bot.privmsg(target, '[ {0} ] {1} ({2}) ({3})'.format(
-                    self.bot.color(hostname, 3),
-                    self.bot.bold(title),
-                    size_fmt(size),
-                    content_type))
+                    self.bot.color(hostname, 3), self.bot.bold(title), size_fmt(size), content_type))
 
             except requests.RequestException as err:
                 if err.response is not None and err.response.reason is not None:
