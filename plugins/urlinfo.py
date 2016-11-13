@@ -123,7 +123,10 @@ class UrlInfo(object):
 
         if not title and content_disposition:
             _, params = cgi.parse_header(content_disposition)
-            title = params['filename']
+            try:
+                title = params['filename']
+            except KeyError:
+                pass
 
         title = title.strip()
         if len(title) > MAX_TITLE_LENGTH:
