@@ -59,7 +59,7 @@ class LastFM(object):
             self.bot.log.exception('Exception occurred while shortening {0}: {1}'.format(track_url, err))
 
         track_info = '{0} - {1} | {2}'.format(
-            self.bot.bold(current_track.get_artist().get_name()),
-            self.bot.bold(current_track.get_title()),
-            self.bot.color(track_url, 2))
-        return '{0} is now playing {1}'.format(self.bot.antiping(irc_username), track_info)
+            self.bot.format(current_track.get_artist().get_name(), bold=True),
+            self.bot.format(current_track.get_title(), bold=True),
+            self.bot.format(track_url, color=self.bot.color.BLUE))
+        return '{0} is now playing {1}'.format(self.bot.format(irc_username, antiping=True), track_info)

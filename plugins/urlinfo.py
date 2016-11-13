@@ -131,7 +131,7 @@ class UrlInfo(object):
         title = title.strip()
         if len(title) > MAX_TITLE_LENGTH:
             title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
-        return title or self.bot.color('No Title', 4)
+        return title or self.bot.format('No Title', color=self.bot.color.RED)
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
     def on_url(self, target, data):
@@ -164,24 +164,22 @@ class UrlInfo(object):
                     if maintype not in CONTENT_TYPES_AND_LIMITS:
                         continue
 
-                    try:
-                        size, content = _read_stream(response, CONTENT_TYPES_AND_LIMITS[maintype])
-                    except ResponseBodyTooLarge as err:
-                        self.bot.privmsg(target, '[ {0} ] {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
-                        continue
+                    size, content = _read_stream(response, CONTENT_TYPES_AND_LIMITS[maintype])
 
                     if not content:
                         continue
 
                 title = self._find_title(content, response.headers.get('Content-Disposition'))
                 self.bot.privmsg(target, '[ {0} ] {1} ({2}) ({3})'.format(
-                    self.bot.color(hostname, 3), self.bot.bold(title), size_fmt(size), mimetype))
+                    self.bot.format(hostname, color=self.bot.color.GREEN),
+                    self.bot.format(title, bold=True), size_fmt(size), mimetype))
 
             except requests.RequestException as err:
                 if err.response is not None and err.response.reason is not None:
                     self.bot.privmsg(target, '[ {0} ] {1} {2}'.format(
-                        self.bot.color(hostname, 4),
-                        self.bot.bold(err.response.status_code),
-                        self.bot.bold(err.response.reason)))
+                        self.bot.format(hostname, color=self.bot.color.RED),
+                        self.bot.format(err.response.status_code, bold=True),
+                        self.bot.format(err.response.reason, bold=True)))
                     continue
-                self.bot.privmsg(target, '[ {0} ] {1}'.format(self.bot.color(hostname, 4), self.bot.bold(err)))
+                self.bot.privmsg(target, '[ {0} ] {1}'.format(
+                    self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))

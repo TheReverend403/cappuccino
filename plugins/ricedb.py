@@ -86,17 +86,16 @@ class RiceDB(object):
             except IndexError:
                 return 'Invalid index.'
 
-        user = args['<user>'] or mask.nick
+        user = self.bot.format(args['<user>'] or mask.nick, antiping=True)
         values = self.bot.get_user_value(user, mode)
         if values:
             indexed_values = []
             for index, item in enumerate(values):
                 indexed_values.append('[{0}] {1}'.format(to_user_index(index), item))
-            return '{0} [{1}]'.format(' | '.join(indexed_values), self.bot.antiping(user))
+            return '{0} [{1}]'.format(' | '.join(indexed_values), user)
 
         return '{0} no {1}.'.format(
-            self.bot.antiping(user) + ' has' if user != mask.nick else 'You have',
-            'reason to live' if random.random() <= 0.15 else mode)
+            user + ' has' if user != mask.nick else 'You have', 'reason to live' if random.random() <= 0.15 else mode)
 
     @command(permission='view')
     def dtop(self, mask, target, args):

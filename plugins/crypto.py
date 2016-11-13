@@ -26,4 +26,4 @@ class Crypto(object):
             if flag in args and args[flag]:
                 hash_object = hashlib.new(algo)
                 hash_object.update(text)
-                return '{0}: {1}'.format(self.bot.antiping(mask.nick), hash_object.hexdigest())
+                return '{0}: {1}'.format(self.bot.format(mask.nick, antiping=True), hash_object.hexdigest())
