@@ -3,7 +3,7 @@ import irc3
 
 @irc3.plugin
 class Formatting(object):
-    class Color:
+    class Color(object):
         RESET = '\x0f'
         WHITE = '00'
         BLACK = '01'

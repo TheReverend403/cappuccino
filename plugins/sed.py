@@ -100,12 +100,12 @@ class Sed(object):
 
         editor = Editor(_sed)
         mask.nick = self.bot.format(mask.nick, antiping=True)
-        for user, message in reversed(self.history_buffer[target]):
+        for target_user, message in reversed(self.history_buffer[target]):
             try:
                 new_message = editor.edit(message)
             except EditorException as error:
                 self.bot.log.error(error)
-                self.bot.privmsg(target, '{0}: {1}'.format(mask.nick, error))
+                self.bot.privmsg(target, '{0}: {1}'.format(self.bot.format(mask.nick, antiping=True), error))
                 # Don't even check the rest if the sed command is invalid.
                 return
 
@@ -118,13 +118,14 @@ class Sed(object):
             error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
             if len(new_message) > len(error_msg) and len(new_message) > max_len:
                 self.bot.privmsg(target, '{0}: {1}'.format(
-                    mask.nick, self.bot.format(error_msg, color=self.bot.color.RED)))
+                    self.bot.format(mask.nick, antiping=True), self.bot.format(error_msg, color=self.bot.color.RED)))
                 return
 
             emphasised_meant = self.bot.format('meant', bold=True)
-            if mask.nick == user:
-                self.bot.privmsg(target, '{0} {1} to say: {2}'.format(mask.nick, emphasised_meant, new_message))
+            if mask.nick == target_user:
+                self.bot.privmsg(target, '{0} {1} to say: {2}'.format(
+                    self.bot.format(mask.nick, antiping=True), emphasised_meant, new_message))
                 return
             self.bot.privmsg(target, '{0} thinks {1} {2} to say: {3}'.format(
-                mask.nick, user, emphasised_meant, new_message))
+                self.bot.format(mask.nick, antiping=True), target_user, emphasised_meant, new_message))
             return
