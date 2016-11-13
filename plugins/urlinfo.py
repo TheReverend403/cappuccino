@@ -127,7 +127,7 @@ class UrlInfo(object):
         if title:
             title = ''.join(title[:MAX_TITLE_LENGTH]).strip()
             if len(title) == MAX_TITLE_LENGTH:
-                title += '...'
+                title = title[:MAX_TITLE_LENGTH - 3] + '...'
         return title or self.bot.color('No Title', 4)
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
