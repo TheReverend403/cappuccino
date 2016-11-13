@@ -96,7 +96,7 @@ class RiceDB(object):
             return '{0} [{1}]'.format(' | '.join(indexed_values), user)
 
         return '{0} no {1}.'.format(
-            user + ' has' if user != mask.nick else 'You have', 'reason to live' if random.random() <= 0.15 else mode)
+            user + ' has' if user != mask.nick else 'You have', 'reason to live' if random.random() <= 0.05 else mode)
 
     @command(permission='view')
     def dtop(self, mask, target, args):
