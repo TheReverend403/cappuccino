@@ -86,8 +86,9 @@ class RiceDB(object):
             except IndexError:
                 return 'Invalid index.'
 
-        user = self.bot.format(args['<user>'] or mask.nick, antiping=True)
+        user = args['<user>'] or mask.nick
         values = self.bot.get_user_value(user, mode)
+        user = self.bot.format(user, antiping=True)
         if values:
             indexed_values = []
             for index, item in enumerate(values):

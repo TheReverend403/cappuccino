@@ -47,13 +47,13 @@ class LastFM(object):
             if irc_username == mask.nick:
                 return 'You have no last.fm username set. Please set one with .np --set <username>'
             return '{0} has no last.fm username set. Ask them to set one with .np --set <username>'.format(
-                self.bot.antiping(irc_username))
+                self.bot.format(irc_username, antiping=True))
 
         try:
             lastfm_user = self.lastfm.get_user(lastfm_username)
             current_track = lastfm_user.get_now_playing()
             if not current_track:
-                return '{0} is not listening to anything right now.'.format(self.bot.antiping(irc_username))
+                return '{0} is not listening to anything right now.'.format(self.bot.format(irc_username, antiping=True))
 
             track_url = current_track.get_url()
             try:
