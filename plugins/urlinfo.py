@@ -173,12 +173,12 @@ class UrlInfo(object):
                     if not content:
                         continue
 
-                    title = self._find_title(response, content)
-                    self.bot.privmsg(target, '[ {0} ] {1} ({2}) ({3})'.format(
-                        self.bot.color(hostname, 3),
-                        self.bot.bold(title),
-                        size_fmt(size),
-                        content_type))
+                title = self._find_title(response, content)
+                self.bot.privmsg(target, '[ {0} ] {1} ({2}) ({3})'.format(
+                    self.bot.color(hostname, 3),
+                    self.bot.bold(title),
+                    size_fmt(size),
+                    content_type))
 
             except requests.RequestException as err:
                 if err.response is not None and err.response.reason is not None:
