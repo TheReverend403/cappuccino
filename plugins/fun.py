@@ -59,7 +59,8 @@ class Fun(object):
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
     def intensify(self, target, data):
-        self.bot.privmsg(target, self.bot.format('[{0} INTENSIFIES]'.format(data.strip().upper()), bold=True))
+        if len(data) <= 32:
+            self.bot.privmsg(target, self.bot.format('[{0} INTENSIFIES]'.format(data.strip().upper()), bold=True))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*wew$')
     def wew(self, target):
