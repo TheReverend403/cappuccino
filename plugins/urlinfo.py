@@ -118,6 +118,7 @@ class UrlInfo(object):
         self.session = Session()
         self.session.headers.update(REQUEST_HEADERS)
         socket.getaddrinfo = getaddrinfo_wrapper
+        requests.packages.urllib3.disable_warnings()
 
     def _find_title(self, content, content_disposition=None):
         title = ''
