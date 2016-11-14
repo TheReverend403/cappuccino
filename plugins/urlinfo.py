@@ -3,6 +3,7 @@ import ipaddress
 import socket
 import time
 from contextlib import closing
+from pprint import pprint
 from urllib.parse import urlparse
 
 import irc3
@@ -49,6 +50,7 @@ class ResponseBodyTooLarge(requests.RequestException):
 
 class RequestTimeout(requests.RequestException):
     pass
+
 
 original_getaddrinfo = socket.getaddrinfo
 
@@ -147,12 +149,12 @@ class UrlInfo(object):
             try:
                 for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
                     ip = ipaddress.ip_address(sockaddr[0])
-                    if ip.is_private or ip.is_reserved or ip.is_link_local or ip.is_loopback:
+                    if ip.is_private or ip.is_reserved or ip.is_link_local or ip.is_loopback or ip.is_multicast:
                         continue
             except (socket.gaierror, ValueError) as err:
                 self.bot.log.warn(err)
                 self.bot.privmsg(target, '[ {0} ] {1}'.format(
-                    self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err.strerror, bold=True)))
+                    self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))
                 continue
 
             hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
@@ -176,12 +178,15 @@ class UrlInfo(object):
                     self.bot.format(hostname, color=self.bot.color.GREEN),
                     self.bot.format(title, bold=True), size_fmt(size), mimetype))
 
-            except requests.RequestException as err:
+            except (requests.RequestException, requests.ConnectTimeout) as err:
+                self.bot.log.error(err)
                 if err.response is not None and err.response.reason is not None:
                     self.bot.privmsg(target, '[ {0} ] {1} {2}'.format(
                         self.bot.format(hostname, color=self.bot.color.RED),
                         self.bot.format(err.response.status_code, bold=True),
                         self.bot.format(err.response.reason, bold=True)))
                     continue
+
                 self.bot.privmsg(target, '[ {0} ] {1}'.format(
-                    self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err.strerror, bold=True)))
+                    self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(
+                        'An unexpected error occurred.', bold=True)))
