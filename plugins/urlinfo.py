@@ -128,10 +128,10 @@ class UrlInfo(object):
             except KeyError:
                 pass
 
-        title = title.strip()
+        title = title.strip() if title is not None else self.bot.format('No Title', color=self.bot.color.RED)
         if len(title) > MAX_TITLE_LENGTH:
             title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
-        return title or self.bot.format('No Title', color=self.bot.color.RED)
+        return title
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
     def on_url(self, target, data):
