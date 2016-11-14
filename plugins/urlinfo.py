@@ -151,6 +151,8 @@ class UrlInfo(object):
                         continue
             except (socket.gaierror, ValueError) as err:
                 self.bot.log.warn(err)
+                self.bot.privmsg(target, '[ {0} ] {1}'.format(
+                    self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err.strerror, bold=True)))
                 continue
 
             hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
@@ -182,4 +184,4 @@ class UrlInfo(object):
                         self.bot.format(err.response.reason, bold=True)))
                     continue
                 self.bot.privmsg(target, '[ {0} ] {1}'.format(
-                    self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))
+                    self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err.strerror, bold=True)))
