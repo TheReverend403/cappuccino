@@ -191,5 +191,4 @@ class UrlInfo(object):
                     continue
 
                 self.bot.privmsg(target, '[ {0} ] {1}'.format(
-                    self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(
-                        'An unexpected error occurred.', bold=True)))
+                    self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))
