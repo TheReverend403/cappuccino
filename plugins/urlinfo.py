@@ -3,7 +3,6 @@ import ipaddress
 import socket
 import time
 from contextlib import closing
-from pprint import pprint
 from urllib.parse import urlparse
 
 import irc3
@@ -115,6 +114,10 @@ class UrlInfo(object):
 
     def __init__(self, bot):
         self.bot = bot
+        try:
+            self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
+        except KeyError:
+            self.ignore_nicks = []
         self.session = Session()
         self.session.headers.update(REQUEST_HEADERS)
         socket.getaddrinfo = getaddrinfo_wrapper
@@ -140,8 +143,11 @@ class UrlInfo(object):
             title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
         return title
 
-    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
-    def on_url(self, target, data):
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
+    def on_url(self, mask, target, data):
+        if mask.nick in self.ignore_nicks:
+            return
+
         urls = URL_FINDER.findall(data)
         if not urls:
             return

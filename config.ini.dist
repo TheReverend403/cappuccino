@@ -64,6 +64,9 @@ password =
 [plugins.lastfm]
 api_key =
 
+[plugins.urlinfo]
+ignore_nicks = Nick1 Nick2
+
 [irc3.plugins.command]
 # command plugin configuration
 
