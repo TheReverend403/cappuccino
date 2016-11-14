@@ -42,19 +42,19 @@ class RiceDB(object):
             except ValueError:
                 pass
 
-        if args['--add']:
+        if args['--add'] or args['-a']:
             values = self.bot.get_user_value(mask.nick, mode) or []
             for value in args['<values>']:
                 values.append(value)
             self.bot.set_user_value(mask.nick, mode, values)
             return '{0} updated.'.format(mode)
 
-        if args['--set']:
+        if args['--set'] or args['-s']:
             values = args['<values>']
             self.bot.set_user_value(mask.nick, mode, values)
             return '{0} updated.'.format(mode)
 
-        if args['--delete']:
+        if args['--delete'] or args['-d']:
             values = self.bot.get_user_value(mask.nick, mode)
             if not values:
                 return 'You do not have any {0} to remove.'.format(mode)
@@ -72,7 +72,7 @@ class RiceDB(object):
             self.bot.set_user_value(mask.nick, mode, values)
             return 'Removed {0}.'.format(', '.join(deleted))
 
-        if args['--replace']:
+        if args['--replace'] or args['-r']:
             index = from_user_index(args['<index>'])
             replacement = args['<value>']
             values = self.bot.get_user_value(mask.nick, mode)
@@ -102,7 +102,7 @@ class RiceDB(object):
     def dtop(self, mask, target, args):
         """View or add a desktop.
 
-            %%dtop [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -110,7 +110,7 @@ class RiceDB(object):
     def dotfiles(self, mask, target, args):
         """View or add dotfiles.
 
-            %%dotfiles [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%dotfiles [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -118,7 +118,7 @@ class RiceDB(object):
     def distro(self, mask, target, args):
         """View or add a distro.
 
-            %%distro [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%distro [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -126,7 +126,7 @@ class RiceDB(object):
     def homescreen(self, mask, target, args):
         """View or add a homescreen.
 
-            %%homescreen [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -134,7 +134,7 @@ class RiceDB(object):
     def selfie(self, mask, target, args):
         """View or add a selfie.
 
-            %%selfie [(--set <values>... | --add <values>... | --delete <indexes>... | --replace <index> <value>) | <user>]
+            %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 

@@ -27,9 +27,9 @@ class LastFM(object):
     def now_playing(self, mask, target, args):
         """View currently playing track info.
 
-            %%np [--set <username> | <username>]
+            %%np [(-s | --set) <username> | <username>]
         """
-        if args['--set']:
+        if args['--set'] or args['-s']:
             lastfm_username = args['<username>']
             try:
                 lastfm_username = self.lastfm.get_user(lastfm_username).get_name(properly_capitalized=True)
