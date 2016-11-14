@@ -20,6 +20,8 @@ class Fun(object):
         'plugins.formatting'
     ]
 
+    random_chance = 0.35
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -61,10 +63,14 @@ class Fun(object):
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*wew$')
     def wew(self, target):
+        if random.random() > self.random_chance:
+            return
         self.bot.privmsg(target, self.bot.format('w e w l a d', bold=True))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*ayy+$')
     def ayy(self, target):
+        if random.random() > self.random_chance:
+            return
         self.bot.privmsg(target, 'lmao')
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)\b')
@@ -74,4 +80,6 @@ class Fun(object):
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*same$')
     def same(self, target):
+        if random.random() > self.random_chance:
+            return
         self.bot.privmsg(target, self.bot.format('same', bold=True))
