@@ -99,7 +99,6 @@ class Sed(object):
             return
 
         editor = Editor(_sed)
-        mask.nick = self.bot.format(mask.nick, antiping=True)
         for target_user, message in reversed(self.history_buffer[target]):
             try:
                 new_message = editor.edit(message)
