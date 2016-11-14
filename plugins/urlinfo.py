@@ -33,6 +33,7 @@ REQUEST_OPTIONS = {
     'timeout': REQUEST_TIMEOUT,
     'stream': True,
     'allow_redirects': True,
+    'verify': False,
     'headers': REQUEST_HEADERS
 }
 
