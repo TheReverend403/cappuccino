@@ -5,6 +5,9 @@ from pyshorteners import Shortener
 from pyshorteners.exceptions import UnknownShortenerException, ExpandingErrorException, ShorteningErrorException
 
 
+MAX_TRACK_INFO_LEN = 75
+
+
 @irc3.plugin
 class LastFM(object):
 
@@ -61,9 +64,15 @@ class LastFM(object):
             except (UnknownShortenerException, ShorteningErrorException, ExpandingErrorException) as err:
                 self.bot.log.exception('Exception occurred while shortening {0}: {1}'.format(track_url, err))
 
+            artist = current_track.get_artist().get_name()
+            title = current_track.get_title()
+            if len(artist) > MAX_TRACK_INFO_LEN:
+                artist = ''.join(artist[:MAX_TRACK_INFO_LEN]) + '...'
+            if len(title) > MAX_TRACK_INFO_LEN:
+                title = ''.join(title[:MAX_TRACK_INFO_LEN]) + '...'
             track_info = '{0} - {1} | {2}'.format(
-                self.bot.format(current_track.get_artist().get_name(), bold=True),
-                self.bot.format(current_track.get_title(), bold=True),
+                self.bot.format(artist, bold=True),
+                self.bot.format(title, bold=True),
                 self.bot.format(track_url, color=self.bot.color.BLUE))
         except pylast.NetworkError as err:
             return err
