@@ -4,8 +4,8 @@ from irc3.plugins.command import command
 from pyshorteners import Shortener
 from pyshorteners.exceptions import UnknownShortenerException, ExpandingErrorException, ShorteningErrorException
 
-
-MAX_TRACK_INFO_LEN = 75
+MAX_TRACK_ARTIST_LEN = 32
+MAX_TRACK_TITLE_LEN = 75
 
 
 @irc3.plugin
@@ -66,10 +66,10 @@ class LastFM(object):
 
             artist = current_track.get_artist().get_name()
             title = current_track.get_title()
-            if len(artist) > MAX_TRACK_INFO_LEN:
-                artist = ''.join(artist[:MAX_TRACK_INFO_LEN]) + '...'
-            if len(title) > MAX_TRACK_INFO_LEN:
-                title = ''.join(title[:MAX_TRACK_INFO_LEN]) + '...'
+            if len(artist) > MAX_TRACK_ARTIST_LEN:
+                artist = ''.join(artist[:MAX_TRACK_ARTIST_LEN]) + '...'
+            if len(title) > MAX_TRACK_TITLE_LEN:
+                title = ''.join(title[:MAX_TRACK_TITLE_LEN]) + '...'
             track_info = '{0} - {1} | {2}'.format(
                 self.bot.format(artist, bold=True),
                 self.bot.format(title, bold=True),
