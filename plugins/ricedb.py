@@ -106,6 +106,7 @@ class RiceDB(object):
         """
         yield self._generic_db(mask, target, args)
 
+    @command(permission='view', name='git')
     @command(permission='view')
     def dotfiles(self, mask, target, args):
         """View or add dotfiles.
