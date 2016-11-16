@@ -138,7 +138,7 @@ class UrlInfo(object):
             except KeyError:
                 pass
 
-        title = title.strip() if title is not None else self.bot.format('No Title', color=self.bot.color.RED)
+        title = title.strip() if title is not None and len(title.strip()) > 0 else self.bot.format('No Title', color=self.bot.color.RED)
         if len(title) > MAX_TITLE_LENGTH:
             title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
         return title
