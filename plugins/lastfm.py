@@ -64,8 +64,8 @@ class LastFM(object):
             except (UnknownShortenerException, ShorteningErrorException, ExpandingErrorException) as err:
                 self.bot.log.exception('Exception occurred while shortening {0}: {1}'.format(track_url, err))
 
-            artist = current_track.get_artist().get_name()
-            title = current_track.get_title()
+            artist = current_track.get_artist().get_name().strip()
+            title = current_track.get_title().strip()
             if len(artist) > MAX_TRACK_ARTIST_LEN:
                 artist = ''.join(artist[:MAX_TRACK_ARTIST_LEN]) + '...'
             if len(title) > MAX_TRACK_TITLE_LEN:
