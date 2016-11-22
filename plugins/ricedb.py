@@ -20,7 +20,6 @@ def from_user_index(index):
 
 @irc3.plugin
 class RiceDB(object):
-
     requires = [
         'irc3.plugins.command',
         'plugins.formatting',
@@ -93,10 +92,11 @@ class RiceDB(object):
             indexed_values = []
             for index, item in enumerate(values):
                 indexed_values.append('[{0}] {1}'.format(to_user_index(index), item))
-            return '{0} [{1}]'.format(' | '.join(indexed_values), user)
+            delim = ' | ' + self.bot.format.color.RESET
+            return '{0} [{1}]'.format(delim.join(indexed_values), self.bot.format(user, antiping=True))
 
-        return '{0} no {1}.'.format(
-            user + ' has' if user != mask.nick else 'You have', 'reason to live' if random.random() <= 0.05 else mode)
+        return '{0} no {1}.'.format(self.bot.format(user, antiping=True) + ' has' if user != mask.nick else 'You have',
+                                    'reason to live' if random.random() <= 0.05 else mode)
 
     @command(permission='view')
     def station(self, mask, target, args):
