@@ -158,32 +158,3 @@ class RiceDB(object):
             %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
-
-    @command(permission='admin', show_in_help_list=False)
-    def mirror_aigis(self, mask, target, args):
-        """Update local DB from Aigis' latest version.
-
-            %%mirror_aigis
-        """
-        server = 'Rizon'
-        db_map = {
-            'dtops': 'desktops',
-            'homescreens': 'homescreens',
-            'selfies': 'selfies',
-            'dotfiles': 'gits'
-        }
-
-        self.bot.log.info('Updating user database...')
-        for db in db_map:
-            r = requests.get('https://api.joaquin-v.xyz/aigis/database.php?server={0}&db={1}'.format(
-                server, db_map[db]))
-
-            data = r.json()
-            if 'error_msg' in data:
-                self.bot.log.error(data['error_msg'])
-                continue
-
-            for user in data:
-                if data[user]:
-                    self.bot.set_user_value(user, db, data[user])
-        yield 'Database updated.'
