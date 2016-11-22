@@ -25,3 +25,4 @@ class UserDB(object):
     def set_user_value(self, username, key, value):
         data = {key: value}
         self.bot.db.set(username, **data)
+        self.bot.db.sync()
