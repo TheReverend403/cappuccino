@@ -145,7 +145,7 @@ class UrlInfo(object):
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
     def on_url(self, mask, target, data):
-        if mask.nick in self.ignore_nicks:
+        if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd):
             return
 
         urls = URL_FINDER.findall(data)
