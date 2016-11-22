@@ -79,7 +79,9 @@ class RiceDB(object):
 
         if args['--replace'] or args['-r']:
             index = from_user_index(args['<index>'])
-            replacement = args['<value>']
+            replacement = args['<value>'].strip()
+            if not replacement:
+                return 'Replacement cannot be empty!'
             values = self.bot.get_user_value(mask.nick, mode)
             if not values:
                 return 'You do not have any {0} to replace.'.format(mode)
