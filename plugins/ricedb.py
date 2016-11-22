@@ -61,6 +61,9 @@ class RiceDB(object):
             if not values:
                 return 'You do not have any {0} to remove.'.format(mode)
             indexes = args['<indexes>']
+            if '*' in indexes:
+                self.bot.set_user_value(mask.nick, mode, [])
+                return 'Removed all of your {0}'.format(mode)
             deleted = []
             for index in indexes:
                 index = from_user_index(index)
