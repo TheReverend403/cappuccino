@@ -93,7 +93,8 @@ class RiceDB(object):
             for index, item in enumerate(values):
                 indexed_values.append('[{0}] {1}'.format(to_user_index(index), item))
             delim = self.bot.color.RESET + ' | '
-            return '{0} [{1}]'.format(delim.join(indexed_values), self.bot.format(user, antiping=True))
+            return '{0} {1}[{2}]'.format(delim.join(indexed_values), self.bot.color.RESET,
+                                         self.bot.format(user, antiping=True))
 
         return '{0} no {1}.'.format(self.bot.format(user, antiping=True) + ' has' if user != mask.nick else 'You have',
                                     'reason to live' if random.random() <= 0.05 else mode)
