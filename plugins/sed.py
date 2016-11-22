@@ -67,7 +67,6 @@ class EditorException(Exception):
 
 @irc3.plugin
 class Sed(object):
-
     requires = [
         'plugins.formatting'
     ]
@@ -78,7 +77,8 @@ class Sed(object):
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def update_chat_history(self, target, event, mask, data):
-        if event != 'PRIVMSG' or not target.is_channel or SED_CHECKER.match(data) or data.startswith(self.bot.cmd):
+        if event != 'PRIVMSG' or not target.is_channel or SED_CHECKER.match(data) or data.startswith(
+                self.bot.config.cmd):
             return
 
         # Strip ACTION data and just use the message.
