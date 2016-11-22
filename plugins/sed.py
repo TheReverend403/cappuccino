@@ -122,9 +122,10 @@ class Sed(object):
 
             emphasised_meant = self.bot.format('meant', bold=True)
             if mask.nick == target_user:
-                self.bot.privmsg(target, '{0} {1} to say: {2}'.format(
-                    self.bot.format(mask.nick, antiping=True), emphasised_meant, new_message))
-                return
-            self.bot.privmsg(target, '{0} thinks {1} {2} to say: {3}'.format(
-                self.bot.format(mask.nick, antiping=True), target_user, emphasised_meant, new_message))
+                prefix = '{0} {1} to say:'.format(
+                    self.bot.format(mask.nick, antiping=True), emphasised_meant)
+            else:
+                prefix = '{0} thinks {1} {2} to say:'.format(
+                    self.bot.format(mask.nick, antiping=True), target_user, emphasised_meant)
+            self.bot.privmsg(target, '{0} {1}'.format(prefix, new_message))
             return
