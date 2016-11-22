@@ -37,11 +37,12 @@ class RiceDB(object):
         # Apply some sanity to the way docopt handles args with spaces.
         if args['<values>']:
             try:
-                args['<values>'] = shlex.split(' '.join(args['<values>']).strip())
-                if len(args['<values>']) == 0:
-                    return 'Values cannot be empty!'
+                args['<values>'] = shlex.split(' '.join(args['<values>'])).strip()
             except ValueError:
                 pass
+
+            if len(args['<values>']) == 0:
+                return 'Values cannot be empty!'
 
         if args['--add'] or args['-a']:
             values = self.bot.get_user_value(mask.nick, mode) or []
