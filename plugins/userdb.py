@@ -12,7 +12,7 @@ class UserDB(object):
         self.bot = bot
         if not os.path.exists('data'):
             os.mkdir('data')
-            self.bot.log.info('Created data/ directory')
+            self.bot.log.debug('Created data/ directory')
 
     @irc3.extend
     def get_user_value(self, username, key):
