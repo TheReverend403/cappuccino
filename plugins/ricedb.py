@@ -99,6 +99,15 @@ class RiceDB(object):
             user + ' has' if user != mask.nick else 'You have', 'reason to live' if random.random() <= 0.05 else mode)
 
     @command(permission='view')
+    def station(self, mask, target, args):
+        """View or add a battlestation.
+
+            %%station [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
+        """
+        yield self._generic_db(mask, target, args)
+
+    @command(permission='view', name='desktop')
+    @command(permission='view')
     def dtop(self, mask, target, args):
         """View or add a desktop.
 
