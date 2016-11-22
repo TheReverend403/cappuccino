@@ -125,6 +125,14 @@ class RiceDB(object):
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
+    def handwriting(self, mask, target, args):
+        """View or add handwriting.
+
+            %%handwriting [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
+        """
+        yield self._generic_db(mask, target, args)
+
+    @command(permission='view')
     def distro(self, mask, target, args):
         """View or add a distro.
 
