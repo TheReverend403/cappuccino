@@ -78,7 +78,7 @@ class Sed(object):
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def update_chat_history(self, target, event, mask, data):
-        if event != 'PRIVMSG' or not target.is_channel or SED_CHECKER.match(data):
+        if event != 'PRIVMSG' or not target.is_channel or SED_CHECKER.match(data) or data.startswith(self.bot.cmd):
             return
 
         # Strip ACTION data and just use the message.
