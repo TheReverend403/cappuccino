@@ -37,7 +37,7 @@ class RiceDB(object):
         # Apply some sanity to the way docopt handles args with spaces.
         if args['<values>']:
             try:
-                args['<values>'] = shlex.split(' '.join(args['<values>']).split())
+                args['<values>'] = shlex.split(' '.join(args['<values>']).strip())
                 if len(args['<values>']) == 0:
                     return 'Values cannot be empty!'
             except ValueError:
