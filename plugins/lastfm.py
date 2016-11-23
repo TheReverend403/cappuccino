@@ -53,7 +53,12 @@ class LastFM(object):
                 self.bot.format(irc_username, antiping=True), self.bot.config.cmd)
 
         try:
-            lastfm_user = self.lastfm.get_user(lastfm_username)
+            try:
+                lastfm_user = self.lastfm.get_user(lastfm_username)
+            except pylast.WSError:
+                return 'No such last.fm user ({0}). Please set a valid user with {1}np --set <username>'.format(
+                        lastfm_username, self.bot.config.cmd)
+
             current_track = lastfm_user.get_now_playing()
             if not current_track:
                 return '{0} is not listening to anything right now.'.format(self.bot.format(irc_username, antiping=True))
@@ -74,9 +79,6 @@ class LastFM(object):
                 self.bot.format(artist, bold=True),
                 self.bot.format(title, bold=True),
                 self.bot.format(track_url, color=self.bot.color.BLUE))
-        except pylast.WSError:
-            return 'No such last.fm user ({0}). Please set a valid user with {1}np --set <username>'.format(
-                    lastfm_username, self.bot.config.cmd)
         except pylast.NetworkError as err:
             return err
 
