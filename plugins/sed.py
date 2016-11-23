@@ -100,6 +100,7 @@ class Sed(object):
 
         editor = Editor(_sed)
         for target_user, message in reversed(self.history_buffer[target]):
+            message = message.strip()
             try:
                 new_message = editor.edit(message)
             except EditorException as error:

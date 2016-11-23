@@ -127,7 +127,7 @@ class UrlInfo(object):
         title = ''
         try:
             title = html.fromstring(content).findtext('.//title')
-        except ParserError as err:
+        except (ParserError, ValueError) as err:
             self.bot.log.warn(err)
             pass
 
