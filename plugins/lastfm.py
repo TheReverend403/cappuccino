@@ -48,9 +48,9 @@ class LastFM(object):
         lastfm_username = self.bot.get_user_value(irc_username, 'lastfm')
         if not lastfm_username:
             if irc_username == mask.nick:
-                return 'You have no last.fm username set. Please set one with .np --set <username>'
-            return '{0} has no last.fm username set. Ask them to set one with .np --set <username>'.format(
-                self.bot.format(irc_username, antiping=True))
+                return 'You have no last.fm username set. Please set one with {0}np --set <username>'.format(self.bot.config.cmd)
+            return '{0} has no last.fm username set. Ask them to set one with {1}np --set <username>'.format(
+                self.bot.format(irc_username, antiping=True), self.bot.config.cmd)
 
         try:
             lastfm_user = self.lastfm.get_user(lastfm_username)
@@ -74,6 +74,10 @@ class LastFM(object):
                 self.bot.format(artist, bold=True),
                 self.bot.format(title, bold=True),
                 self.bot.format(track_url, color=self.bot.color.BLUE))
+        except pylast.WSError:
+            return 'No such last.fm user ({0}). Please set a valid user with {1}np --set <username>'.format(
+                    lastfm_username, self.bot.config.cmd)
         except pylast.NetworkError as err:
             return err
+
         return '{0} is now playing {1}'.format(self.bot.format(irc_username, antiping=True), track_info)
