@@ -170,7 +170,7 @@ class UrlInfo(object):
                         raise InvalidIPAddress('{0} is not a publicly routable address.'.format(hostname))
             except (socket.gaierror, ValueError, InvalidIPAddress) as err:
                 self.bot.log.error(err)
-                self.bot.privmsg(target, '[ {0} ] {1}'.format(
+                messages.append('[ {0} ] {1}'.format(
                     self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))
                 continue
 
