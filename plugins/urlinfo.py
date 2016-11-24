@@ -86,7 +86,7 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
     start_time = time.time()
     content = StringIO()
     downloaded_size = 0
-    chunk_size = 32
+    chunk_size = 256
 
     for chunk in response.iter_content(chunk_size):
         if time.time() - start_time >= 5:
