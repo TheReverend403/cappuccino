@@ -3,8 +3,8 @@ from contextlib import closing
 
 import irc3
 import requests
+from bs4 import BeautifulSoup
 from irc3.plugins.command import command
-from lxml import html
 
 USER_AGENT = 'ricedb/fun.py (https://github.com/TheReverend403/ricedb)'
 DEFAULT_HEADERS = {
@@ -33,8 +33,7 @@ class Fun(object):
         """
         try:
             with closing(requests.get('http://www.insultgenerator.org')) as response:
-                doc = html.fromstring(response.text)
-                insult = ''.join(doc.xpath('//div[@class="wrap"]//text()')).strip()
+                insult = BeautifulSoup(response.text, 'html.parser').find('div', {'class': 'wrap'}).text.strip()
                 yield insult
         except requests.exceptions.RequestException as err:
             self.bot.log.exception(err)

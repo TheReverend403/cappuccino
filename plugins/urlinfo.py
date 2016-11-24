@@ -3,19 +3,19 @@ import ipaddress
 import socket
 import time
 from contextlib import closing
+
+from bs4 import BeautifulSoup
+from io import StringIO
 from urllib.parse import urlparse
 
 import irc3
 import re
 import requests
-from io import BytesIO
-from lxml import html
-from lxml.etree import ParserError
 from requests import Session
 
 URL_FINDER = re.compile(r'(?:http|https)(?:://\S+)', re.IGNORECASE)
 
-DEFAULT_MAX_BYTES = 1048576
+DEFAULT_MAX_BYTES = 655360  # 64K
 MAX_TITLE_LENGTH = 150
 USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
 REQUEST_TIMEOUT = 5
@@ -36,18 +36,18 @@ REQUEST_OPTIONS = {
     'headers': REQUEST_HEADERS
 }
 
-CONTENT_TYPES_AND_LIMITS = {
-    'text': DEFAULT_MAX_BYTES,
-    'video': DEFAULT_MAX_BYTES * 10,
-    'image': DEFAULT_MAX_BYTES * 5,
-    'application': DEFAULT_MAX_BYTES * 10
-}
+ALLOWED_CONTENT_TYPES = ['text', 'video', 'image', 'application']
 
 
 class ResponseBodyTooLarge(requests.RequestException):
     pass
 
+
 class InvalidIPAddress(Exception):
+    pass
+
+
+class ContentTypeNotAllowed(Exception):
     pass
 
 
@@ -83,27 +83,23 @@ def size_fmt(num, suffix='B'):
 
 def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
     start_time = time.time()
-    content = BytesIO()
-    content_size_header = int(response.headers.get('Content-Length', 0))
+    content = StringIO()
     downloaded_size = 0
-    chunk_size = int(max_bytes / 64)
-    response_body_exception = ResponseBodyTooLarge(
-        'Response body is too large. Maximum size is {0}.'.format(size_fmt(max_bytes)))
-
-    if content_size_header > max_bytes:
-        raise response_body_exception
+    chunk_size = 32
 
     for chunk in response.iter_content(chunk_size):
         if time.time() - start_time >= 5:
             raise RequestTimeout('Request timed out.')
         if not chunk:  # filter out keep-alive new chunks
             continue
-        content.write(chunk)
+        content.write(chunk.decode('UTF-8', errors='ignore'))
+        if '</title>' in content.getvalue():
+            break
         downloaded_size += len(chunk)
         if downloaded_size > max_bytes:
-            raise response_body_exception
+            raise ResponseBodyTooLarge('Response body is too large. Maximum size is {0}.'.format(size_fmt(max_bytes)))
 
-    return downloaded_size, content.getvalue().decode('UTF-8', errors='ignore')
+    return content.getvalue()
 
 
 @irc3.plugin
@@ -123,25 +119,34 @@ class UrlInfo(object):
         socket.getaddrinfo = getaddrinfo_wrapper
         requests.packages.urllib3.disable_warnings()
 
-    def _find_title(self, content, content_disposition=None):
-        title = ''
-        try:
-            title = html.fromstring(content).findtext('.//title')
-        except (ParserError, ValueError) as err:
-            self.bot.log.warn(err)
-            pass
+    def _parse_response(self, response):
+        mimetype, _ = cgi.parse_header(response.headers.get('Content-Type'))
+        maintype = mimetype.split('/')[0]
+        no_title = self.bot.format('No Title', color=self.bot.color.RED)
+        if maintype not in ALLOWED_CONTENT_TYPES:
+            raise ContentTypeNotAllowed('{0} not in {1}'.format(maintype, ALLOWED_CONTENT_TYPES))
 
-        if not title and content_disposition:
+        title = None
+        size = int(response.headers.get('Content-Length', 0))
+        content_disposition = response.headers.get('Content-Disposition')
+        if content_disposition:
             _, params = cgi.parse_header(content_disposition)
             try:
                 title = params['filename']
             except KeyError:
                 pass
 
-        title = title.strip() if title is not None and len(title.strip()) > 0 else self.bot.format('No Title', color=self.bot.color.RED)
+        if not title and maintype == 'text':
+            try:
+                content = _read_stream(response)
+                title = BeautifulSoup(content, 'html.parser').title.string
+            except requests.RequestException:
+                raise
+
+        title = title.strip() if title is not None and len(title.strip()) > 0 else no_title
         if len(title) > MAX_TITLE_LENGTH:
             title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
-        return title
+        return title, mimetype, size
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
     def on_url(self, mask, target, data):
@@ -173,21 +178,16 @@ class UrlInfo(object):
                 with closing(self.session.get(url, **REQUEST_OPTIONS)) as response:
                     if response.status_code != requests.codes.ok:
                         response.raise_for_status()
+                    title, mimetype, size = self._parse_response(response)
 
-                    mimetype, _ = cgi.parse_header(response.headers.get('Content-Type'))
-                    maintype = mimetype.split('/')[0]
-                    if maintype not in CONTENT_TYPES_AND_LIMITS:
-                        continue
+                reply = '[ {0} ] {1} ({2})'.format(self.bot.format(hostname, color=self.bot.color.GREEN),
+                                                   self.bot.format(title, bold=True), mimetype)
+                if size:
+                    reply += ' ({0})'.format(size_fmt(size))
+                self.bot.privmsg(target, reply)
 
-                    size, content = _read_stream(response, CONTENT_TYPES_AND_LIMITS[maintype])
-
-                    if not content:
-                        continue
-
-                title = self._find_title(content, response.headers.get('Content-Disposition'))
-                self.bot.privmsg(target, '[ {0} ] {1} ({2}) ({3})'.format(
-                    self.bot.format(hostname, color=self.bot.color.GREEN),
-                    self.bot.format(title, bold=True), size_fmt(size), mimetype))
+            except ContentTypeNotAllowed:
+                return
 
             except requests.RequestException as err:
                 self.bot.log.error(err)
