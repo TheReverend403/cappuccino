@@ -4,6 +4,7 @@ import socket
 import time
 from contextlib import closing
 
+import random
 from bs4 import BeautifulSoup
 from io import StringIO
 from urllib.parse import urlparse
@@ -157,9 +158,8 @@ class UrlInfo(object):
         if not urls:
             return
 
-        # Only handle 1 URL until I get the hang of Python async.
         messages = []
-        for url in urls[-3:]:
+        for url in random.shuffle(urls)[-3:]:
             self.bot.log.debug('Fetching page title for {0}'.format(url))
 
             hostname = urlparse(url).hostname
