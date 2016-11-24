@@ -149,7 +149,7 @@ class UrlInfo(object):
         socket.getaddrinfo = getaddrinfo_wrapper
         requests.packages.urllib3.disable_warnings()
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*{0}).*'.format(URL_FINDER.pattern))
     def on_url(self, mask, target, data):
         if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd):
             return
