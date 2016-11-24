@@ -102,6 +102,35 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
     return content.getvalue()
 
 
+def _parse_response(response):
+    mimetype, _ = cgi.parse_header(response.headers.get('Content-Type'))
+    maintype = mimetype.split('/')[0]
+    if maintype not in ALLOWED_CONTENT_TYPES:
+        raise ContentTypeNotAllowed('{0} not in {1}'.format(maintype, ALLOWED_CONTENT_TYPES))
+
+    title = None
+    size = int(response.headers.get('Content-Length', 0))
+    content_disposition = response.headers.get('Content-Disposition')
+    if content_disposition:
+        _, params = cgi.parse_header(content_disposition)
+        try:
+            title = params['filename']
+        except KeyError:
+            pass
+    elif maintype == 'text':
+        try:
+            content = _read_stream(response)
+            title = BeautifulSoup(content, 'html.parser').title.string
+        except requests.RequestException:
+            raise
+
+    if title:
+        title = title.strip()
+        if len(title) > MAX_TITLE_LENGTH:
+            title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
+    return title, mimetype, size
+
+
 @irc3.plugin
 class UrlInfo(object):
     requires = [
@@ -118,35 +147,6 @@ class UrlInfo(object):
         self.session.headers.update(REQUEST_HEADERS)
         socket.getaddrinfo = getaddrinfo_wrapper
         requests.packages.urllib3.disable_warnings()
-
-    def _parse_response(self, response):
-        mimetype, _ = cgi.parse_header(response.headers.get('Content-Type'))
-        maintype = mimetype.split('/')[0]
-        no_title = self.bot.format('No Title', color=self.bot.color.RED)
-        if maintype not in ALLOWED_CONTENT_TYPES:
-            raise ContentTypeNotAllowed('{0} not in {1}'.format(maintype, ALLOWED_CONTENT_TYPES))
-
-        title = None
-        size = int(response.headers.get('Content-Length', 0))
-        content_disposition = response.headers.get('Content-Disposition')
-        if content_disposition:
-            _, params = cgi.parse_header(content_disposition)
-            try:
-                title = params['filename']
-            except KeyError:
-                pass
-
-        if not title and maintype == 'text':
-            try:
-                content = _read_stream(response)
-                title = BeautifulSoup(content, 'html.parser').title.string
-            except requests.RequestException:
-                raise
-
-        title = title.strip() if title is not None and len(title.strip()) > 0 else no_title
-        if len(title) > MAX_TITLE_LENGTH:
-            title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
-        return title, mimetype, size
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*https?://\S+).*')
     def on_url(self, mask, target, data):
@@ -178,7 +178,10 @@ class UrlInfo(object):
                 with closing(self.session.get(url, **REQUEST_OPTIONS)) as response:
                     if response.status_code != requests.codes.ok:
                         response.raise_for_status()
-                    title, mimetype, size = self._parse_response(response)
+                    title, mimetype, size = _parse_response(response)
+
+                if not title:
+                    title = self.bot.format('No Title', color=self.bot.color.RED)
 
                 reply = '[ {0} ] {1} ({2})'.format(self.bot.format(hostname, color=self.bot.color.GREEN),
                                                    self.bot.format(title, bold=True), mimetype)

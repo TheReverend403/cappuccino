@@ -27,13 +27,11 @@ class Formatting(object):
         self.bot.color = self.Color
 
     @irc3.extend
-    def format(self, text, color=None, bold=False, antiping=False, reset=True):
+    def format(self, text, color=None, bold=False, antiping=False):
         if antiping:
             text = '\u200B'.join(text)
         if color:
-            text = '\x03{0}{1}'.format(color, text)
+            text = '\x03{0}{1}'.format(color, text) + self.bot.color.RESET
         if bold:
-            text = '\x02{0}'.format(text)
-        if reset:
-            text += self.bot.color.RESET
+            text = '\x02{0}'.format(text) + self.bot.color.RESET
         return text

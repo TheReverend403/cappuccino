@@ -3,7 +3,6 @@ import shlex
 
 import irc3
 import random
-import requests
 from irc3.plugins.command import command
 
 
