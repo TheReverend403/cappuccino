@@ -14,13 +14,13 @@ import re
 import requests
 from requests import Session
 
-URL_FINDER = re.compile(r'(?:http|https)(?:://\S+)', re.IGNORECASE)
+URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE)
 
 DEFAULT_MAX_BYTES = 655360  # 64K
 MAX_TITLE_LENGTH = 128
 USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
 REQUEST_TIMEOUT = 5
-HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.I)
+HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.IGNORECASE)
 
 FORCE_IPV4_HOSTNAMES = ['www.youtube.com', 'youtube.com', 'youtu.be']
 
@@ -185,8 +185,8 @@ class UrlInfo(object):
                 if not title:
                     title = self.bot.format('No Title', color=self.bot.color.RED)
 
-                reply = '[ {0} ] {1} ({2})'.format(self.bot.format(hostname, color=self.bot.color.GREEN),
-                                                   self.bot.format(title, bold=True), mimetype)
+                reply = '[ {0} ] {1} ({2})'.format(
+                    self.bot.format(hostname, color=self.bot.color.GREEN), self.bot.format(title, bold=True), mimetype)
                 if size:
                     reply += ' ({0})'.format(size_fmt(size))
                 messages.append(reply)
