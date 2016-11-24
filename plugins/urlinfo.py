@@ -159,7 +159,8 @@ class UrlInfo(object):
             return
 
         messages = []
-        for url in random.shuffle(urls)[-3:]:
+        random.shuffle(urls)
+        for url in urls[-3:]:
             self.bot.log.debug('Fetching page title for {0}'.format(url))
 
             hostname = urlparse(url).hostname
