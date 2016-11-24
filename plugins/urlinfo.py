@@ -158,7 +158,8 @@ class UrlInfo(object):
             return
 
         # Only handle 1 URL until I get the hang of Python async.
-        for url in urls[-1:]:
+        messages = []
+        for url in urls[-3:]:
             self.bot.log.debug('Fetching page title for {0}'.format(url))
 
             hostname = urlparse(url).hostname
@@ -187,19 +188,22 @@ class UrlInfo(object):
                                                    self.bot.format(title, bold=True), mimetype)
                 if size:
                     reply += ' ({0})'.format(size_fmt(size))
-                self.bot.privmsg(target, reply)
+                messages.append(reply)
 
             except ContentTypeNotAllowed:
-                return
+                continue
 
             except requests.RequestException as err:
                 self.bot.log.error(err)
                 if err.response is not None and err.response.reason is not None:
-                    self.bot.privmsg(target, '[ {0} ] {1} {2}'.format(
+                    messages.append('[ {0} ] {1} {2}'.format(
                         self.bot.format(hostname, color=self.bot.color.RED),
                         self.bot.format(err.response.status_code, bold=True),
                         self.bot.format(err.response.reason, bold=True)))
                     continue
 
-                self.bot.privmsg(target, '[ {0} ] {1}'.format(
+                messages.append('[ {0} ] {1}'.format(
                     self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))
+
+        if messages:
+            self.bot.privmsg(target, ' | '.join(messages))
