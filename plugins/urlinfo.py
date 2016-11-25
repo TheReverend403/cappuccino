@@ -24,6 +24,7 @@ HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.IGNORECASE)
 
 FORCE_IPV4_HOSTNAMES = ['www.youtube.com', 'youtube.com', 'youtu.be']
 
+REQUEST_CHUNK_SIZE = 256  # Bytes
 REQUEST_HEADERS = {
     'User-Agent': USER_AGENT,
     'Accept-Language': 'en-GB,en-US,en;q=0.5'
@@ -85,9 +86,8 @@ def size_fmt(num, suffix='B'):
 def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
     start_time = time.time()
     content = StringIO()
-    chunk_size = 256
 
-    for chunk in response.iter_content(chunk_size):
+    for chunk in response.iter_content(REQUEST_CHUNK_SIZE):
         if time.time() - start_time >= REQUEST_TIMEOUT:
             raise RequestTimeout('Request timed out')
         if not chunk:  # filter out keep-alive new chunks
