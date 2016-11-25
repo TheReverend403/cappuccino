@@ -163,7 +163,7 @@ class UrlInfo(object):
         messages = []
         random.shuffle(urls)
         for url in urls[-3:]:
-            self.bot.log.debug('Fetching page title for {0}'.format(url))
+            self.bot.log.info('Fetching page title for {0}'.format(url))
 
             hostname = urlparse(url).hostname
             try:
