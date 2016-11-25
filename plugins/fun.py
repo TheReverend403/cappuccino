@@ -3,6 +3,7 @@ from contextlib import closing
 
 import irc3
 import requests
+import time
 from bs4 import BeautifulSoup
 from irc3.plugins.command import command
 
@@ -20,7 +21,8 @@ class Fun(object):
         'plugins.formatting'
     ]
 
-    random_chance = 0.35
+    random_chance = 0.05
+    last_reply_time = 0
 
     def __init__(self, bot):
         self.bot = bot
@@ -75,6 +77,9 @@ class Fun(object):
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)\b')
     def gravity(self, mask, target):
+        if time.time() - self.last_reply_time < 30 or random.random() > self.random_chance:
+            return
+        self.last_reply_time = time.time()
         self.bot.privmsg(target,
                          '{0}: A direction away from the center of gravity of a celestial object.'.format(mask.nick))
 
