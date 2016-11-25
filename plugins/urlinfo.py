@@ -85,7 +85,6 @@ def size_fmt(num, suffix='B'):
 def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
     start_time = time.time()
     content = StringIO()
-    downloaded_size = 0
     chunk_size = 256
 
     for chunk in response.iter_content(chunk_size):
@@ -93,11 +92,10 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
             raise RequestTimeout('Request timed out')
         if not chunk:  # filter out keep-alive new chunks
             continue
-        content.write(chunk.decode('UTF-8', errors='ignore'))
+        response_length = content.write(chunk.decode('UTF-8', errors='ignore'))
         if '</title>' in content.getvalue():
             break
-        downloaded_size += len(chunk)
-        if downloaded_size > max_bytes:
+        if response_length > max_bytes:
             raise ResponseBodyTooLarge('Couldn\'t find page title in less than {0}'.format(size_fmt(max_bytes)))
 
     return content.getvalue()
