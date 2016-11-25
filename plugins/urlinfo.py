@@ -89,7 +89,7 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
     chunk_size = 256
 
     for chunk in response.iter_content(chunk_size):
-        if time.time() - start_time >= 5:
+        if time.time() - start_time >= REQUEST_TIMEOUT:
             raise RequestTimeout('Request timed out')
         if not chunk:  # filter out keep-alive new chunks
             continue
@@ -127,6 +127,8 @@ def _parse_response(response):
             title = BeautifulSoup(content, 'html.parser').title.string
         except requests.RequestException:
             raise
+        except AttributeError:
+            pass
 
     if title:
         title = title.strip()
