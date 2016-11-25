@@ -98,7 +98,7 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
             break
         downloaded_size += len(chunk)
         if downloaded_size > max_bytes:
-            raise ResponseBodyTooLarge('Response body is too large. Maximum size is {0}.'.format(size_fmt(max_bytes)))
+            raise ResponseBodyTooLarge('Couldn\'t find page title in less than {0}.'.format(size_fmt(max_bytes)))
 
     return content.getvalue()
 
