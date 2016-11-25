@@ -104,10 +104,13 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
 
 
 def _parse_response(response):
-    mimetype, _ = cgi.parse_header(response.headers.get('Content-Type'))
-    maintype = mimetype.split('/')[0]
-    if maintype not in ALLOWED_CONTENT_TYPES:
-        raise ContentTypeNotAllowed('{0} not in {1}'.format(maintype, ALLOWED_CONTENT_TYPES))
+    content_type = response.headers.get('Content-Type')
+    main_type = None
+    if content_type:
+        content_type, _ = cgi.parse_header(content_type)
+        main_type = content_type.split('/')[0]
+        if main_type not in ALLOWED_CONTENT_TYPES:
+            raise ContentTypeNotAllowed('{0} not in {1}'.format(main_type, ALLOWED_CONTENT_TYPES))
 
     title = None
     size = int(response.headers.get('Content-Length', 0))
@@ -118,7 +121,7 @@ def _parse_response(response):
             title = params['filename']
         except KeyError:
             pass
-    elif maintype == 'text':
+    elif main_type == 'text':
         try:
             content = _read_stream(response)
             title = BeautifulSoup(content, 'html.parser').title.string
@@ -129,7 +132,7 @@ def _parse_response(response):
         title = title.strip()
         if len(title) > MAX_TITLE_LENGTH:
             title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
-    return title, mimetype, size
+    return title, content_type, size
 
 
 @irc3.plugin
@@ -185,10 +188,13 @@ class UrlInfo(object):
                 if not title:
                     title = self.bot.format('No Title', color=self.bot.color.RED)
 
-                reply = '[ {0} ] {1} ({2})'.format(
-                    self.bot.format(hostname, color=self.bot.color.GREEN), self.bot.format(title, bold=True), mimetype)
+                reply = '[ {0} ] {1}'.format(
+                    self.bot.format(hostname, color=self.bot.color.GREEN), self.bot.format(title, bold=True))
+                if mimetype:
+                    reply += ' ({0})'.format(mimetype)
                 if size:
                     reply += ' ({0})'.format(size_fmt(size))
+
                 messages.append(reply)
 
             except ContentTypeNotAllowed:
