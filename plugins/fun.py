@@ -28,7 +28,7 @@ class Fun(object):
     ]
 
     random_chance = 0.05
-    last_reply_time = 0
+    last_reply_time = None
 
     def __init__(self, bot):
         self.bot = bot
@@ -93,9 +93,13 @@ class Fun(object):
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)\b')
     def gravity(self, mask, target):
-        if time.time() - self.last_reply_time < 30 or random.random() > self.random_chance:
+        if self.last_reply_time and time.time() - self.last_reply_time < 30:
             return
         self.last_reply_time = time.time()
+
+        if not random.random() > self.random_chance:
+            return
+
         self.bot.privmsg(target,
                          '{0}: A direction away from the center of gravity of a celestial object.'.format(mask.nick))
 
