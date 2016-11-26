@@ -199,7 +199,8 @@ class UrlInfo(object):
 
                 messages.append(reply)
 
-            except ContentTypeNotAllowed:
+            except ContentTypeNotAllowed as err:
+                self.bot.log.warn(err)
                 continue
 
             except requests.RequestException as err:
