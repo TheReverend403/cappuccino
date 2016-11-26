@@ -135,6 +135,15 @@ def _parse_url(url):
         return title, content_type, size
 
 
+def _clean_url(url):
+    if url:
+        url = url.rstrip('\'.,"')
+        for left_brace, right_brace in BRACES:
+            if left_brace not in url and url.endswith(right_brace):
+                url = url.rstrip(right_brace)
+    return url
+
+
 @irc3.plugin
 class UrlInfo(object):
     requires = [
@@ -155,18 +164,12 @@ class UrlInfo(object):
         if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd):
             return
 
-        urls = URL_FINDER.findall(data)
+        urls = [_clean_url(url) for url in URL_FINDER.findall(data)]
         if not urls:
             return
 
         messages = []
-        random.shuffle(urls)
-        for url in urls[-3:]:
-            url = url.rstrip('\'.,"')
-            for left_brace, right_brace in BRACES:
-                if left_brace not in url and url.endswith(right_brace):
-                    url = url.rstrip(right_brace)
-
+        for url in random.sample(urls, len(urls))[-3:]:
             self.bot.log.info('Fetching page title for {0}'.format(url))
 
             hostname = urlparse(url).hostname
