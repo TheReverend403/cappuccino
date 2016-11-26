@@ -1,9 +1,9 @@
-import random
+import time
 from contextlib import closing
 
 import irc3
+import random
 import requests
-import time
 from bs4 import BeautifulSoup
 from irc3.plugins.command import command
 
@@ -13,10 +13,16 @@ DEFAULT_HEADERS = {
     'Accept-Language': 'en-GB, en-US, en'
 }
 
+# Borrowed from https://github.com/GeneralUnRest/8ball-bot/blob/master/8ball.js
+EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.', 'Without a doubt.',
+                       'My sources say no.', 'As I see it, yes.', 'You may rely on it.', 'Concentrate and ask again.',
+                       'Outlook not so good.', 'It is decidedly so.', 'Better not tell you now.', 'Very doubtful.',
+                       'Yes - definitely.', 'It is certain.', 'Cannot predict now.', 'Most likely.', 'Ask again later.',
+                       'My reply is no.', 'Outlook good.', 'Don\'t count on it.']
+
 
 @irc3.plugin
 class Fun(object):
-
     requires = [
         'plugins.formatting'
     ]
@@ -57,6 +63,16 @@ class Fun(object):
 
         rolls = [random.SystemRandom().randint(1, dice_size) for _ in range(dice_count)]
         return '[{0}] = {1}'.format(', '.join(str(roll) for roll in rolls), self.bot.format(sum(rolls), bold=True))
+
+    @command(permission='view', name='8ball')
+    def eightball(self, mask, target, args):
+        """Consult the wise and powerful 8 ball.
+
+            %%8ball <query>...
+        """
+
+        nick = self.bot.format(mask.nick, antiping=True)
+        return '{0}: {1}'.format(nick, random.choice(EIGHTBALL_RESPONSES))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
     def intensify(self, target, data):
