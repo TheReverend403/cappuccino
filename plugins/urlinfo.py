@@ -105,35 +105,35 @@ def _parse_url(url):
         if response.status_code != requests.codes.ok:
             response.raise_for_status()
 
-    content_type = response.headers.get('Content-Type')
-    main_type = None
-    if content_type:
-        content_type, _ = cgi.parse_header(content_type)
-        main_type = content_type.split('/')[0]
-        if main_type not in ALLOWED_CONTENT_TYPES:
-            raise ContentTypeNotAllowed('{0} not in {1}'.format(main_type, ALLOWED_CONTENT_TYPES))
+        content_type = response.headers.get('Content-Type')
+        main_type = None
+        if content_type:
+            content_type, _ = cgi.parse_header(content_type)
+            main_type = content_type.split('/')[0]
+            if main_type not in ALLOWED_CONTENT_TYPES:
+                raise ContentTypeNotAllowed('{0} not in {1}'.format(main_type, ALLOWED_CONTENT_TYPES))
 
-    title = None
-    size = int(response.headers.get('Content-Length', 0))
-    content_disposition = response.headers.get('Content-Disposition')
-    if content_disposition:
-        _, params = cgi.parse_header(content_disposition)
-        try:
-            title = params['filename']
-        except KeyError:
-            pass
-    elif main_type == 'text':
-        try:
-            content = _read_stream(response)
-            title = BeautifulSoup(content, 'html.parser').title.string
-        except AttributeError:
-            pass
+        title = None
+        size = int(response.headers.get('Content-Length', 0))
+        content_disposition = response.headers.get('Content-Disposition')
+        if content_disposition:
+            _, params = cgi.parse_header(content_disposition)
+            try:
+                title = params['filename']
+            except KeyError:
+                pass
+        elif main_type == 'text':
+            try:
+                content = _read_stream(response)
+                title = BeautifulSoup(content, 'html.parser').title.string
+            except AttributeError:
+                pass
 
-    if title:
-        title = title.strip()
-        if len(title) > MAX_TITLE_LENGTH:
-            title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
-    return title, content_type, size
+        if title:
+            title = title.strip()
+            if len(title) > MAX_TITLE_LENGTH:
+                title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
+        return title, content_type, size
 
 
 @irc3.plugin
