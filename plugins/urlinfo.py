@@ -181,12 +181,14 @@ class UrlInfo(object):
                     self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))
                 continue
 
-            hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
+            hostname = self.bot.format(HOSTNAME_CLEANUP_REGEX.sub('', hostname), antiping=True)
             try:
                 title, mimetype, size = _parse_url(url)
 
                 if not title:
                     title = self.bot.format('No Title', color=self.bot.color.RED)
+                else:
+                    title = self.bot.format(title, antiping=True)
 
                 reply = '[ {0} ] {1}'.format(
                     self.bot.format(hostname, color=self.bot.color.GREEN), self.bot.format(title, bold=True))
