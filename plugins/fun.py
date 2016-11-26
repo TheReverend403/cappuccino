@@ -97,7 +97,7 @@ class Fun(object):
             return
         self.last_reply_time = time.time()
 
-        if not random.random() > self.random_chance:
+        if random.random() > self.random_chance:
             return
 
         self.bot.privmsg(target,
