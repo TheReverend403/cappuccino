@@ -106,7 +106,6 @@ def _parse_url(url):
             response.raise_for_status()
 
         content_type = response.headers.get('Content-Type')
-        main_type = None
         if content_type:
             content_type, _ = cgi.parse_header(content_type)
             main_type = content_type.split('/')[0]
@@ -122,7 +121,7 @@ def _parse_url(url):
                 title = params['filename']
             except KeyError:
                 pass
-        elif main_type == 'text':
+        elif content_type in ['text/html', 'application/xhtml+xml']:
             try:
                 content = _read_stream(response)
                 title = BeautifulSoup(content, 'html.parser').title.string
