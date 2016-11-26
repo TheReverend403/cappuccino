@@ -92,10 +92,11 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
             raise RequestTimeout('Request timed out')
         if not chunk:  # filter out keep-alive new chunks
             continue
-        if content.write(chunk.decode('UTF-8', errors='ignore')) > max_bytes:
-            raise ResponseBodyTooLarge('Couldn\'t find page title in less than {0}'.format(size_fmt(max_bytes)))
+        content_length = content.write(chunk.decode('UTF-8', errors='ignore'))
         if '</title>' in content.getvalue():
             break
+        if content_length > max_bytes:
+            raise ResponseBodyTooLarge('Couldn\'t find page title in less than {0}'.format(size_fmt(content_length)))
 
     return content.getvalue()
 
