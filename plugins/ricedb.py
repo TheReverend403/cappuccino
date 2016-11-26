@@ -59,7 +59,7 @@ class RiceDB(object):
             values = self.bot.get_user_value(mask.nick, mode)
             if not values:
                 return 'You do not have any {0} to remove.'.format(mode)
-            indexes = args['<indexes>']
+            indexes = args['<id>']
             if '*' in indexes:
                 self.bot.set_user_value(mask.nick, mode, [])
                 return 'Removed all of your {0}.'.format(mode)
@@ -77,7 +77,7 @@ class RiceDB(object):
             return 'Removed {0}.'.format(', '.join(deleted))
 
         if args['--replace'] or args['-r']:
-            index = from_user_index(args['<index>'])
+            index = from_user_index(args['<id>'])
             replacement = args['<value>'].strip()
             if not replacement:
                 return 'Replacement cannot be empty!'
@@ -108,7 +108,7 @@ class RiceDB(object):
     def station(self, mask, target, args):
         """View or add a battlestation.
 
-            %%station [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
+            %%station [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <id>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -116,7 +116,7 @@ class RiceDB(object):
     def dtop(self, mask, target, args):
         """View or add a desktop.
 
-            %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
+            %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <id>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -124,7 +124,7 @@ class RiceDB(object):
     def dotfiles(self, mask, target, args):
         """View or add dotfiles.
 
-            %%dotfiles [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
+            %%dotfiles [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <id>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -132,7 +132,7 @@ class RiceDB(object):
     def handwriting(self, mask, target, args):
         """View or add handwriting.
 
-            %%handwriting [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
+            %%handwriting [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <id>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -140,7 +140,7 @@ class RiceDB(object):
     def distro(self, mask, target, args):
         """View or add a distro.
 
-            %%distro [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
+            %%distro [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <id>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -148,7 +148,7 @@ class RiceDB(object):
     def homescreen(self, mask, target, args):
         """View or add a homescreen.
 
-            %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
+            %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <id>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -156,6 +156,6 @@ class RiceDB(object):
     def selfie(self, mask, target, args):
         """View or add a selfie.
 
-            %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <indexes>... | (-r | --replace) <index> <value>) | <user>]
+            %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <id>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
