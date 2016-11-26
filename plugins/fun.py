@@ -91,7 +91,7 @@ class Fun(object):
             return
         self.bot.privmsg(target, 'lmao')
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*z*|u)t?(\'?| i)s? ?up|\'?sup)\b')
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b')
     def gravity(self, mask, target):
         if self.last_reply_time and time.time() - self.last_reply_time < 30:
             return
