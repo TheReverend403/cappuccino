@@ -16,6 +16,7 @@ from requests import Session
 
 URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE)
 
+BRACES = [('{', '}'), ('<', '>'), ('[', ']'), ('(', ')')]
 DEFAULT_MAX_BYTES = 655360  # 64K
 MAX_TITLE_LENGTH = 128
 USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
@@ -164,6 +165,10 @@ class UrlInfo(object):
         random.shuffle(urls)
         for url in urls[-3:]:
             url = url.rstrip('\'.,"')
+            for left_brace, right_brace in BRACES:
+                if left_brace not in url and url.endswith(right_brace):
+                    url = url.rstrip(right_brace)
+
             self.bot.log.info('Fetching page title for {0}'.format(url))
 
             hostname = urlparse(url).hostname
