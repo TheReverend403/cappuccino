@@ -12,7 +12,6 @@ from urllib.parse import urlparse
 import irc3
 import re
 import requests
-from requests import Session
 
 URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE)
 
@@ -101,7 +100,11 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
     return content.getvalue()
 
 
-def _parse_response(response):
+def _parse_url(url):
+    with closing(requests.get(url, **REQUEST_OPTIONS)) as response:
+        if response.status_code != requests.codes.ok:
+            response.raise_for_status()
+
     content_type = response.headers.get('Content-Type')
     main_type = None
     if content_type:
@@ -123,8 +126,6 @@ def _parse_response(response):
         try:
             content = _read_stream(response)
             title = BeautifulSoup(content, 'html.parser').title.string
-        except requests.RequestException:
-            raise
         except AttributeError:
             pass
 
@@ -147,8 +148,6 @@ class UrlInfo(object):
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
         except KeyError:
             self.ignore_nicks = []
-        self.session = Session()
-        self.session.headers.update(REQUEST_HEADERS)
         socket.getaddrinfo = getaddrinfo_wrapper
         requests.packages.urllib3.disable_warnings()
 
@@ -185,10 +184,7 @@ class UrlInfo(object):
 
             hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
             try:
-                with closing(self.session.get(url, **REQUEST_OPTIONS)) as response:
-                    if response.status_code != requests.codes.ok:
-                        response.raise_for_status()
-                    title, mimetype, size = _parse_response(response)
+                title, mimetype, size = _parse_url(url)
 
                 if not title:
                     title = self.bot.format('No Title', color=self.bot.color.RED)
