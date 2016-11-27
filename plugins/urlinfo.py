@@ -25,6 +25,7 @@ HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.IGNORECASE)
 
 FORCE_IPV4_HOSTNAMES = ['www.youtube.com', 'youtube.com', 'youtu.be']
 
+HTML_MIMETYPES = ['text/html', 'application/xhtml+xml']
 REQUEST_CHUNK_SIZE = 256  # Bytes
 REQUEST_HEADERS = {
     'User-Agent': USER_AGENT,
@@ -135,7 +136,7 @@ def _parse_url(url):
                     title = params['filename']
                 except KeyError:
                     pass
-            elif content_type in ['text/html', 'application/xhtml+xml']:
+            elif content_type in HTML_MIMETYPES:
                 try:
                     content = _read_stream(response)
                     title = BeautifulSoup(content, 'html.parser').title.string
@@ -218,7 +219,7 @@ class UrlInfo(object):
                         self.bot.format(hostname, color=self.bot.color.GREEN), self.bot.format(title, bold=True))
                     if mimetype:
                         reply += ' ({0})'.format(mimetype)
-                    if size:
+                    if size and mimetype not in HTML_MIMETYPES:
                         reply += ' ({0})'.format(size_fmt(size))
 
                     messages.append(reply)
