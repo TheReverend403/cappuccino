@@ -196,7 +196,6 @@ class UrlInfo(object):
                         raise err
                 except ContentTypeNotAllowed as err:
                     self.bot.log.warn(err)
-                    continue
                 except (socket.gaierror, ValueError, InvalidIPAddress) as err:
                     messages.append('[ {0} ] {1}'.format(self.bot.format(hostname, color=self.bot.color.RED),
                                                          self.bot.format(err, bold=True)))
@@ -208,10 +207,9 @@ class UrlInfo(object):
                             self.bot.format(hostname, color=self.bot.color.RED),
                             self.bot.format(err.response.status_code, bold=True),
                             self.bot.format(err.response.reason, bold=True)))
-                        continue
-
-                    messages.append('[ {0} ] {1}'.format(
-                        self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))
+                    else:
+                        messages.append('[ {0} ] {1}'.format(
+                            self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))
                 else:
                     if not title:
                         title = self.bot.format('No Title', color=self.bot.color.RED)
