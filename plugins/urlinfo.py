@@ -180,13 +180,13 @@ class UrlInfo(object):
         if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd):
             return
 
-        urls = [_clean_url(url) for url in URL_FINDER.findall(data)]
+        urls = set([_clean_url(url) for url in URL_FINDER.findall(data)])
         if not urls:
             return
 
         messages = []
         with ThreadPool(len(urls)) as threadpool:
-            results = threadpool.imap_unordered(_parse_url, set(random.sample(urls, len(urls))[-3:]))
+            results = threadpool.imap_unordered(_parse_url, random.sample(urls, len(urls))[-3:])
             for hostname, title, mimetype, size, err in results:
                 self.bot.log.info('Retrieving page title for {0}'.format(hostname))
                 hostname = self.bot.format(hostname, antiping=True)
