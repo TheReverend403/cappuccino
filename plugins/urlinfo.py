@@ -103,7 +103,6 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
 
 
 def _parse_url(url):
-    print(url)
     hostname = urlparse(url).hostname
     try:
         for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
@@ -187,8 +186,9 @@ class UrlInfo(object):
 
         messages = []
         with ThreadPool(len(urls)) as threadpool:
-            results = threadpool.imap_unordered(_parse_url, random.sample(urls, len(urls))[-3:])
+            results = threadpool.imap_unordered(_parse_url, set(random.sample(urls, len(urls))[-3:]))
             for hostname, title, mimetype, size, err in results:
+                self.bot.log.info('Retrieving page title for {0}'.format(hostname))
                 hostname = self.bot.format(hostname, antiping=True)
                 try:
                     # Lets me handle exceptions properly rather than as a bunch of if checks
