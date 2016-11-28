@@ -13,6 +13,9 @@ DEFAULT_HEADERS = {
     'Accept-Language': 'en-GB, en-US, en'
 }
 
+DICE_SIDES_LIMIT = (4, 128)
+DICE_COUNT_LIMIT = (1, 64)
+
 # Borrowed from https://github.com/GeneralUnRest/8ball-bot/blob/master/8ball.js
 EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.', 'Without a doubt.',
                        'My sources say no.', 'As I see it, yes.', 'You may rely on it.', 'Concentrate and ask again.',
@@ -57,9 +60,15 @@ class Fun(object):
         dice_count, dice_size = int(args['<amount>']), int(args['<die-faces>'])
         if not dice_count or not dice_size:
             return 'Please supply numbers only.'
-        if dice_count < 1 or dice_count > 64 or dice_size < 4 or dice_size > 128:
+        count_limit_lower, count_limit_upper = DICE_COUNT_LIMIT
+        size_limit_lower, size_limit_upper = DICE_SIDES_LIMIT
+        if target.is_channel:
+            count_limit_upper, size_limit_upper = int(count_limit_upper / 2), int(size_limit_upper / 2)
+        if dice_count < count_limit_lower or dice_count > count_limit_upper \
+                or dice_size < size_limit_lower or dice_size > size_limit_upper:
             return 'Invalid roll specification. Must be a minimum of {0} and a maximum of {1}'.format(
-                self.bot.format('1 4', bold=True), self.bot.format('64 128', bold=True))
+                self.bot.format('{0} {1}'.format(count_limit_lower, size_limit_lower), bold=True),
+                self.bot.format('{0} {1}'.format(count_limit_upper, size_limit_upper), bold=True))
 
         rolls = [random.SystemRandom().randint(1, dice_size) for _ in range(dice_count)]
         return '[{0}] = {1}'.format(', '.join(str(roll) for roll in rolls), self.bot.format(sum(rolls), bold=True))
