@@ -83,7 +83,7 @@ class RiceDB(object):
             return 'Removed {0}.'.format(', '.join(deleted))
 
         if args['--replace'] or args['-r']:
-            index = from_user_index(args['<id>'])
+            index = from_user_index(args['<id>'][0])  # TODO: Find out why this is a list.
             replacement = args['<value>'].strip()
             if not replacement:
                 return 'Replacement cannot be empty!'
