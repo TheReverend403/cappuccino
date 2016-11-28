@@ -215,6 +215,8 @@ class UrlInfo(object):
                 else:
                     if not title:
                         title = self.bot.format('No Title', color=self.bot.color.RED)
+                    else:
+                        title = self.bot.format(title, antiping=True)
 
                     reply = '[ {0} ] {1}'.format(
                         self.bot.format(hostname, color=self.bot.color.GREEN), self.bot.format(title, bold=True))

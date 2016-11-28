@@ -28,10 +28,18 @@ class Formatting(object):
 
     @irc3.extend
     def format(self, text, color=None, bold=False, antiping=False):
+        # Insert a single zero-width space in the middle of each word of a string to prevent unwanted IRC client pings
         if antiping:
-            text = '\u200B'.join(text)
-        if color:
-            text = '\x03{0}{1}'.format(color, text) + self.bot.color.RESET
+            newtext = []
+            for word in text.split():
+                word_middle = int(len(word) / 2)
+                newtext.append(word[:word_middle] + '\u200B' + word[word_middle:])
+            text = ' '.join(newtext)
+            print(text.encode('UTF-8'))
         if bold:
-            text = '\x02{0}'.format(text) + self.bot.color.RESET
+            text = '\x02{0}'.format(text)
+        if color:
+            text = '\x03{0}{1}'.format(color, text)
+        if bold or color:
+            text += self.bot.color.RESET
         return text
