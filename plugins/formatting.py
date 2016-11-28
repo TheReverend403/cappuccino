@@ -35,7 +35,6 @@ class Formatting(object):
                 word_middle = int(len(word) / 2)
                 newtext.append(word[:word_middle] + '\u200B' + word[word_middle:])
             text = ' '.join(newtext)
-            print(text.encode('UTF-8'))
         if bold:
             text = '\x02{0}'.format(text)
         if color:
