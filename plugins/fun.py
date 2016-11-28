@@ -102,7 +102,7 @@ class Fun(object):
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b')
     def gravity(self, mask, target):
-        if self.last_reply_time and time.time() - self.last_reply_time < 30:
+        if self.last_reply_time and time.time() - self.last_reply_time < 60 * 60:  # 1 hour rate limit
             return
         self.last_reply_time = time.time()
 
