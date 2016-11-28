@@ -184,12 +184,12 @@ class UrlInfo(object):
         urls = set([_clean_url(url) for url in URL_FINDER.findall(data)])
         if not urls:
             return
+        urls = random.sample(urls, len(urls))[-3:]
 
         messages = []
         with ThreadPool(len(urls)) as threadpool:
-            results = threadpool.imap_unordered(_parse_url, random.sample(urls, len(urls))[-3:])
-            for hostname, title, mimetype, size, err in results:
-                self.bot.log.info('Retrieving page title for {0}'.format(hostname))
+            self.bot.log.info('Retrieving page titles for {0}'.format(urls))
+            for hostname, title, mimetype, size, err in threadpool.imap_unordered(_parse_url, urls):
                 hostname = self.bot.format(hostname, antiping=True)
                 try:
                     # Lets me handle exceptions properly rather than as a bunch of if checks
@@ -198,6 +198,7 @@ class UrlInfo(object):
                 except ContentTypeNotAllowed as err:
                     self.bot.log.warn(err)
                 except (socket.gaierror, ValueError, InvalidIPAddress) as err:
+                    self.bot.log.error(err)
                     messages.append('[ {0} ] {1}'.format(self.bot.format(hostname, color=self.bot.color.RED),
                                                          self.bot.format(err, bold=True)))
 
