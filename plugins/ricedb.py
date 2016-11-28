@@ -5,6 +5,8 @@ import irc3
 import random
 from irc3.plugins.command import command
 
+MAX_USER_VALUES = 6
+
 
 def to_user_index(index):
     """Converts a zero-indexed value to a user-friendly value starting from 1"""
@@ -41,10 +43,12 @@ class RiceDB(object):
                 pass
 
             if len(args['<values>']) == 0:
-                return 'Values cannot be empty!'
+                return '{0} cannot be empty!'.format(mode)
 
         if args['--add'] or args['-a']:
             values = self.bot.get_user_value(mask.nick, mode) or []
+            if len(values) >= MAX_USER_VALUES:
+                return 'You can only set {0} {1}! Consider deleting or replacing some.'.format(MAX_USER_VALUES, mode)
             for value in args['<values>']:
                 values.append(value)
             self.bot.set_user_value(mask.nick, mode, values)
@@ -52,6 +56,8 @@ class RiceDB(object):
 
         if args['--set'] or args['-s']:
             values = args['<values>']
+            if len(values) > MAX_USER_VALUES:
+                return 'You can only set {0} {1}! Consider deleting or replacing some.'.format(MAX_USER_VALUES, mode)
             self.bot.set_user_value(mask.nick, mode, values)
             return '{0} updated.'.format(mode)
 
@@ -72,7 +78,7 @@ class RiceDB(object):
                 except IndexError:
                     pass
             if not deleted:
-                return 'No {0} were removed. Maybe you supplied the wrong indexes?'.format(mode)
+                return 'No {0} were removed. Maybe you supplied the wrong IDs?'.format(mode)
             self.bot.set_user_value(mask.nick, mode, values)
             return 'Removed {0}.'.format(', '.join(deleted))
 
@@ -90,7 +96,7 @@ class RiceDB(object):
                 self.bot.set_user_value(mask.nick, mode, values)
                 return 'Replaced {0} with {1}'.format(old_value, replacement)
             except IndexError:
-                return 'Invalid index.'
+                return 'Invalid ID.'
 
         user = args['<user>'] or mask.nick
         values = self.bot.get_user_value(user, mode)
