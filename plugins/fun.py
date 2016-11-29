@@ -3,6 +3,7 @@ from contextlib import closing
 
 import irc3
 import random
+import re
 import requests
 from bs4 import BeautifulSoup
 from irc3.plugins.command import command
@@ -15,6 +16,8 @@ DEFAULT_HEADERS = {
 
 DICE_SIDES_LIMIT = (4, 128)
 DICE_COUNT_LIMIT = (1, 64)
+
+DECIDE_DELIMITERS = [' or ', ',', '|']
 
 # Borrowed from https://github.com/GeneralUnRest/8ball-bot/blob/master/8ball.js
 EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.', 'Without a doubt.',
@@ -49,6 +52,46 @@ class Fun(object):
         except requests.exceptions.RequestException as err:
             self.bot.log.exception(err)
             yield 'Error: {0}'.format(err.strerror)
+
+    @command(permission='view')
+    def decide(self, mask, target, args):
+        """Make the difficult decisions in life.
+
+            %%decide <options>...
+        """
+
+        options = ' '.join(args['<options>'])
+        for delimiter in DECIDE_DELIMITERS:
+            options = options.replace(delimiter, '|')
+        options = options.split('|')
+        options = list(filter(bool, set(option.replace(delimiter, '').strip()
+                                        for delimiter in DECIDE_DELIMITERS
+                                        for option in options
+                                        if option not in DECIDE_DELIMITERS)))
+
+        for delimiter in DECIDE_DELIMITERS:
+            delimiter = delimiter.strip()
+            if delimiter in options:
+                options.remove(delimiter)
+
+        self.bot.log.debug('Parsed options: %s', options)
+
+        nick = self.bot.format(mask.nick, antiping=True)
+        if not options:
+            return '{0}: I can\'t make a decision for you if you don\'t give me any choices >:V'.format(nick)
+
+        options_length = len(options)
+        if options_length == 1:
+            return '{0}: {1}'.format(nick, random.choice(['Yes', 'No']))
+
+        if options_length == 2:
+            for reply in ['Neither.', 'Both.']:
+                options.append(reply)
+            return '{0}: {1}'.format(nick, random.choice(options))
+
+        for reply in ['None of the above.', 'All of the above.']:
+            options.append(reply)
+        return '{0}: {1}'.format(nick, random.choice(options))
 
     @command(permission='view')
     def roll(self, mask, target, args):
