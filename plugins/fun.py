@@ -82,15 +82,11 @@ class Fun(object):
 
         options_length = len(options)
         if options_length == 1:
-            return '{0}: {1}'.format(nick, random.choice(['Yes.', 'Maybe.', 'No.']))
-
+            options = ['Yes.', 'Maybe.', 'No.']
         if options_length == 2:
-            for reply in ['Neither.', 'Both.']:
-                options.append(reply)
-            return '{0}: {1}'.format(nick, random.choice(options))
-
-        for reply in ['None of the above.', 'All of the above.']:
-            options.append(reply)
+            options.extend(['Neither.', 'Both.'])
+        else:
+            options.extend(['None of the above.', 'All of the above.'])
         return '{0}: {1}'.format(nick, random.choice(options))
 
     @command(permission='view')
