@@ -82,7 +82,7 @@ class Fun(object):
 
         options_length = len(options)
         if options_length == 1:
-            return '{0}: {1}'.format(nick, random.choice(['Yes.', 'No.']))
+            return '{0}: {1}'.format(nick, random.choice(['Yes.', 'Maybe.', 'No.']))
 
         if options_length == 2:
             for reply in ['Neither.', 'Both.']:
@@ -128,8 +128,9 @@ class Fun(object):
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
     def intensify(self, target, data):
-        if len(data) <= 32:
-            self.bot.privmsg(target, self.bot.format('[{0} INTENSIFIES]'.format(data.strip().upper()), bold=True))
+        data = data.strip()
+        if data and len(data) <= 32:
+            self.bot.privmsg(target, self.bot.format('[{0} INTENSIFIES]'.format(data.upper()), bold=True))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*wew$')
     def wew(self, target):
