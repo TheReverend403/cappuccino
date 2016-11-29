@@ -47,7 +47,7 @@ class RiceDB(object):
 
         if args['--add'] or args['-a']:
             values = self.bot.get_user_value(mask.nick, mode) or []
-            if len(values) >= MAX_USER_VALUES:
+            if len(values) + len(args['<values>']) >= MAX_USER_VALUES:
                 return 'You can only set {0} {1}! Consider deleting or replacing some.'.format(MAX_USER_VALUES, mode)
             for value in args['<values>']:
                 values.append(value)
