@@ -105,7 +105,8 @@ class Sed(object):
                 new_message = editor.edit(message)
             except EditorException as error:
                 self.bot.log.error(error)
-                self.bot.privmsg(target, '{0}: {1}'.format(self.bot.format(mask.nick, antiping=True), error))
+                if 'unterminated' not in str(error):
+                    self.bot.privmsg(target, '{0}: {1}'.format(self.bot.format(mask.nick, antiping=True), error))
                 # Don't even check the rest if the sed command is invalid.
                 return
 
