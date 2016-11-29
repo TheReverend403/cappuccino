@@ -69,11 +69,7 @@ class Fun(object):
                                         for option in options
                                         if option not in DECIDE_DELIMITERS)))
 
-        for delimiter in DECIDE_DELIMITERS:
-            delimiter = delimiter.strip()
-            if delimiter in options:
-                options.remove(delimiter)
-
+        [options.remove(delimiter.strip()) for delimiter in DECIDE_DELIMITERS if delimiter.strip() in options]
         self.bot.log.debug('Parsed options: %s', options)
 
         nick = self.bot.format(mask.nick, antiping=True)
