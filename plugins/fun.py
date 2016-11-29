@@ -82,7 +82,7 @@ class Fun(object):
 
         options_length = len(options)
         if options_length == 1:
-            return '{0}: {1}'.format(nick, random.choice(['Yes', 'No']))
+            return '{0}: {1}'.format(nick, random.choice(['Yes.', 'No.']))
 
         if options_length == 2:
             for reply in ['Neither.', 'Both.']:
