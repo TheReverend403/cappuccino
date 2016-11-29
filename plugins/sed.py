@@ -93,7 +93,7 @@ class Sed(object):
         queue.append(line)
         self.history_buffer.update({target: queue})
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?P<_sed>{0})'.format(SED_PRIVMSG))
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<_sed>{0})'.format(SED_PRIVMSG))
     def sed(self, mask, target, _sed):
         if target not in self.history_buffer:
             return
@@ -124,8 +124,11 @@ class Sed(object):
 
             emphasised_meant = self.bot.format('meant', bold=True)
             if mask.nick == target_user:
-                prefix = '{0} {1} to say:'.format(
-                    self.bot.format(mask.nick, antiping=True), emphasised_meant)
+                if target.is_channel:
+                    prefix = '{0} {1} to say:'.format(
+                        self.bot.format(mask.nick, antiping=True), emphasised_meant)
+                else:
+                    self.bot.privmsg(target, new_message)
             else:
                 prefix = '{0} thinks {1} {2} to say:'.format(
                     self.bot.format(mask.nick, antiping=True), target_user, emphasised_meant)
