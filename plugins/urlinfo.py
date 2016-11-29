@@ -137,8 +137,8 @@ def _parse_url(url):
                 except KeyError:
                     pass
             elif content_type in HTML_MIMETYPES:
+                content = _read_stream(response)
                 try:
-                    content = _read_stream(response)
                     title = BeautifulSoup(content, 'html.parser').title.string
                 except AttributeError:
                     pass
@@ -181,7 +181,7 @@ class UrlInfo(object):
         if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd):
             return
 
-        urls = set([_clean_url(url) for url in URL_FINDER.findall(data)])
+        urls = set(_clean_url(url) for url in URL_FINDER.findall(data))
         if not urls:
             return
         urls = random.sample(urls, len(urls))[-3:]
@@ -220,6 +220,7 @@ class UrlInfo(object):
 
                     reply = '[ {0} ] {1}'.format(
                         self.bot.format(hostname, color=self.bot.color.GREEN), self.bot.format(title, bold=True))
+
                     if mimetype:
                         reply += ' ({0})'.format(mimetype)
                     if size and mimetype not in HTML_MIMETYPES:
