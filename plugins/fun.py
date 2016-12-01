@@ -3,7 +3,6 @@ from contextlib import closing
 
 import irc3
 import random
-import re
 import requests
 from bs4 import BeautifulSoup
 from irc3.plugins.command import command
@@ -72,9 +71,8 @@ class Fun(object):
         [options.remove(delimiter.strip()) for delimiter in DECIDE_DELIMITERS if delimiter.strip() in options]
         self.bot.log.debug('Parsed options: %s', options)
 
-        nick = self.bot.format(mask.nick, antiping=True)
         if not options:
-            return '{0}: I can\'t make a decision for you if you don\'t give me any choices >:V'.format(nick)
+            return '{0}: I can\'t make a decision for you if you don\'t give me any choices >:V'.format(mask.nick)
 
         options_length = len(options)
         if options_length == 1:
@@ -84,7 +82,7 @@ class Fun(object):
         else:
             options.extend(['None of the above.', 'All of the above.'])
 
-        return '{0}: {1}'.format(nick, random.choice(options))
+        return '{0}: {1}'.format(mask.nick, random.choice(options))
 
     @command(permission='view')
     def roll(self, mask, target, args):
@@ -116,8 +114,7 @@ class Fun(object):
             %%8ball <query>...
         """
 
-        nick = self.bot.format(mask.nick, antiping=True)
-        return '{0}: {1}'.format(nick, random.choice(EIGHTBALL_RESPONSES))
+        return '{0}: {1}'.format(mask.nick, random.choice(EIGHTBALL_RESPONSES))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
     def intensify(self, target, data):

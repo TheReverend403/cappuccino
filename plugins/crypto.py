@@ -6,10 +6,6 @@ from irc3.plugins.command import command
 @irc3.plugin
 class Crypto(object):
 
-    requires = [
-        'plugins.formatting'
-    ]
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -26,4 +22,4 @@ class Crypto(object):
             if flag in args and args[flag]:
                 hash_object = hashlib.new(algo)
                 hash_object.update(text)
-                return '{0}: {1}'.format(self.bot.format(mask.nick, antiping=True), hash_object.hexdigest())
+                return '{0}: {1}'.format(mask.nick, hash_object.hexdigest())

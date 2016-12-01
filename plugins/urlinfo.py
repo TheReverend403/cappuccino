@@ -190,7 +190,6 @@ class UrlInfo(object):
         with ThreadPool(len(urls)) as threadpool:
             self.bot.log.info('Retrieving page titles for {0}'.format(urls))
             for hostname, title, mimetype, size, err in threadpool.imap_unordered(_parse_url, urls):
-                hostname = self.bot.format(hostname, antiping=True)
                 try:
                     # Lets me handle exceptions properly rather than as a bunch of if checks
                     if err:
@@ -215,8 +214,6 @@ class UrlInfo(object):
                 else:
                     if not title:
                         title = self.bot.format('No Title', color=self.bot.color.RED)
-                    else:
-                        title = self.bot.format(title, antiping=True)
 
                     reply = '[ {0} ] {1}'.format(
                         self.bot.format(hostname, color=self.bot.color.GREEN), self.bot.format(title, bold=True))

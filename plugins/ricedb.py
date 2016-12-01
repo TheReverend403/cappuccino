@@ -103,11 +103,11 @@ class RiceDB(object):
         if values:
             indexed_values = []
             for index, item in enumerate(values):
-                indexed_values.append(
-                    '({0}) {1}{2}'.format(self.bot.format(to_user_index(index), bold=True), item, self.bot.color.RESET))
-            return '{0} [{1}]'.format(' | '.join(indexed_values), self.bot.format(user, antiping=True))
+                indexed_values.append('({0}) {1}'.format(
+                        self.bot.format(to_user_index(index), bold=True), self.bot.format(item, reset=True)))
+            return '{0} [{1}]'.format(' | '.join(indexed_values), user)
 
-        return '{0} no {1}.'.format(self.bot.format(user, antiping=True) + ' has' if user != mask.nick else 'You have',
+        return '{0} no {1}.'.format(user + ' has' if user != mask.nick else 'You have',
                                     'reason to live' if random.random() <= 0.05 else mode)
 
     @command(permission='view')

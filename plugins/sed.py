@@ -105,7 +105,7 @@ class Sed(object):
             except EditorException as error:
                 self.bot.log.error(error)
                 if 'unterminated' not in str(error):
-                    self.bot.privmsg(target, '{0}: {1}'.format(self.bot.format(mask.nick, antiping=True), error))
+                    self.bot.privmsg(target, '{0}: {1}'.format(mask.nick, error))
                 # Don't even check the rest if the sed command is invalid.
                 return
 
@@ -118,18 +118,17 @@ class Sed(object):
             error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
             if len(new_message) > len(error_msg) and len(new_message) > max_len or len(new_message) > 256:
                 self.bot.privmsg(target, '{0}: {1}'.format(
-                    self.bot.format(mask.nick, antiping=True), self.bot.format(error_msg, color=self.bot.color.RED)))
+                    mask.nick, self.bot.format(error_msg, color=self.bot.color.RED)))
                 return
 
             emphasised_meant = self.bot.format('meant', bold=True)
             if mask.nick == target_user:
                 if target.is_channel:
-                    prefix = '{0} {1} to say:'.format(self.bot.format(mask.nick, antiping=True), emphasised_meant)
+                    prefix = '{0} {1} to say:'.format(mask.nick, emphasised_meant)
                 else:
                     self.bot.privmsg(mask.nick, new_message)
                     return
             else:
-                prefix = '{0} thinks {1} {2} to say:'.format(
-                    self.bot.format(mask.nick, antiping=True), target_user, emphasised_meant)
+                prefix = '{0} thinks {1} {2} to say:'.format(mask.nick, target_user, emphasised_meant)
             self.bot.privmsg(target, '{0} {1}'.format(prefix, new_message))
             return
