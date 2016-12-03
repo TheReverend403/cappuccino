@@ -32,7 +32,7 @@ class Fun(object):
         'plugins.formatting'
     ]
 
-    random_chance = 0.05
+    random_chance = 0.1
     last_reply_time = None
 
     def __init__(self, bot):
@@ -135,16 +135,16 @@ class Fun(object):
         self.bot.privmsg(target, 'lmao')
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b')
-    def gravity(self, mask, target):
-        if self.last_reply_time and time.time() - self.last_reply_time < 60 * 60:  # 1 hour rate limit
+    def up(self, mask, target):
+        if self.last_reply_time and time.time() - self.last_reply_time < 60 * 30:  # 30 minute rate limit
             return
         self.last_reply_time = time.time()
 
         if random.random() > self.random_chance:
             return
 
-        self.bot.privmsg(target,
-                         '{0}: A direction away from the center of gravity of a celestial object.'.format(mask.nick))
+        answers = ['A direction away from the center of gravity of a celestial object.', 'The sky.']
+        self.bot.privmsg(target, '{0}: {1}'.format(mask.nick, random.choice(answers)))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*same$')
     def same(self, target):
