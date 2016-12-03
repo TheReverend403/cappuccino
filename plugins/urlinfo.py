@@ -132,10 +132,7 @@ def _parse_url(url):
             content_disposition = response.headers.get('Content-Disposition')
             if content_disposition:
                 _, params = cgi.parse_header(content_disposition)
-                try:
-                    title = params['filename']
-                except KeyError:
-                    pass
+                title = params.get('filename')
             elif content_type in HTML_MIMETYPES:
                 content = _read_stream(response)
                 try:

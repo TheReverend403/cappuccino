@@ -29,28 +29,26 @@ class LastFM(object):
 
             %%np [(-s | --set) <username> | <username>]
         """
-        if args['--set'] or args['-s']:
-            lastfm_username = args['<username>']
-            try:
-                lastfm_username = self.lastfm.get_user(lastfm_username).get_name(properly_capitalized=True)
-            except pylast.WSError:
-                return 'No such last.fm user. Are you trying to trick me? :^)'
-            except pylast.NetworkError as err:
-                return err
-            else:
-                self.bot.set_user_value(mask.nick, 'lastfm', lastfm_username)
-                return 'last.fm username set.'
-
-        irc_username = args['<username>'] or mask.nick
-        lastfm_username = self.bot.get_user_value(irc_username, 'lastfm')
-        if not lastfm_username:
-            if irc_username == mask.nick:
-                return 'You have no last.fm username set. Please set one with {0}np --set <username>'.format(
-                    self.bot.config.cmd)
-            return '{0} has no last.fm username set. Ask them to set one with {1}np --set <username>'.format(
-                irc_username, self.bot.config.cmd)
 
         try:
+            if args['--set'] or args['-s']:
+                lastfm_username = args['<username>']
+                try:
+                    lastfm_username = self.lastfm.get_user(lastfm_username).get_name(properly_capitalized=True)
+                except pylast.WSError:
+                    return 'No such last.fm user. Are you trying to trick me? :^)'
+                else:
+                    self.bot.set_user_value(mask.nick, 'lastfm', lastfm_username)
+                    return 'last.fm username set.'
+
+            irc_username = args['<username>'] or mask.nick
+            lastfm_username = self.bot.get_user_value(irc_username, 'lastfm')
+            if not lastfm_username:
+                if irc_username == mask.nick:
+                    return 'You have no last.fm username set. Please set one with {0}np --set <username>'.format(
+                        self.bot.config.cmd)
+                return '{0} has no last.fm username set. Ask them to set one with {1}np --set <username>'.format(
+                    irc_username, self.bot.config.cmd)
             try:
                 lastfm_user = self.lastfm.get_user(lastfm_username)
             except pylast.WSError:
@@ -70,7 +68,7 @@ class LastFM(object):
                 title = ''.join(title[:MAX_TRACK_TITLE_LEN]) + '...'
 
             track_info = '{0} - {1}'.format(self.bot.format(artist, bold=True), self.bot.format(title, bold=True))
-        except pylast.NetworkError as err:
-            return err
+        except (pylast.NetworkError, pylast.MalformedResponseError) as err:
+            return '{0}: A last.fm error occurred: {1}'.format(mask.nick, self.bot.format(err, bold=True))
 
         return '{0} is now playing {1}'.format(irc_username, track_info)
