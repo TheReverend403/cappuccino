@@ -143,6 +143,7 @@ def _parse_url(url):
                         summary = summary[:64]
                         if len(summary) >= 64:
                             summary += '...'
+                        title = summary
 
             if title:
                 title = title.strip()
