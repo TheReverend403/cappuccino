@@ -139,11 +139,7 @@ def _parse_url(url):
                     title = BeautifulSoup(content, 'html.parser').title.string
                 except AttributeError:
                     if content:
-                        summary = re.sub('\s+', ' ', ' '.join(content.split('\n')))
-                        summary = summary[:64]
-                        if len(summary) >= 64:
-                            summary += '...'
-                        title = summary
+                        title = re.sub('\s+', ' ', ' '.join(content.split('\n')))
 
             if title:
                 title = title.strip()
