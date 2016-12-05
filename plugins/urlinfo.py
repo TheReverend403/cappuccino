@@ -140,7 +140,9 @@ def _parse_url(url):
                 except AttributeError:
                     if content:
                         summary = re.sub('\s+', ' ', ' '.join(content.split('\n')))
-                        title = summary[:64]
+                        summary = summary[:64]
+                        if len(summary) >= 64:
+                            summary += '...'
 
             if title:
                 title = title.strip()
