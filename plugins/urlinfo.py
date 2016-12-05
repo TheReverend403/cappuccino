@@ -133,12 +133,14 @@ def _parse_url(url):
             if content_disposition:
                 _, params = cgi.parse_header(content_disposition)
                 title = params.get('filename')
-            elif content_type in HTML_MIMETYPES:
+            elif content_type in HTML_MIMETYPES or content_type == 'text/plain':
                 content = _read_stream(response)
                 try:
                     title = BeautifulSoup(content, 'html.parser').title.string
                 except AttributeError:
-                    pass
+                    if content:
+                        summary = re.sub('\s+', ' ', ' '.join(content.split('\n')))
+                        title = summary[:64]
 
             if title:
                 title = title.strip()
