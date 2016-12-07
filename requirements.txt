@@ -5,4 +5,3 @@ pylast==1.6.0
 requests==2.11.1
 six==1.10.0
 venusian==1.0
-wheel==0.24.0
