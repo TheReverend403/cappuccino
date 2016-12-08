@@ -119,27 +119,31 @@ class RiceDB(object):
         """
         yield self._generic_db(mask, target, args)
 
+
     @command(permission='view')
+    @command(permission='view', name='desktop')
     def dtop(self, mask, target, args):
         """View or add a desktop.
 
-            %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%(dtop|desktop) [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
+    @command(permission='view', name='git')
     def dotfiles(self, mask, target, args):
         """View or add dotfiles.
 
-            %%dotfiles [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%(dotfiles|git) [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
+    @command(permission='view', name='hw')
     def handwriting(self, mask, target, args):
         """View or add handwriting.
 
-            %%handwriting [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%(handwriting|hw) [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
@@ -152,10 +156,11 @@ class RiceDB(object):
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
+    @command(permission='view', name='hscr')
     def homescreen(self, mask, target, args):
         """View or add a homescreen.
 
-            %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%(homescreen|hscr) [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
