@@ -120,10 +120,10 @@ class RiceDB(object):
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
-    def dtop(self, mask, target, args):
+    def desktop(self, mask, target, args):
         """View or add a desktop.
 
-            %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%desktop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
