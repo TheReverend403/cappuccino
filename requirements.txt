@@ -1,7 +1,7 @@
 beautifulsoup4==4.5.1
 docopt==0.6.2
-irc3==0.9.6
+irc3==0.9.7
 pylast==1.6.0
-requests==2.11.1
+requests==2.12.3
 six==1.10.0
 venusian==1.0

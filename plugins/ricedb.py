@@ -1,5 +1,4 @@
 import inspect
-import shlex
 
 import irc3
 import random
@@ -39,7 +38,7 @@ class RiceDB(object):
         # Apply some sanity to the way docopt handles args with spaces.
         if args['<values>']:
             try:
-                args['<values>'] = [arg.strip() for arg in shlex.split(' '.join(args['<values>'])) if arg.strip()]
+                args['<values>'] = [arg.strip() for arg in args['<values>'] if arg.strip()]
             except ValueError:
                 pass
 
@@ -118,7 +117,6 @@ class RiceDB(object):
             %%station [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
-
 
     @command(permission='view')
     @command(permission='view', name='desktop')
