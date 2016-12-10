@@ -35,12 +35,8 @@ class RiceDB(object):
         self.bot.log.debug('{0} called by {1} with args: {2}'.format(mode, mask, args))
         mode = mode if mode.endswith('s') else mode + 's'
 
-        # Apply some sanity to the way docopt handles args with spaces.
         if args['<values>']:
-            try:
-                args['<values>'] = [arg.strip() for arg in args['<values>'] if arg.strip()]
-            except ValueError:
-                pass
+            args['<values>'] = [arg.strip() for arg in args['<values>'] if arg.strip()]
 
             if len(args['<values>']) == 0:
                 return '{0} cannot be empty!'.format(mode)

@@ -52,7 +52,7 @@ class Fun(object):
             self.bot.log.exception(err)
             yield 'Error: {0}'.format(err.strerror)
 
-    @command(permission='view')
+    @command(permission='view', use_shlex=False)
     def decide(self, mask, target, args):
         """Make the difficult decisions in life.
 
