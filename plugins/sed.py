@@ -4,7 +4,7 @@ import collections
 import irc3
 import re
 
-SED_PRIVMSG = r'\s*s[^A-Za-z0-9\s].+'
+SED_PRIVMSG = r'\s*s[/|\\!\.,\\].+'
 SED_CHECKER = re.compile('^' + SED_PRIVMSG)
 
 
