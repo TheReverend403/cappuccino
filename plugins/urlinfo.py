@@ -5,6 +5,7 @@ import time
 from contextlib import closing
 from multiprocessing.pool import ThreadPool
 
+import html
 import random
 from bs4 import BeautifulSoup
 from io import StringIO
@@ -142,7 +143,7 @@ def _parse_url(url):
                         title = re.sub('\s+', ' ', ' '.join(content.split('\n')))
 
             if title:
-                title = title.strip()
+                title = html.unescape(title).strip()
                 if len(title) > MAX_TITLE_LENGTH:
                     title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
     except requests.RequestException as err:
