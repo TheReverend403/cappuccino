@@ -45,7 +45,7 @@ class UserDB(dict):
         try:
             return self.get(username)[key]
         except (KeyError, TypeError):
-            return None
+            return []
 
     @irc3.extend
     def set_user_value(self, username, key, value):
