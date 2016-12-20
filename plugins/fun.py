@@ -63,7 +63,7 @@ class Fun(object):
         for delimiter in DECIDE_DELIMITERS:
             options = options.replace(delimiter, '|')
         options = options.split('|')
-        options = list(filter(bool, set(option.replace(delimiter, '').strip()
+        options = list(filter(None, set(option.replace(delimiter, '').strip()
                                         for delimiter in DECIDE_DELIMITERS
                                         for option in options
                                         if option not in DECIDE_DELIMITERS)))

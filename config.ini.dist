@@ -64,6 +64,11 @@ password =
 [plugins.lastfm]
 api_key =
 
+# [plugins.userdb]
+# enable_http_server = false
+# http_host = 127.0.0.1
+# http_port = 8080
+
 [plugins.urlinfo]
 ignore_nicks = Nick1 Nick2
 
