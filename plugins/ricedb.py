@@ -95,6 +95,15 @@ class RiceDB(object):
                 return 'Invalid ID.'
 
         user = args['<user>'] or mask.nick
+        if user.isdigit():  # Support .command <id> syntax
+            index = from_user_index(int(user))
+            try:
+                value = self.bot.get_user_value(mask.nick, mode)[index]
+            except IndexError:
+                return 'Invalid ID.'
+            else:
+                return '{0} [{1}]'.format(value, mask.nick)
+
         values = self.bot.get_user_value(user, mode)
         if values:
             indexed_values = []
