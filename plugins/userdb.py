@@ -36,8 +36,8 @@ class UserDB(dict):
             host, port = '127.0.0.1', 8080
 
         bottle.route('/')(self.__http_index)
-        bottle.route('/<user>')(self.__http_user)
-        bottle.route('/<user>/<key>')(self.__http_user)
+        bottle.route('/<user>')(self.__http_index)
+        bottle.route('/<user>/<key>')(self.__http_index)
 
         bottle_thread = threading.Thread(
             target=bottle.run,
@@ -48,23 +48,17 @@ class UserDB(dict):
         bottle_thread.start()
         self.bot.log.info('{0} started on http://{1}:{2}'.format(bottle_thread.name, host, port))
 
-    def __http_index(self):
+    def __http_index(self, user=None, key=None):
         bottle.response.content_type = 'application/json'
-        user = bottle.request.query.get('user')
-        data = self
         if user:
-            data = data.get(user)
-        return json.dumps(data)
-
-    def __http_user(self, user, key=None):
-        bottle.response.content_type = 'application/json'
-        if user not in self:
-            return bottle.HTTPResponse(status=404, body=json.dumps(None))
-        if key:
-            if key not in self.get(user):
+            if user not in self:
                 return bottle.HTTPResponse(status=404, body=json.dumps(None))
-            return json.dumps(self.get(user).get(key))
-        return json.dumps(self.get(user))
+            if key:
+                if key not in self.get(user):
+                    return bottle.HTTPResponse(status=404, body=json.dumps(None))
+                return json.dumps(self.get(user).get(key))
+            return json.dumps(self.get(user))
+        return json.dumps(self)
 
     @irc3.extend
     def get_user_value(self, username, key):
