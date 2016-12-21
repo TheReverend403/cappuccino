@@ -35,6 +35,7 @@ class UserDB(dict):
         except KeyError:
             host, port = '127.0.0.1', 8080
 
+        bottle.hook('before_request')(self.__strip_path)
         bottle.route('/')(self.__http_index)
         bottle.route('/<user>')(self.__http_index)
         bottle.route('/<user>/<key>')(self.__http_index)
@@ -42,11 +43,15 @@ class UserDB(dict):
         bottle_thread = threading.Thread(
             target=bottle.run,
             kwargs={'quiet': True, 'host': host, 'port': port},
-            name='{0} HTTP server'.format(__name__)
+            name='{0} HTTP server'.format(__name__),
+            daemon=True
         )
-        bottle_thread.daemon = True
+
         bottle_thread.start()
         self.bot.log.info('{0} started on http://{1}:{2}'.format(bottle_thread.name, host, port))
+
+    def __strip_path(self):
+        bottle.request.environ['PATH_INFO'] = bottle.request.environ['PATH_INFO'].rstrip('/')
 
     def __http_index(self, user=None, key=None):
         bottle.response.content_type = 'application/json'
