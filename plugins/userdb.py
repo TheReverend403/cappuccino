@@ -35,14 +35,17 @@ class UserDB(dict):
         except KeyError:
             host, port = '127.0.0.1', 8080
 
-        bottle.route('/')(self.http_index)
+        bottle.route('/')(self.__http_index)
         bottle_thread = threading.Thread(
-            target=bottle.run, kwargs={'quiet': True, 'host': host, 'port': port}, name='ricedb HTTP server')
+            target=bottle.run,
+            kwargs={'quiet': True, 'host': host, 'port': port},
+            name='{0} HTTP server'.format(__name__)
+        )
         bottle_thread.daemon = True
         bottle_thread.start()
-        self.bot.log.info('HTTP server started on http://{0}:{1}'.format(host, port))
+        self.bot.log.info('{0} started on http://{1}:{2}'.format(bottle_thread.name, host, port))
 
-    def http_index(self):
+    def __http_index(self):
         bottle.response.content_type = 'application/json'
         return json.dumps(self)
 
