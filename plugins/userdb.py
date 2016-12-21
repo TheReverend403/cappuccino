@@ -13,13 +13,19 @@ import irc3
 class UserDB(dict):
     def __init__(self, bot, **kwargs):
         super().__init__(**kwargs)
+
         self.bot = bot
-        if not os.path.exists('data'):
-            os.mkdir('data')
-            bot.log.debug('Created data/ directory')
         self.file = os.path.join('data', 'ricedb.json')
-        with open(self.file, 'r') as fd:
-            self.update(json.load(fd))
+
+        datadir = os.path.dirname(self.file)
+        try:
+            with open(self.file, 'r') as fd:
+                self.update(json.load(fd))
+        except FileNotFoundError:
+            # Database file itself doesn't need to exist on first run, it will be created on first write.
+            if not os.path.exists(datadir):
+                os.mkdir(datadir)
+                self.bot.log.debug('Created {0}/ directory'.format(datadir))
 
         try:
             self.config = self.bot.config[__name__]
