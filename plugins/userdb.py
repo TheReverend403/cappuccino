@@ -50,6 +50,9 @@ class UserDB(dict):
     @irc3.extend
     def set_user_value(self, username, key, value):
         data = {key: value}
-        self[username] = data
+        try:
+            self[username].update(data)
+        except KeyError:
+            self[username] = data
         with open(self.file, 'w') as fd:
             json.dump(self, fd)
