@@ -211,12 +211,10 @@ class UrlInfo(object):
                         messages.append('[ {0} ] {1}'.format(
                             self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))
                 else:
-                    if not title:
-                        title = self.bot.format('No Title', color=self.bot.color.RED)
+                    reply = '[ {0} ]'.format(self.bot.format(hostname, color=self.bot.color.GREEN))
 
-                    reply = '[ {0} ] {1}'.format(
-                        self.bot.format(hostname, color=self.bot.color.GREEN), self.bot.format(title, bold=True))
-
+                    if title:
+                        reply += ' {0}'.format(self.bot.format(title, bold=True))
                     if mimetype:
                         reply += ' ({0})'.format(mimetype)
                     if size and mimetype not in HTML_MIMETYPES:
