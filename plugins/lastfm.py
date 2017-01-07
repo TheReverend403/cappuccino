@@ -23,7 +23,7 @@ class LastFM(object):
             self.bot.log.warn('Missing last.fm API key')
             return
 
-    @command(name='np', permission='view')
+    @command(name='np', permission='view', aliases=['lastfm'])
     def now_playing(self, mask, target, args):
         """View currently playing track info.
 

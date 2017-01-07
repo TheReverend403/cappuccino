@@ -117,60 +117,49 @@ class RiceDB(object):
 
     @command(permission='view')
     def station(self, mask, target, args):
-        """View or add a battlestation.
-
+        """
             %%station [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view')
-    @command(permission='view', name='desktop')
+    @command(permission='view', aliases=['desktop'])
     def dtop(self, mask, target, args):
-        """View or add a desktop.
-
-            %%(dtop|desktop) [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+        """
+            %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view')
-    @command(permission='view', name='git')
+    @command(permission='view', aliases=['git'])
     def dotfiles(self, mask, target, args):
-        """View or add dotfiles.
-
-            %%(dotfiles|git) [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+        """
+            %%dotfiles [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view')
-    @command(permission='view', name='hw')
+    @command(permission='view', aliases=['hw'])
     def handwriting(self, mask, target, args):
-        """View or add handwriting.
-
-            %%(handwriting|hw) [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+        """
+            %%handwriting [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
     def distro(self, mask, target, args):
-        """View or add a distro.
-
+        """
             %%distro [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view')
-    @command(permission='view', name='hscr')
+    @command(permission='view', aliases=['hscr'])
     def homescreen(self, mask, target, args):
-        """View or add a homescreen.
-
-            %%(homescreen|hscr) [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+        """
+            %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
     def selfie(self, mask, target, args):
-        """View or add a selfie.
-
+        """
             %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
