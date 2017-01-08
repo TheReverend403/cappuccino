@@ -109,7 +109,7 @@ def _parse_url(url):
     try:
         for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
             ip = ipaddress.ip_address(sockaddr[0])
-            if ip.is_private or ip.is_reserved or ip.is_link_local or ip.is_loopback or ip.is_multicast:
+            if not ip.is_global:
                 raise InvalidIPAddress('{0} is not a publicly routable address.'.format(hostname))
     except (socket.gaierror, ValueError, InvalidIPAddress) as err:
         return hostname, None, None, None, err
