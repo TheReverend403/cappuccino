@@ -139,7 +139,7 @@ def _parse_url(url):
                 try:
                     title = BeautifulSoup(content, 'html.parser').title.string
                 except AttributeError:
-                    if content:
+                    if content and content_type not in HTML_MIMETYPES:
                         title = re.sub('\s+', ' ', ' '.join(content.split('\n')))
 
             if title:
