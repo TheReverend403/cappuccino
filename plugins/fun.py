@@ -38,6 +38,9 @@ class Fun(object):
     def __init__(self, bot):
         self.bot = bot
 
+    def should_reply(self):
+        return random.random() > self.random_chance
+
     @command(permission='view')
     def insult(self, mask, target, args):
         """Send a randomly generated insult from insultgenerator.org
@@ -124,30 +127,31 @@ class Fun(object):
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*wew$')
     def wew(self, target):
-        if random.random() > self.random_chance:
-            return
-        self.bot.privmsg(target, self.bot.format('w e w l a d', bold=True))
+        if self.should_reply():
+            self.bot.privmsg(target, self.bot.format('w e w l a d', bold=True))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*ayy+$')
     def ayy(self, target):
-        if random.random() > self.random_chance:
-            return
-        self.bot.privmsg(target, 'lmao')
+        if self.should_reply():
+            self.bot.privmsg(target, 'lmao')
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b')
     def up(self, mask, target):
+        if not self.should_reply():
+            return
+
         if self.last_reply_time and time.time() - self.last_reply_time < 60 * 30:  # 30 minute rate limit
-            return
-        self.last_reply_time = time.time()
+            self.last_reply_time = time.time()
 
-        if random.random() > self.random_chance:
-            return
-
-        answers = ['A direction away from the center of gravity of a celestial object.', 'The sky.']
-        self.bot.privmsg(target, '{0}: {1}'.format(mask.nick, random.choice(answers)))
+            answers = ['A direction away from the center of gravity of a celestial object.', 'The sky.']
+            self.bot.privmsg(target, '{0}: {1}'.format(mask.nick, random.choice(answers)))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*same$')
     def same(self, target):
-        if random.random() > self.random_chance:
-            return
-        self.bot.privmsg(target, self.bot.format('same', bold=True))
+        if self.should_reply():
+            self.bot.privmsg(target, self.bot.format('same', bold=True))
+
+    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*benis$')
+    def benis(self, target):
+        if self.should_reply():
+            self.bot.privmsg(target, self.bot.format('3===D', bold=True))
