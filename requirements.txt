@@ -1,8 +1,8 @@
 beautifulsoup4==4.5.1
-bottle==0.12.11
+bottle==0.12.13
 docopt==0.6.2
 irc3==0.9.8
-pylast==1.6.0
-requests==2.12.3
+pylast==1.7.0
+requests==2.12.4
 six==1.10.0
 venusian==1.0
