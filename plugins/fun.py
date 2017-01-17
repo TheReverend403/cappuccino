@@ -39,7 +39,7 @@ class Fun(object):
         self.bot = bot
 
     def should_reply(self):
-        return random.random() > self.random_chance
+        return random.random() <= self.random_chance
 
     @command(permission='view')
     def insult(self, mask, target, args):
