@@ -38,8 +38,8 @@ class Unixporn(object):
             self.channel = '#' + self.bot.config[__name__]['channel']
             self.client_id = self.bot.config[__name__]['reddit_client_id']
             self.client_secret = self.bot.config[__name__]['reddit_client_secret']
-        except KeyError:
-            self.bot.log.warn('No channel configured for posting /r/unixporn submissions')
+        except KeyError as err:
+            self.bot.log.exception(err)
             return
 
         self.praw = Reddit(
