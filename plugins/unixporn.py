@@ -1,6 +1,6 @@
-import os
 import random
 import threading
+
 try:
     import ujson as json
 except ImportError:
@@ -12,27 +12,16 @@ from praw import Reddit
 
 MAX_TITLE_LENGTH = 64
 
+
 @irc3.plugin
 class Unixporn(object):
-
     requires = [
         'plugins.formatting'
     ]
 
     def __init__(self, bot):
         self.bot = bot
-        self.submission_cache_file = os.path.join('data', 'unixporn_cache.json')
         self.submission_cache = []
-
-        datadir = os.path.dirname(self.submission_cache_file)
-        try:
-            with open(self.submission_cache_file, 'r') as fd:
-                self.submission_cache = json.load(fd)
-        except FileNotFoundError:
-            # Cache file itself doesn't need to exist on first run, it will be created on first write.
-            if not os.path.exists(datadir):
-                os.mkdir(datadir)
-                self.bot.log.debug('Created {0}/ directory'.format(datadir))
 
         try:
             self.channel = '#' + self.bot.config[__name__]['channel']
@@ -45,28 +34,27 @@ class Unixporn(object):
         self.praw = Reddit(
             user_agent='ricedb/unixporn.py (https://github.com/TheReverend403/ricedb)',
             client_id=self.client_id,
-            client_secret=self.client_secret,
+            client_secret=self.client_secret
         )
 
-        # Clear out old submissions before starting a submission stream to avoid spam.
-        self.submission_cache = [submission.id for submission in self.praw.subreddit('unixporn').new(limit=150)]
         self.praw_thread = threading.Thread(target=self.fetch_latest_posts, name=__name__, daemon=True)
 
     def fetch_latest_posts(self):
+        # Clear out old submissions before starting a submission stream to avoid spam.
+        self.bot.log.info('Starting /r/unixporn new submission stream')
+        self.submission_cache = [submission.id for submission in self.praw.subreddit('unixporn').new(limit=150)]
         subreddit = self.praw.subreddit('unixporn')
         for submission in subreddit.stream.submissions():
             if 'Screenshot' not in submission.link_flair_text:
-                self.bot.log.debug('Ignoring "%s" because it is not a screenshot', submission.title)
+                self.bot.log.debug('Ignoring %s because it is not a screenshot', submission.id)
                 continue
 
             if submission.id in self.submission_cache:
-                self.bot.log.debug('Ignoring "%s" because I\'ve seen it before', submission.title)
+                self.bot.log.debug('Ignoring %s because I have it cached', submission.id)
                 continue
 
             self.bot.log.info('Got new submission: %s', submission.title)
             self.submission_cache.append(submission.id)
-            with open(self.submission_cache_file, 'w') as fd:
-                json.dump(self.submission_cache, fd)
 
             title = submission.title
             if len(title) > MAX_TITLE_LENGTH:
@@ -87,5 +75,4 @@ class Unixporn(object):
     @irc3.event(irc3.rfc.JOIN)
     def on_join(self, mask, channel):
         if mask.nick == self.bot.nick and channel.lower() == self.channel and not self.praw_thread.is_alive():
-            self.bot.log.info('Started /r/unixporn fetcher')
             self.praw_thread.start()
