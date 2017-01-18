@@ -72,6 +72,11 @@ api_key =
 [plugins.urlinfo]
 ignore_nicks = Nick1 Nick2
 
+[plugins.unixporn]
+channel = ricedb
+reddit_client_id =
+reddit_client_secret =
+
 [irc3.plugins.command]
 # command plugin configuration
 

@@ -1,8 +1,12 @@
 beautifulsoup4==4.5.1
 bottle==0.12.13
+decorator==4.0.11
 docopt==0.6.2
 irc3==0.9.8
+praw==4.2.0
+prawcore==0.6.0
 pylast==1.7.0
 requests==2.12.4
 six==1.10.0
+update-checker==0.16
 venusian==1.0
