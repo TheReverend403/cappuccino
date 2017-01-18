@@ -54,12 +54,12 @@ class Unixporn(object):
             time.sleep(5)
             self.bot.log.debug('Fetching latest /r/unixporn posts')
             for submission in self.praw.subreddit('unixporn').new(limit=5):
-                if submission.id in self.submission_cache:
-                    self.bot.log.debug('Ignoring "%s" because I\'ve seen it before', submission.title)
+                if 'Screenshot' not in submission.link_flair_text:
+                    self.bot.log.debug('Ignoring "%s" because it is not a screenshot', submission.title)
                     continue
 
-                if submission.is_self:
-                    self.bot.log.debug('Ignoring "%s" because it is a self-post', submission.title)
+                if submission.id in self.submission_cache:
+                    self.bot.log.debug('Ignoring "%s" because I\'ve seen it before', submission.title)
                     continue
 
                 self.submission_cache.append(submission.id)
