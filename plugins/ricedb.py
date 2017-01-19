@@ -66,7 +66,8 @@ class RiceDB(object):
                 self.bot.set_user_value(mask.nick, mode, [])
                 return 'Removed all of your {0}.'.format(mode)
             deleted = []
-            for index in indexes:
+            # Delete values in descending order to prevent re-ordering of the list while deleting.
+            for index in sorted(indexes, reversed=True):
                 index = from_user_index(index)
                 try:
                     deleted.append(values[index])
