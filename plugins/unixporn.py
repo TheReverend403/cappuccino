@@ -45,7 +45,7 @@ class Unixporn(object):
         self.submission_cache = [submission.id for submission in self.praw.subreddit('unixporn').new(limit=150)]
         subreddit = self.praw.subreddit('unixporn')
         for submission in subreddit.stream.submissions():
-            if 'Screenshot' not in submission.link_flair_text:
+            if submission.is_self or '[' not in submission.title:
                 self.bot.log.debug('Ignoring %s because it is not a screenshot', submission.id)
                 continue
 
