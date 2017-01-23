@@ -155,3 +155,8 @@ class Fun(object):
     def benis(self, target):
         if self.should_reply():
             self.bot.privmsg(target, self.bot.format('3===D', bold=True))
+
+    @irc3.event(r':TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#(?i)DontJoinItsATrap) :.*freedom.*')
+    def antitrap(self, target):
+        self.bot.log.info('Parting {0}'.format(target))
+        self.bot.part(target)
