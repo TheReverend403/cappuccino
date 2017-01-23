@@ -77,16 +77,6 @@ class BotUI(object):
         self.bot.privmsg(args['<target>'], msg)
 
     @command(permission='admin', show_in_help_list=False)
-    def quote(self, mask, target, args):
-        """Send a raw string to the IRCd.
-
-           %%quote <string>...
-        """
-        cmd = ' '.join(args['<string>'] or [])
-        self.bot.log.info('quote> {0}'.format(cmd))
-        self.bot.send(cmd)
-
-    @command(permission='admin', show_in_help_list=False)
     def psa(self, mask, target, args):
         """Broadcast a public service announcement to all channels.
 
