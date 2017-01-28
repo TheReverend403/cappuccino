@@ -61,20 +61,13 @@ class LastFM(object):
 
             artist = current_track.get_artist().get_name().strip()
             title = current_track.get_title().strip()
-            album = current_track.get_album().get_title()
 
             if len(artist) > MAX_TRACK_ARTIST_LEN:
                 artist = ''.join(artist[:MAX_TRACK_ARTIST_LEN]) + '...'
             if len(title) > MAX_TRACK_TITLE_LEN:
                 title = ''.join(title[:MAX_TRACK_TITLE_LEN]) + '...'
-            if len(album) > MAX_TRACK_TITLE_LEN:
-                album = ''.join(album[:MAX_TRACK_TITLE_LEN]) + '...'
 
-            track_info = '{0} - {1} from {2}'.format(
-                self.bot.format(artist, bold=True),
-                self.bot.format(title, bold=True),
-                self.bot.format(album, bold=True))
-
+            track_info = '{0} - {1}'.format(self.bot.format(artist, bold=True), self.bot.format(title, bold=True))
         except (pylast.NetworkError, pylast.MalformedResponseError) as err:
             return '{0}: A last.fm error occurred: {1}'.format(mask.nick, self.bot.format(err, bold=True))
 
