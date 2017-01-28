@@ -156,7 +156,7 @@ class Fun(object):
         if self.should_reply():
             self.bot.privmsg(target, self.bot.format('3===D', bold=True))
 
-    @irc3.event(r':TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#(?i)DontJoinItsATrap) :.*YOU HAVE 1 MINUTE TO PART THE CHANNEL.*')
+    @irc3.event(r':TrapBot!.* PRIVMSG (?P<target>#(?i)DontJoinItsATrap) :.*YOU HAVE 1 MINUTE TO PART THE CHANNEL.*')
     def antitrap(self, target):
         self.bot.log.info('Parting {0}'.format(target))
         self.bot.part(target)
