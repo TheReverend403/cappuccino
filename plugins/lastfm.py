@@ -67,7 +67,7 @@ class LastFM(object):
             if len(title) > MAX_TRACK_TITLE_LEN:
                 title = ''.join(title[:MAX_TRACK_TITLE_LEN]) + '...'
 
-            track_info = '{0} - {1}'.format(self.bot.format(artist, bold=True), self.bot.format(title, bold=True))
+            track_info = '{1} by {0}'.format(self.bot.format(artist, bold=True), self.bot.format(title, bold=True))
         except (pylast.NetworkError, pylast.MalformedResponseError) as err:
             return '{0}: A last.fm error occurred: {1}'.format(mask.nick, self.bot.format(err, bold=True))
 
