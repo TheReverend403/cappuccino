@@ -80,10 +80,6 @@ class Fun(object):
         options_length = len(options)
         if options_length == 1:
             options = ['Yes.', 'Maybe.', 'No.']
-        elif options_length == 2:
-            options.extend(['Neither.', 'Both.'])
-        else:
-            options.extend(['None of the above.', 'All of the above.'])
 
         return '{0}: {1}'.format(mask.nick, random.choice(options))
 
