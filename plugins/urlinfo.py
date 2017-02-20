@@ -41,7 +41,7 @@ REQUEST_OPTIONS = {
     'headers': REQUEST_HEADERS
 }
 
-ALLOWED_CONTENT_TYPES = ['text', 'video', 'image', 'application']
+ALLOWED_CONTENT_TYPES = ['text', 'video', 'application']
 
 
 class ResponseBodyTooLarge(requests.RequestException):
