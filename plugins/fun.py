@@ -41,20 +41,6 @@ class Fun(object):
     def should_reply(self):
         return random.random() <= self.random_chance
 
-    @command(permission='view')
-    def insult(self, mask, target, args):
-        """Send a randomly generated insult from insultgenerator.org
-
-            %%insult
-        """
-        try:
-            with closing(requests.get('http://www.insultgenerator.org')) as response:
-                insult = BeautifulSoup(response.text, 'html.parser').find('div', {'class': 'wrap'}).text.strip()
-                yield insult
-        except requests.exceptions.RequestException as err:
-            self.bot.log.exception(err)
-            yield 'Error: {0}'.format(err.strerror)
-
     @command(permission='view', use_shlex=False)
     def decide(self, mask, target, args):
         """Make the difficult decisions in life.
