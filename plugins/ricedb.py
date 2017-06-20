@@ -164,3 +164,17 @@ class RiceDB(object):
             %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
+
+    @command(permission='view')
+    def dog(self, mask, target, args):
+        """
+            %%dog [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+        """
+        yield self._generic_db(mask, target, args)
+
+    @command(permission='view')
+    def cat(self, mask, target, args):
+        """
+            %%cat [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+        """
+        yield self._generic_db(mask, target, args)
