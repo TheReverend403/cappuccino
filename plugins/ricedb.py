@@ -164,3 +164,10 @@ class RiceDB(object):
             %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
+
+    @command(permission='view')
+    def pet(self, mask, target, args):
+        """
+            %%pet [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+        """
+        yield self._generic_db(mask, target, args)
