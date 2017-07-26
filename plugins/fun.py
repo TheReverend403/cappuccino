@@ -79,10 +79,13 @@ class Fun(object):
         dice_count, dice_size = int(args['<amount>']), int(args['<die-faces>'])
         if not dice_count or not dice_size:
             return 'Please supply numbers only.'
+
         count_limit_lower, count_limit_upper = DICE_COUNT_LIMIT
         size_limit_lower, size_limit_upper = DICE_SIDES_LIMIT
+
         if target.is_channel:
             count_limit_upper, size_limit_upper = int(count_limit_upper / 2), int(size_limit_upper / 2)
+
         if dice_count < count_limit_lower or dice_count > count_limit_upper \
                 or dice_size < size_limit_lower or dice_size > size_limit_upper:
             return 'Invalid roll specification. Must be a minimum of {0} and a maximum of {1}'.format(
