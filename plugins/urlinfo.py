@@ -182,7 +182,7 @@ class UrlInfo(object):
         urls = set(_clean_url(url) for url in URL_FINDER.findall(data))
         if not urls:
             return
-        urls = random.sample(urls, 3)
+        urls = [random.choice(urls) for _ in range(3)]
 
         messages = []
         with ThreadPool(len(urls)) as threadpool:
