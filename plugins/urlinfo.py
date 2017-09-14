@@ -179,10 +179,12 @@ class UrlInfo(object):
     def on_url(self, mask, target, data):
         if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd):
             return
+
         urls = list(set(_clean_url(url) for url in URL_FINDER.findall(data)))
         if not urls:
             return
-        urls = [random.choice(urls) for _ in range(3)]
+        random.shuffle(urls)
+        urls = urls[:3]
 
         messages = []
         with ThreadPool(len(urls)) as threadpool:
