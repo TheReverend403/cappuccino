@@ -75,7 +75,7 @@ class LastFM(object):
                     'is' if currently_listening is 1 else 'are', currently_listening,
                     'user' if currently_listening is 1 else 'users')
 
-        except (pylast.NetworkError, pylast.MalformedResponseError) as err:
+        except (pylast.NetworkError, pylast.MalformedResponseError, pylast.WSError) as err:
             return '{0}: A last.fm error occurred: {1}'.format(mask.nick, self.bot.format(err, bold=True))
 
         return '{0} is now playing {1}'.format(irc_username, track_info)
