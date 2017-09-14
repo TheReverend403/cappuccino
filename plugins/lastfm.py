@@ -68,6 +68,13 @@ class LastFM(object):
                 title = ''.join(title[:MAX_TRACK_TITLE_LEN]) + '...'
 
             track_info = '{1} by {0}'.format(self.bot.format(artist, bold=True), self.bot.format(title, bold=True))
+
+            currently_listening = current_track.get_listener_count() - 1
+            if currently_listening:
+                track_info += ', and so {0} {1} other {2}.'.format(
+                    'is' if currently_listening is 1 else 'are', currently_listening,
+                    'user' if currently_listening is 1 else 'users')
+
         except (pylast.NetworkError, pylast.MalformedResponseError) as err:
             return '{0}: A last.fm error occurred: {1}'.format(mask.nick, self.bot.format(err, bold=True))
 
