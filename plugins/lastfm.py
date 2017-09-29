@@ -72,7 +72,7 @@ class LastFM(object):
             currently_listening = current_track.get_listener_count() - 1
             if currently_listening:
                 track_info += ', and so {0} {1} other {2}.'.format(
-                    'is' if currently_listening is 1 else 'are', currently_listening,
+                    'has' if currently_listening is 1 else 'have', currently_listening,
                     'user' if currently_listening is 1 else 'users')
 
         except (pylast.NetworkError, pylast.MalformedResponseError, pylast.WSError) as err:
