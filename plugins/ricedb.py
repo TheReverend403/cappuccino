@@ -1,4 +1,5 @@
 import inspect
+import re
 
 import irc3
 import random
@@ -96,6 +97,10 @@ class RiceDB(object):
                 return 'Invalid ID.'
 
         user = args['<user>'] or mask.nick
+
+        if re.match('^https?://.*', user, re.IGNORECASE | re.DOTALL):
+            return 'Did you mean to use --add (-a) or --set (a) there?'
+
         if user.isdigit():  # Support .command <id> syntax
             index = from_user_index(int(user))
             try:
