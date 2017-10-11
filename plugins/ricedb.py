@@ -99,7 +99,7 @@ class RiceDB(object):
         user = args['<user>'] or mask.nick
 
         if re.match('^https?://.*', user, re.IGNORECASE | re.DOTALL):
-            return 'Did you mean to use --add (-a) or --set (a) there?'
+            return 'Did you mean to use --add (-a) or --set (-s) there?'
 
         if user.isdigit():  # Support .command <id> syntax
             index = from_user_index(int(user))

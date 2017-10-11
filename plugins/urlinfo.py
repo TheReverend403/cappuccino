@@ -180,7 +180,7 @@ class UrlInfo(object):
         if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd):
             return
 
-        urls = list(set(_clean_url(url) for url in URL_FINDER.findall(data)))
+        urls = [_clean_url(url) for url in set(URL_FINDER.findall(data))]
         if not urls:
             return
         random.shuffle(urls)
