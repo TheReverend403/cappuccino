@@ -67,6 +67,8 @@ class Ai(object):
             return
         if not data.lower().startswith(self.bot.nick.lower()):
             self._add_line(data)
+        if self.muted:
+            return
         if self.bot.nick.lower() in data.lower():
             corpus = self._get_lines()
             if not corpus:
