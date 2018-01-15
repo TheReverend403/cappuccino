@@ -77,6 +77,10 @@ channel = ricedb
 reddit_client_id =
 reddit_client_secret =
 
+[plugins.ai]
+ignore_nicks = ExampleUser
+channel = example
+
 [irc3.plugins.command]
 # command plugin configuration
 
