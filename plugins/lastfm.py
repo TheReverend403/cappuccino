@@ -27,7 +27,7 @@ class LastFM(object):
     def now_playing(self, mask, target, args):
         """View currently playing track info.
 
-            %%np [--full] [(-s | --set) <username> | <username>]
+            %%np [--full | -f] [(-s | --set) <username> | <username>]
         """
 
         try:
@@ -70,7 +70,7 @@ class LastFM(object):
             track_info = '{1} by {0}'.format(self.bot.format(artist, bold=True), self.bot.format(title, bold=True))
 
             currently_listening = current_track.get_listener_count() - 1
-            if currently_listening and args['--full']:
+            if currently_listening and (args['--full'] or args['-f']):
                 track_info += ', and so {0} {1} other {2}.'.format(
                     'has' if currently_listening is 1 else 'have', currently_listening,
                     'user' if currently_listening is 1 else 'users')
