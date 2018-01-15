@@ -38,7 +38,7 @@ class Ai(object):
 
     def _get_lines(self, channel, line_count=1000):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?', (line_count, channel))
+        cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?', (channel, line_count))
         lines = [line[0] for line in cursor.fetchall()]
         return lines if len(lines) >= line_count else None
 
