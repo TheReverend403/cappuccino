@@ -23,11 +23,6 @@ class Ai(object):
         except KeyError:
             self.ignore_nicks = []
 
-        try:
-            self.channel = self.bot.config[__name__]['channel']
-        except KeyError:
-            self.channel = None
-
         self._init_db()
 
     def _init_db(self):
@@ -41,7 +36,7 @@ class Ai(object):
         cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (line, channel))
         self.conn.commit()
 
-    def _get_lines(self, channel, line_count=5000):
+    def _get_lines(self, channel, line_count=1000):
         cursor = self.conn.cursor()
         cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?', (line_count, channel))
         lines = [line[0] for line in cursor.fetchall()]
@@ -70,8 +65,7 @@ class Ai(object):
         if self.bot.nick.lower() in data.lower():
             corpus = self._get_lines(channel)
             if not corpus:
-                self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply. '
-                                     'Consider running import.py to import lines from a text file.')
+                self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
                 return
             text_model = markovify.NewlineText('\n'.join(corpus))
             generated_reply = text_model.make_short_sentence(140)
