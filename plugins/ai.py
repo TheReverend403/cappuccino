@@ -73,3 +73,4 @@ class Ai(object):
                 self.bot.privmsg(channel, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))
                 return
             self.bot.privmsg(channel, generated_reply.strip())
+            del corpus
