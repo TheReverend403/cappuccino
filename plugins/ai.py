@@ -59,9 +59,13 @@ class Ai(object):
         cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (line, channel))
         self.conn.commit()
 
-    def _get_lines(self, channel, max_line_count=5000):
+    def _get_lines(self, channel=None, max_line_count=5000):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (max_line_count,))
+        if channel:
+            cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?', (channel, max_line_count))
+        else:
+            cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (max_line_count,))
+
         lines = [self.bot.strip_formatting(line[0]) for line in cursor.fetchall()]
         return lines if len(lines) > 0 else None
 
@@ -140,7 +144,7 @@ class Ai(object):
         if not self.bot.nick.lower() in data.lower():
             return
 
-        corpus = self._get_lines(channel)
+        corpus = self._get_lines()
         if not corpus:
             self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
             return
