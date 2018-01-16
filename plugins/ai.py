@@ -12,6 +12,9 @@ CMD_PREFIX_PATTERN = re.compile(r'^\s*(\.|!|~|`|\$)+')
 
 @irc3.plugin
 class Ai(object):
+    requires = [
+        'irc3.plugins.userlist'
+    ]
 
     def __init__(self, bot):
         self.bot = bot
