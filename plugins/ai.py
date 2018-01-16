@@ -51,6 +51,9 @@ class Ai(object):
         self.conn.commit()
 
     def _add_line(self, line, channel):
+        if CMD_PREFIX_PATTERN.match(line) or SED_CHECKER.match(line) or line.startswith('['):
+            return
+
         cursor = self.conn.cursor()
         cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (line, channel))
         self.conn.commit()
@@ -116,8 +119,7 @@ class Ai(object):
         if not data:
             return
 
-        if CMD_PREFIX_PATTERN.match(data) or SED_CHECKER.match(
-                data) or mask.nick in self.ignore_nicks or data.lower().startswith('['):
+        if mask.nick in self.ignore_nicks:
             return
 
         if not data.lower().startswith(self.bot.nick.lower()):
