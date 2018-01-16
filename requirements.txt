@@ -1,5 +1,4 @@
 beautifulsoup4==4.6.0
-bottle==0.12.13
 chardet==3.0.4
 decorator==4.2.1
 docopt==0.6.2
