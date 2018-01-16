@@ -39,11 +39,11 @@ class Ai(object):
         cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (line, channel))
         self.conn.commit()
 
-    def _get_lines(self, channel, line_count=1000):
+    def _get_lines(self, channel, max_line_count=5000):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (line_count,))
+        cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (max_line_count,))
         lines = [line[0] for line in cursor.fetchall()]
-        return lines if len(lines) >= line_count else None
+        return lines if len(lines) > 0 else None
 
     def _line_count(self, channel=None):
         cursor = self.conn.cursor()
