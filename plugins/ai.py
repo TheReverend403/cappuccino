@@ -16,7 +16,7 @@ class Ai(object):
     def __init__(self, bot):
         self.bot = bot
         self.file = os.path.join('data', 'ai.sqlite')
-        self.muted = True
+        self.active_channels = []
 
         try:
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
@@ -42,35 +42,70 @@ class Ai(object):
         lines = [line[0] for line in cursor.fetchall()]
         return lines if len(lines) >= line_count else None
 
-    @command(permission='admin', show_in_help_list=False)
-    def shutup(self, mask, target, args):
+    def is_active(self, channel):
+        return channel in self.active_channels
+
+    def toggle(self, channel):
+        try:
+            self.active_channels.remove(channel)
+        except ValueError:
+            self.active_channels.append(channel)
+
+    @command()
+    def ai(self, mask, target, args):
         """Toggles chattiness.
 
-            %%shutup
+            %%ai [--status]
         """
-        self.muted = not self.muted
-        return 'Shutting up!' if self.muted else 'Unmuted!'
+
+        privmodes = ['@', '&', '~', '%']
+        is_op = False
+        for mode in privmodes:
+            try:
+                if mask.nick in self.bot.channels[target].modes[mode]:
+                    is_op = True
+                    break
+            except (KeyError, AttributeError):
+                continue
+
+        if not is_op:
+            return '{0}: You must have one of the following modes to use this command: {1}'.format(
+                mask.nick, ', '.join(privmodes))
+
+        if args['--status']:
+            return '{0}: Chatbot is currently {1}.'.format(
+                mask.nick, 'enabled' if self.is_active(target) else 'disabled')
+
+        self.toggle(target)
+        return 'Chatbot activated.' if self.is_active(target) else 'Shutting up!'
 
     @irc3.event(r'.*:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<channel>#\S+) :\s*(?P<data>\S+.*)$')
     def handle_line(self, mask, channel, data):
         data = data.strip()
         if not data:
             return
+
         if CMD_PREFIX_PATTERN.match(data) or mask.nick in self.ignore_nicks:
             return
+
         if not data.lower().startswith(self.bot.nick.lower()):
             self._add_line(data, channel)
-        if self.muted:
+
+        if not self.is_active(channel):
             return
-        if self.bot.nick.lower() in data.lower():
-            corpus = self._get_lines(channel)
-            if not corpus:
-                self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
-                return
-            text_model = markovify.NewlineText('\n'.join(corpus))
-            generated_reply = text_model.make_short_sentence(140)
-            if not generated_reply:
-                self.bot.privmsg(channel, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))
-                return
-            self.bot.privmsg(channel, generated_reply.strip())
-            del corpus
+
+        if not self.bot.nick.lower() in data.lower():
+            return
+
+        corpus = self._get_lines(channel)
+        if not corpus:
+            self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
+            return
+
+        text_model = markovify.NewlineText('\n'.join(corpus))
+        generated_reply = text_model.make_short_sentence(140)
+        if not generated_reply:
+            self.bot.privmsg(channel, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))
+            return
+
+        self.bot.privmsg(channel, generated_reply.strip())
