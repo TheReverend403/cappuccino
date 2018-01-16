@@ -114,8 +114,8 @@ class Ai(object):
             if channel_line_count >= 0 and line_count >= 0:
                 channel_percentage = int(100 * float(channel_line_count) / float(line_count))
 
-            return '{0}: Chatbot is currently {1} for {4}. Channel/global line count: {3}/{2} ({5}%).'.format(
-                mask.nick, 'enabled' if self.is_active(target) else 'disabled',
+            return 'Chatbot is currently {0} for {3}. Channel/global line count: {2}/{1} ({4}%).'.format(
+                'enabled' if self.is_active(target) else 'disabled',
                 line_count, channel_line_count, target, channel_percentage)
 
         self.toggle(target)
