@@ -111,7 +111,7 @@ class Ai(object):
 
             # Percentage of global lines the current channel accounts for.
             if channel_line_count >= 0 and line_count >= 0:
-                channel_percentage = round(100 * float(channel_line_count) / float(line_count), ndigits=0)
+                channel_percentage = int(round(100 * float(channel_line_count) / float(line_count), ndigits=0))
 
             return 'Chatbot is currently {0} for {3}. Channel/global line count: {2}/{1} ({4}%).'.format(
                 'enabled' if self.is_active(target) else 'disabled',
