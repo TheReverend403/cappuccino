@@ -84,10 +84,9 @@ class Ai(object):
                 mask.nick, ', '.join(privmodes))
 
         if args['--status']:
-            line_count = self._line_count()
-
-            return '{0}: Chatbot is currently {1} for {3} and knows {2} lines.'.format(
-                mask.nick, 'enabled' if self.is_active(target) else 'disabled', line_count, target)
+            return '{0}: Chatbot is currently {1} for {4}. Global/channel line count: {2}/{3}.'.format(
+                mask.nick, 'enabled' if self.is_active(target) else 'disabled',
+                self._line_count(), self._line_count(target), target)
 
         self.toggle(target)
         return 'Chatbot activated.' if self.is_active(target) else 'Shutting up!'
