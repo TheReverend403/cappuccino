@@ -107,7 +107,8 @@ class Ai(object):
         if not self.is_active(channel):
             return
 
-        if not self.bot.nick.lower() in data.lower():
+        # Only respond to messages directly addressed to the bot
+        if not data.lower().startswith(self.bot.nick.lower() + ': '):
             return
 
         corpus = self._get_lines(channel)
