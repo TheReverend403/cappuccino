@@ -91,19 +91,6 @@ class Ai(object):
             %%ai [--status]
         """
 
-        privmodes = ['@', '&', '~', '%']
-        is_op = False
-        for mode in privmodes:
-            try:
-                if mask.nick in self.bot.channels[target].modes[mode]:
-                    is_op = True
-                    break
-            except (KeyError, AttributeError):
-                continue
-
-        if not is_op:
-            return 'You must have one of the following modes to use this command: {0}'.format(', '.join(privmodes))
-
         if args['--status']:
             line_count = self._line_count()
             channel_line_count = self._line_count(target)
@@ -116,6 +103,19 @@ class Ai(object):
             return 'Chatbot is currently {0} for {3}. Channel/global line count: {2}/{1} ({4}%).'.format(
                 'enabled' if self.is_active(target) else 'disabled',
                 line_count, channel_line_count, target, channel_percentage)
+
+        privmodes = ['@', '&', '~', '%']
+        is_op = False
+        for mode in privmodes:
+            try:
+                if mask.nick in self.bot.channels[target].modes[mode]:
+                    is_op = True
+                    break
+            except (KeyError, AttributeError):
+                continue
+
+        if not is_op:
+            return 'You must have one of the following modes to use this command: {0}'.format(', '.join(privmodes))
 
         self.toggle(target)
         return 'Chatbot activated.' if self.is_active(target) else 'Shutting up!'
