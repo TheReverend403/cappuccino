@@ -18,7 +18,7 @@ SED_CHECKER = re.compile(r'^\s*s[/|\\!.,\\].+')
 @irc3.plugin
 class Ai(object):
     requires = [
-        'irc3.plugins.userlist'
+        'irc3.plugins.userlist',
         'plugins.formatting'
     ]
 
