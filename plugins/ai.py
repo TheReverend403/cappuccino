@@ -116,7 +116,8 @@ class Ai(object):
         if not data:
             return
 
-        if CMD_PREFIX_PATTERN.match(data) or SED_CHECKER.match(data) or mask.nick in self.ignore_nicks:
+        if CMD_PREFIX_PATTERN.match(data) or SED_CHECKER.match(
+                data) or mask.nick in self.ignore_nicks or data.lower().startswith('['):
             return
 
         if not data.lower().startswith(self.bot.nick.lower()):
