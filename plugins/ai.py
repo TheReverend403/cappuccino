@@ -19,6 +19,7 @@ SED_CHECKER = re.compile(r'^\s*s[/|\\!.,\\].+')
 class Ai(object):
     requires = [
         'irc3.plugins.userlist'
+        'plugins.formatting'
     ]
 
     def __init__(self, bot):
@@ -57,7 +58,7 @@ class Ai(object):
     def _get_lines(self, channel, max_line_count=5000):
         cursor = self.conn.cursor()
         cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (max_line_count,))
-        lines = [line[0] for line in cursor.fetchall()]
+        lines = [self.bot.strip_formatting(line[0]) for line in cursor.fetchall()]
         return lines if len(lines) > 0 else None
 
     def _line_count(self, channel=None):

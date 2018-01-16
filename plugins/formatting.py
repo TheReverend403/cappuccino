@@ -1,3 +1,5 @@
+import re
+
 import irc3
 
 
@@ -35,3 +37,11 @@ class Formatting(object):
         if reset:
             text += self.bot.color.RESET
         return text
+
+    @irc3.extend
+    def strip_formatting(self, string):
+        ccodes = ['\x0F', '\x16', '\x1D', '\x1F', '\x02',
+                  '\x03([1-9][0-6]?)?,?([1-9][0-6]?)?']
+        for cc in ccodes:
+            string = re.sub(cc, '', string)
+        return string
