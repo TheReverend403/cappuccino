@@ -52,7 +52,7 @@ class Ai(object):
 
     def _add_line(self, line, channel):
         if CMD_PREFIX_PATTERN.match(line) or SED_CHECKER.match(line) \
-                or line.startswith('[') or line.startswith('ACTION '):
+                or line.startswith('[') or line.startswith('\x01ACTION '):
             return
 
         cursor = self.conn.cursor()
