@@ -1,10 +1,10 @@
+import os
 import random
 import re
 import sqlite3
 
 import irc3
 import markovify
-import os
 from irc3.plugins.command import command
 
 CMD_PREFIX_PATTERN = re.compile(r'^\s*(\.|!|~|`|\$)+')
@@ -45,6 +45,14 @@ class Ai(object):
         lines = [line[0] for line in cursor.fetchall()]
         return lines if len(lines) >= line_count else None
 
+    def _line_count(self, channel=None):
+        cursor = self.conn.cursor()
+        if channel:
+            cursor.execute('SELECT COUNT(*) FROM corpus WHERE channel=?', (channel,))
+        else:
+            cursor.execute('SELECT COUNT(*) FROM corpus')
+        return cursor.fetchone()[0]
+
     def is_active(self, channel):
         return channel in self.active_channels
 
@@ -76,8 +84,10 @@ class Ai(object):
                 mask.nick, ', '.join(privmodes))
 
         if args['--status']:
-            return '{0}: Chatbot is currently {1}.'.format(
-                mask.nick, 'enabled' if self.is_active(target) else 'disabled')
+            line_count = self._line_count()
+
+            return '{0}: Chatbot is currently {1} for {3} and knows {2} lines.'.format(
+                mask.nick, 'enabled' if self.is_active(target) else 'disabled', line_count, target)
 
         self.toggle(target)
         return 'Chatbot activated.' if self.is_active(target) else 'Shutting up!'
