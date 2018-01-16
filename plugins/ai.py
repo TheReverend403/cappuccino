@@ -25,7 +25,6 @@ class Ai(object):
     def __init__(self, bot):
         self.bot = bot
         self.datadir = 'data'
-        self.file = os.path.join(self.datadir, 'ai.sqlite')
         self.channel_file = os.path.join(self.datadir, 'ai.json')
         self.active_channels = []
 
@@ -45,7 +44,7 @@ class Ai(object):
         self._init_db()
 
     def _init_db(self):
-        self.conn = sqlite3.connect(self.file)
+        self.conn = sqlite3.connect(os.path.join(self.datadir, 'ai.sqlite'))
         cursor = self.conn.cursor()
         cursor.execute('CREATE TABLE IF NOT EXISTS corpus (line TEXT PRIMARY KEY, channel TEXT)')
         self.conn.commit()
