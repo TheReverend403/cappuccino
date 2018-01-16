@@ -8,6 +8,7 @@ import markovify
 from irc3.plugins.command import command
 
 CMD_PREFIX_PATTERN = re.compile(r'^\s*(\.|!|~|`|\$)+')
+SED_CHECKER = re.compile(r'^\s*s[/|\\!.,\\].+')
 
 
 @irc3.plugin
@@ -97,7 +98,7 @@ class Ai(object):
         if not data:
             return
 
-        if CMD_PREFIX_PATTERN.match(data) or mask.nick in self.ignore_nicks:
+        if CMD_PREFIX_PATTERN.match(data) or SED_CHECKER.match(data) or mask.nick in self.ignore_nicks:
             return
 
         if not data.lower().startswith(self.bot.nick.lower()):
