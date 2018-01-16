@@ -102,8 +102,7 @@ class Ai(object):
                 continue
 
         if not is_op:
-            return '{0}: You must have one of the following modes to use this command: {1}'.format(
-                mask.nick, ', '.join(privmodes))
+            return 'You must have one of the following modes to use this command: {0}'.format(', '.join(privmodes))
 
         if args['--status']:
             line_count = self._line_count()
