@@ -51,7 +51,8 @@ class Ai(object):
         self.conn.commit()
 
     def _add_line(self, line, channel):
-        if CMD_PREFIX_PATTERN.match(line) or SED_CHECKER.match(line) or line.startswith('['):
+        if CMD_PREFIX_PATTERN.match(line) or SED_CHECKER.match(line) \
+                or line.startswith('[') or line.startswith('ACTION '):
             return
 
         cursor = self.conn.cursor()
@@ -104,9 +105,9 @@ class Ai(object):
                 'enabled' if self.is_active(target) else 'disabled',
                 line_count, channel_line_count, target, channel_percentage)
 
-        privmodes = ['@', '&', '~', '%']
+        op_modes = ['@', '&', '~', '%']
         is_op = False
-        for mode in privmodes:
+        for mode in op_modes:
             try:
                 if mask.nick in self.bot.channels[target].modes[mode]:
                     is_op = True
@@ -115,7 +116,7 @@ class Ai(object):
                 continue
 
         if not is_op:
-            return 'You must have one of the following modes to do that: {0}'.format(', '.join(privmodes))
+            return 'You must have one of the following modes to do that: {0}'.format(', '.join(op_modes))
 
         self.toggle(target)
         return 'Chatbot activated.' if self.is_active(target) else 'Shutting up!'
