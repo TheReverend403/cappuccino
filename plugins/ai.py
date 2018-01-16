@@ -1,3 +1,7 @@
+try:
+    import ujson as json
+except ImportError:
+    import json
 import os
 import random
 import re
@@ -19,13 +23,23 @@ class Ai(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.file = os.path.join('data', 'ai.sqlite')
+        self.datadir = 'data'
+        self.file = os.path.join(self.datadir, 'ai.sqlite')
+        self.channel_file = os.path.join(self.datadir, 'ai.json')
         self.active_channels = []
 
         try:
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
         except KeyError:
             self.ignore_nicks = []
+
+        try:
+            with open(self.channel_file, 'r') as fd:
+                self.active_channels = json.load(fd)
+        except FileNotFoundError:
+            if not os.path.exists(self.datadir):
+                os.mkdir(self.datadir)
+                self.bot.log.debug('Created {0}/ directory'.format(self.datadir))
 
         self._init_db()
 
@@ -62,6 +76,9 @@ class Ai(object):
             self.active_channels.remove(channel)
         except ValueError:
             self.active_channels.append(channel)
+
+        with open(self.channel_file, 'w') as fd:
+            json.dump(self.active_channels, fd)
 
     @command()
     def ai(self, mask, target, args):
