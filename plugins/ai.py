@@ -115,7 +115,7 @@ class Ai(object):
                 continue
 
         if not is_op:
-            return 'You must have one of the following modes to use this command: {0}'.format(', '.join(privmodes))
+            return 'You must have one of the following modes to do that: {0}'.format(', '.join(privmodes))
 
         self.toggle(target)
         return 'Chatbot activated.' if self.is_active(target) else 'Shutting up!'
