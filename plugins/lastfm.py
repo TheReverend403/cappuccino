@@ -57,7 +57,7 @@ class LastFM(object):
 
             current_track = lastfm_user.get_now_playing()
             if not current_track:
-                return '{0} is not listening to anything right now.'.format(irc_username)
+                return '{0} is not listening to anything right now.'.format(lastfm_username)
 
             artist = current_track.get_artist().get_name().strip()
             title = current_track.get_title().strip()
