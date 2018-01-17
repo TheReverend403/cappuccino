@@ -78,4 +78,4 @@ class LastFM(object):
         except (pylast.NetworkError, pylast.MalformedResponseError, pylast.WSError) as err:
             return '{0}: A last.fm error occurred: {1}'.format(mask.nick, self.bot.format(err, bold=True))
 
-        return '{0} is now playing {1}'.format(irc_username, track_info)
+        return '{0} is now playing {1}'.format(lastfm_username, track_info)
