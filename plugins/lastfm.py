@@ -55,9 +55,10 @@ class LastFM(object):
                 return 'No such last.fm user ({0}). Please set a valid user with {1}np --set <username>'.format(
                         lastfm_username, self.bot.config.cmd)
 
+            printed_name = f'{irc_username} ({lastfm_user})'
             current_track = lastfm_user.get_now_playing()
             if not current_track:
-                return '{0} is not listening to anything right now.'.format(lastfm_username)
+                return '{0} is not listening to anything right now.'.format(printed_name)
 
             artist = current_track.get_artist().get_name().strip()
             title = current_track.get_title().strip()
@@ -78,4 +79,4 @@ class LastFM(object):
         except (pylast.NetworkError, pylast.MalformedResponseError, pylast.WSError) as err:
             return '{0}: A last.fm error occurred: {1}'.format(mask.nick, self.bot.format(err, bold=True))
 
-        return '{0} is now playing {1}'.format(lastfm_username, track_info)
+        return '{0} is now playing {1}'.format(printed_name, track_info)
