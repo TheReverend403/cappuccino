@@ -129,11 +129,11 @@ class Ai(object):
 
     @irc3.event(r'.*:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<channel>#\S+) :\s*(?P<data>\S+.*)$')
     def handle_line(self, mask, channel, data):
-        data = data.strip()
-        if not data:
+        if mask.nick in self.ignore_nicks:
             return
 
-        if mask.nick in self.ignore_nicks:
+        data = data.strip()
+        if not data:
             return
 
         if not data.lower().startswith(self.bot.nick.lower()):
