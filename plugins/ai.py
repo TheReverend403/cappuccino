@@ -27,11 +27,12 @@ class Ai(object):
         self.datadir = 'data'
         self.channel_file = os.path.join(self.datadir, 'ai.json')
         self.active_channels = []
+        self.ignore_nicks = []
 
         try:
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
         except KeyError:
-            self.ignore_nicks = []
+            pass
 
         try:
             with open(self.channel_file, 'r') as fd:
