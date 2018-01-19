@@ -38,10 +38,11 @@ class Formatting(object):
             text += self.bot.color.RESET
         return text
 
+    # https://codebottle.io/s/b475a78c71
     @irc3.extend
     def strip_formatting(self, string):
-        ccodes = ['\x0F', '\x16', '\x1D', '\x1F', '\x02',
+        ccodes = [self.bot.color.RESET, '\x16', '\x1D', '\x1F', '\x02',
                   '\x03([1-9][0-6]?)?,?([1-9][0-6]?)?']
         for cc in ccodes:
-            string = re.sub(cc, '', string)
+            string = re.sub(cc, '', string, flags=re.I)
         return string
