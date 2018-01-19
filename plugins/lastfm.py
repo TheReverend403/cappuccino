@@ -55,7 +55,10 @@ class LastFM(object):
                 return 'No such last.fm user ({0}). Please set a valid user with {1}np --set <username>'.format(
                         lastfm_username, self.bot.config.cmd)
 
-            printed_name = f'{irc_username} ({lastfm_username})'
+            printed_name = irc_username
+            if irc_username.lower() != lastfm_username.lower():
+                printed_name += f' ({lastfm_username})'
+
             current_track = lastfm_user.get_now_playing()
             if not current_track:
                 return '{0} is not listening to anything right now.'.format(printed_name)
