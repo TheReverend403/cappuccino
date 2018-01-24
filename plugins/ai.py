@@ -62,7 +62,7 @@ class Ai(object):
         cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (line, channel))
         self.conn.commit()
 
-    def _get_lines(self, channel=None, max_line_count=5000):
+    def _get_lines(self, channel=None, max_line_count=10000):
         cursor = self.conn.cursor()
         if channel:
             cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?', (channel, max_line_count))
