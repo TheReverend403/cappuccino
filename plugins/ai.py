@@ -110,7 +110,7 @@ class Ai(object):
 
         return False
 
-    @command()
+    @command
     def ai(self, mask, target, args):
         """Toggles chattiness.
 

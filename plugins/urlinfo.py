@@ -188,14 +188,14 @@ class UrlInfo(object):
 
         messages = []
         with ThreadPool(len(urls)) as threadpool:
-            self.bot.log.info('Retrieving page titles for {0}'.format(urls))
+            self.bot.log.debug('Retrieving page titles for {0}'.format(urls))
             for hostname, title, mimetype, size, err in threadpool.imap_unordered(_parse_url, urls):
                 try:
                     # Lets me handle exceptions properly rather than as a bunch of if checks
                     if err:
                         raise err
                 except ContentTypeNotAllowed as err:
-                    self.bot.log.warn(err)
+                    self.bot.log.debug(err)
                 except (socket.gaierror, ValueError, InvalidIPAddress) as err:
                     self.bot.log.error(err)
                     messages.append('[ {0} ] {1}'.format(self.bot.format(hostname, color=self.bot.color.RED),
