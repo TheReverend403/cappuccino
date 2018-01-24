@@ -5,6 +5,8 @@ import irc3
 
 @irc3.plugin
 class Formatting(object):
+    irc_codes_regex = re.compile('\x1f|\x02|\x1D|\x03(?:\d{1,2}(?:,\d{1,2})?)?', re.UNICODE)
+
     class Color(object):
         RESET = '\x0f'
         WHITE = '00'
@@ -38,11 +40,6 @@ class Formatting(object):
             text += self.bot.color.RESET
         return text
 
-    # https://codebottle.io/s/b475a78c71
     @irc3.extend
     def strip_formatting(self, string):
-        ccodes = [self.bot.color.RESET, '\x16', '\x1D', '\x1F', '\x02',
-                  '\x03([1-9][0-6]?)?,?([1-9][0-6]?)?']
-        for cc in ccodes:
-            string = re.sub(cc, '', string, flags=re.I)
-        return string
+        return self.irc_codes_regex.sub('', string)

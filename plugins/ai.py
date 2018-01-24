@@ -15,6 +15,13 @@ CMD_PREFIX_PATTERN = re.compile(r'^\s*(\.|!|~|`|\$)+')
 SED_CHECKER = re.compile(r'^\s*s[/|\\!.,\\].+')
 
 
+def should_ignore_message(line):
+    if not line:
+        return
+
+    return CMD_PREFIX_PATTERN.match(line) or SED_CHECKER.match(line) or line.startswith('[') or line.startswith('\x01ACTION ')
+
+
 @irc3.plugin
 class Ai(object):
     requires = [
@@ -51,10 +58,6 @@ class Ai(object):
         self.conn.commit()
 
     def _add_line(self, line, channel):
-        if CMD_PREFIX_PATTERN.match(line) or SED_CHECKER.match(line) \
-                or line.startswith('[') or line.startswith('\x01ACTION '):
-            return
-
         cursor = self.conn.cursor()
         cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (line, channel))
         self.conn.commit()
@@ -133,17 +136,16 @@ class Ai(object):
             return
 
         data = data.strip()
-        if not data:
+        if should_ignore_message(data):
             return
 
-        if not data.lower().startswith(self.bot.nick.lower()):
+        # Only respond to messages mentioning the bot in an active channel
+        if self.bot.nick.lower() not in data.lower():
+            # Only add lines that aren't mentioning the bot
             self._add_line(data, channel)
+            return
 
         if not self.is_active(channel):
-            return
-
-        # Only respond to messages mentioning the bot
-        if not self.bot.nick.lower() in data.lower():
             return
 
         corpus = self._get_lines()
