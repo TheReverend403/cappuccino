@@ -160,7 +160,7 @@ class Ai(object):
             return
 
         text_model = markovify.NewlineText('\n'.join(corpus))
-        generated_reply = text_model.make_short_sentence(140)
+        generated_reply = text_model.make_short_sentence(180)
         if not generated_reply:
             self.bot.privmsg(channel, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))
             return
