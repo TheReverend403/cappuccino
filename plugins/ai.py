@@ -35,9 +35,15 @@ class Ai(object):
         self.channel_file = os.path.join(self.datadir, 'ai.json')
         self.active_channels = []
         self.ignore_nicks = []
+        self.max_loaded_lines = 5000
 
         try:
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
+        except KeyError:
+            pass
+
+        try:
+            self.max_loaded_lines = self.bot.config[__name__]['max_loaded_lines']
         except KeyError:
             pass
 
@@ -62,12 +68,12 @@ class Ai(object):
         cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (line, channel))
         self.conn.commit()
 
-    def _get_lines(self, channel=None, max_line_count=10000):
+    def _get_lines(self, channel=None):
         cursor = self.conn.cursor()
         if channel:
-            cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?', (channel, max_line_count))
+            cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?', (channel, self.max_loaded_lines))
         else:
-            cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (max_line_count,))
+            cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (self.max_loaded_lines,))
 
         lines = [self.bot.strip_formatting(line[0]) for line in cursor.fetchall()]
         return lines if len(lines) > 0 else None
