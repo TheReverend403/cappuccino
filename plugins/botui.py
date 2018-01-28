@@ -89,13 +89,13 @@ class BotUI(object):
         self.bot.privmsg(args['<target>'], msg)
 
     @command(permission='admin', show_in_help_list=False)
-    def psa(self, mask, target, args):
-        """Broadcast a public service announcement to all channels.
+    def broadcast(self, mask, target, args):
+        """Broadcast a message to all channels.
 
             %%psa <message>...
         """
         for channel in self.bot.channels:
-            self.bot.privmsg(channel, '[PSA] {0}'.format(' '.join(args['<message>'])))
+            self.bot.privmsg(channel, '[Broadcast] {0}'.format(' '.join(args['<message>'])))
 
     @command(permission='view')
     def ping(self, mask, target, args):
