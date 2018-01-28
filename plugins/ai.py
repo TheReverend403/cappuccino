@@ -25,7 +25,7 @@ def should_ignore_message(line):
 @irc3.plugin
 class Ai(object):
     requires = [
-        'irc3.plugins.userlist',
+        'plugins.botui',
         'plugins.formatting'
     ]
 
@@ -98,18 +98,6 @@ class Ai(object):
         with open(self.channel_file, 'w') as fd:
             json.dump(self.active_channels, fd)
 
-    def is_chanop(self, channel, nick):
-
-        op_modes = ['@', '&', '~', '%']
-        for mode in op_modes:
-            try:
-                if nick in self.bot.channels[channel].modes[mode]:
-                    return True
-            except (KeyError, AttributeError):
-                continue
-
-        return False
-
     @command
     def ai(self, mask, target, args):
         """Toggles chattiness.
@@ -130,7 +118,7 @@ class Ai(object):
                 'enabled' if self.is_active(target) else 'disabled',
                 line_count, channel_line_count, target, channel_percentage)
 
-        if not self.is_chanop(target, mask.nick):
+        if not self.bot.is_chanop(target, mask.nick):
             return 'You must be a channel operator (% and above) to do that.'
 
         self.toggle(target)

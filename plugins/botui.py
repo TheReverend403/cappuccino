@@ -15,6 +15,18 @@ class BotUI(object):
     def __init__(self, bot):
         self.bot = bot
 
+    @irc3.extend
+    def is_chanop(self, channel, nick):
+        op_modes = ['@', '&', '~', '%']
+        for mode in op_modes:
+            try:
+                if nick in self.bot.channels[channel].modes[mode]:
+                    return True
+            except (KeyError, AttributeError):
+                continue
+
+        return False
+
     @command(permission='view')
     def bots(self, mask, target, args):
         """Report in!
