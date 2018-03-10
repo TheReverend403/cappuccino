@@ -134,7 +134,7 @@ class Ai(object):
             return
 
         # Only respond to messages mentioning the bot in an active channel
-        if self.bot.nick.lower() not in data.lower():
+        if self.bot.nick.lower() + ':' not in data.lower():
             # Only add lines that aren't mentioning the bot
             self._add_line(data, channel)
             return
