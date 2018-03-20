@@ -35,7 +35,7 @@ class Ai(object):
         self.channel_file = os.path.join(self.datadir, 'ai.json')
         self.active_channels = []
         self.ignore_nicks = []
-        self.max_loaded_lines = 5000
+        self.max_loaded_lines = 20000
 
         try:
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
