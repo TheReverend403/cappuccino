@@ -43,7 +43,7 @@ class Currency(object):
                                                    currency['percent_change_24h'], \
                                                    currency['percent_change_7d']
                 value = float(currency[f'price_{to_currency.lower()}'])
-                value = '{0:.2f}'.format(value)
+                value = '{0:.3f}'.format(value)
                 symbol = currency['symbol']
         except requests.RequestException as ex:
             self.bot.privmsg(target, f'{mask.nick}: {ex}')
