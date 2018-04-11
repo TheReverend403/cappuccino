@@ -128,7 +128,7 @@ class RiceDB(object):
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view', aliases=['desktop'])
+    @command(permission='view', aliases=['desktop', 'dt'])
     def dtop(self, mask, target, args):
         """
             %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
