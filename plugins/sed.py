@@ -34,7 +34,7 @@ class Sed(object):
         queue.append(line)
         self.history_buffer.update({target: queue})
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<_sed>{0})'.format(SED_PRIVMSG))
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :{re_cmd}(?P<_sed>{0})'.format(SED_PRIVMSG))
     def sed(self, mask, target, _sed):
         if target not in self.history_buffer:
             return
