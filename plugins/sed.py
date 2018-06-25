@@ -2,9 +2,65 @@ import collections
 import irc3
 import re
 
-# Source: https://github.com/CloudBotIRC/CloudBot/blob/master/plugins/correction.py
-SED_PRIVMSG = r's/(.*/.*(?:/[igx]{{,4}})?)\S*$'
-SED_RE = re.compile(SED_PRIVMSG, re.I | re.UNICODE)
+SED_PRIVMSG = r'\s*s[/|\\!\.,\\].+'
+SED_CHECKER = re.compile('^' + SED_PRIVMSG)
+
+
+class Editor(object):
+    """
+    Wrapper to provide ed-style line editing.
+    https://gist.github.com/rduplain/3441687
+    Ron DuPlain <ron.duplain@gmail.com>
+    """
+
+    def __init__(self, command):
+        """A wrapper around UNIX sed, for operating on strings with sed expressions.
+
+        Args:
+            command: Any valid sed s/ expression.
+
+        Example:
+            >>> editor = Editor('s/Hello/Greetings/')
+            >>> print(editor.edit('Hello World!'))
+            "Greetings World!"
+            >>> print(editor.edit('Hello World!', 's/World!/World\./'))
+            "Hello World."
+            >>> print(editor.edit('Hello, World'))
+            "Greetings, World"
+        """
+
+        self.command = command
+
+    def _sed_wrapper(self, text, command=None):
+        arguments = ['sed', '--sandbox', '--posix', '--regexp-extended', command or self.command]
+        sed = Popen(arguments, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        sed.stdin.write(bytes(text.strip(), 'UTF-8'))
+        sed.stdin.close()
+        returncode = sed.wait()
+        if returncode != 0:
+            # Unix integer returncode, where 0 is success.
+            raise EditorException(sed.stderr.read().decode('UTF-8').strip().replace('sed: -e ', ''))
+        return sed.stdout.read().decode('UTF-8').strip()
+
+    def edit(self, text, command=None):
+        """Run this Editor's sed command against :text.
+
+        Args:
+            text: Text to run sed command against.
+            command: An optional command to use for this specific operation.
+        Returns:
+            Resulting text after sed operation.
+        Raises:
+            EditorException: Details of sed errors.
+        """
+        output = self._sed_wrapper(text, command or self.command)
+        if not output or output == text:
+            return text
+        return output
+
+
+class EditorException(Exception):
+    """An error occurred while processing the editor command."""
 
 
 @irc3.plugin
@@ -19,7 +75,7 @@ class Sed(object):
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def update_chat_history(self, target, event, mask, data):
-        if event != 'PRIVMSG' or SED_RE.match(data) or data.startswith(self.bot.config.cmd):
+        if event != 'PRIVMSG' or SED_CHECKER.match(data) or data.startswith(self.bot.config.cmd):
             return
 
         # Strip ACTION data and just use the message.
@@ -39,14 +95,16 @@ class Sed(object):
         if target not in self.history_buffer:
             return
 
-        match = SED_RE.match(_sed)
-        groups = [b.replace('\/', '/') for b in re.split(r"(?<!\\)/", match.groups()[0])]
-        sed_find = groups[0]
-        sed_replacement = groups[1].replace('\n', '\\n').replace('\r', '\\r')
-
+        editor = Editor(_sed)
         for target_user, message in reversed(self.history_buffer[target]):
             message = message.strip()
-            new_message = re.sub(sed_find, sed_replacement, message)
+            try:
+                new_message = editor.edit(message)
+            except EditorException as error:
+                self.bot.log.error(error)
+                self.bot.notice(mask.nick, str(error))
+                # Don't even check the rest if the sed command is invalid.
+                return
 
             if not new_message or new_message == message:
                 continue
