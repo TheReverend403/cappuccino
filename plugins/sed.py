@@ -1,3 +1,4 @@
+from subprocess import Popen, PIPE
 import collections
 import irc3
 import re
