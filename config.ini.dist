@@ -83,6 +83,8 @@ ignore_nicks = ExampleUser
 [plugins.autopsy]
 # Nick to track their death.
 nick = DeadUser
+# Channel to monitor.
+chan = deadchannel
 # Minimum time of death in seconds to announce a revival.
 notify_time = 604800
 

@@ -18,6 +18,7 @@ class ChannelAutopsy(object):
         self.bot = bot
 
         self.nick_dead   = bot.config[__name__]['nick']
+        self.channel     = bot.config[__name__]['chan']
         self.notify_time = bot.config[__name__]['notify_time']
 
         if self.get_tod is []:
@@ -51,9 +52,9 @@ class ChannelAutopsy(object):
         Let's face it, from this point on this is going to be code that will
         never even run in production.
     """
-    @irc3.event(r".*:(?P<nick>\S+)!\S+@\S+ PRIVMSG (?P<channel>#\S+)")
+    @irc3.event(r".*:(?P<nick>\S+)!\S+@\S+ PRIVMSG #(?P<channel>\S+)")
     def handle_revival(self, nick, channel):
-        if nick != self.nick_dead:
+        if nick != self.nick_dead or channel.lower() != self.channel.lower():
             return
 
         tim = int(time.time())
