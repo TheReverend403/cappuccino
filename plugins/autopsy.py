@@ -66,4 +66,4 @@ class ChannelAutopsy(object):
                 nick=self.nick_dead, timefmt=self.format(tim - old_tod)
             )
 
-            self.bot.privmsg(channel, txt)
+            self.bot.privmsg('#'+channel, txt)
