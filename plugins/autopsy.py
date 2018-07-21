@@ -21,14 +21,14 @@ class ChannelAutopsy(object):
         self.channel     = bot.config[__name__]['chan']
         self.notify_time = bot.config[__name__]['notify_time']
 
-        if self.get_tod is []:
+        if type(self.get_tod()) is not int:
             self.update_tod(time.time())
 
     def get_tod(self):
         return self.bot.get_user_value(self.nick_dead, "deadsince")
 
     def update_tod(self, tim):
-        self.bot.set_user_value(self.nick_dead, "deadsince", tim)
+        self.bot.set_user_value(self.nick_dead, "deadsince", int(tim))
 
     def format(self, tim):
         delta = timedelta(seconds=tim)
