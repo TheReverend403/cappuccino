@@ -168,21 +168,34 @@ class UrlInfo(object):
 
     def __init__(self, bot):
         self.bot = bot
+        self.load_config()
+        socket.getaddrinfo = getaddrinfo_wrapper
+        requests.packages.urllib3.disable_warnings()
+
+    def load_config(self):
         try:
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
         except KeyError:
             self.ignore_nicks = []
-        socket.getaddrinfo = getaddrinfo_wrapper
-        requests.packages.urllib3.disable_warnings()
+
+        try:
+            self.ignore_hostnames= self.bot.config[__name__]['ignore_hostnames'].split()
+        except KeyError:
+            self.ignore_hostnames = []
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*{0}).*'.format(URL_FINDER.pattern))
     def on_url(self, mask, target, data):
         if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd):
             return
 
-        urls = [_clean_url(url) for url in set(URL_FINDER.findall(data))]
+        urls = [_clean_url(url) for url in set(URL_FINDER.findall(data))] or []
+        for url in urls:
+            if urlparse(url).hostname in self.ignore_hostnames:
+                urls.remove(url)
+
         if not urls:
             return
+
         random.shuffle(urls)
         urls = urls[:3]
 

@@ -71,6 +71,7 @@ api_key =
 
 [plugins.urlinfo]
 ignore_nicks = Nick1 Nick2
+ignore_hostnames = example.com
 
 [plugins.unixporn]
 channel = ricedb
