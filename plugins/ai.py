@@ -147,7 +147,7 @@ class Ai(object):
             self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
             return
 
-        text_model = markovify.NewlineText('\n'.join(corpus))
+        text_model = markovify.NewlineText('\n'.join(corpus), state_size=3)
         generated_reply = text_model.make_short_sentence(180)
         if not generated_reply:
             self.bot.privmsg(channel, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))
