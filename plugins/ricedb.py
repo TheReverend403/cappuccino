@@ -176,3 +176,10 @@ class RiceDB(object):
             %%pet [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
         """
         yield self._generic_db(mask, target, args)
+
+    @command(permission='view', aliases=['site'])
+    def website(self, mask, target, args):
+        """
+            %%website [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+        """
+        yield self._generic_db(mask, target, args)
