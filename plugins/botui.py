@@ -88,8 +88,8 @@ class BotUI(object):
         msg = ' '.join(args['<message>'] or [])
         self.bot.privmsg(args['<target>'], msg)
 
-    @command(permission='admin', show_in_help_list=False)
-    def broadcast(self, mask, target, args):
+    @command(permission='admin', aliases=['bc', 'broadcast'], show_in_help_list=False)
+    def psa(self, mask, target, args):
         """Broadcast a message to all channels.
 
             %%psa <message>...
