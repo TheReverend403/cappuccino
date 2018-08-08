@@ -4,9 +4,6 @@ from datetime import timedelta
 from irc3.plugins.command import command
 
 
-"""
-    Author: Joaquin Varela <https://github.com/jjvvx>
-"""
 @irc3.plugin
 class ChannelAutopsy(object):
 
@@ -17,21 +14,21 @@ class ChannelAutopsy(object):
     def __init__(self, bot):
         self.bot = bot
 
-        self.nick_dead   = bot.config[__name__]['nick']
-        self.channel     = bot.config[__name__]['chan']
+        self.nick_dead = bot.config[__name__]['nick']
+        self.channel = bot.config[__name__]['chan']
         self.notify_time = bot.config[__name__]['notify_time']
 
-        if type(self.get_tod()) is not int:
-            self.update_tod(time.time())
+        if not self.get_time_of_death():
+            self.set_time_of_death(time.time())
 
-    def get_tod(self):
+    def get_time_of_death(self):
         return self.bot.get_user_value(self.nick_dead, "deadsince")
 
-    def update_tod(self, tim):
-        self.bot.set_user_value(self.nick_dead, "deadsince", int(tim))
+    def set_time_of_death(self, time):
+        self.bot.set_user_value(self.nick_dead, "deadsince", time)
 
-    def format(self, tim):
-        delta = timedelta(seconds=tim)
+    def time_format(self, seconds):
+        delta = timedelta(seconds=seconds)
         
         return str(delta)
 
@@ -42,28 +39,22 @@ class ChannelAutopsy(object):
             %%died
         """
 
-        tod  = self.get_tod()
-        tim = int(time.time())
-        return '{nick} has been pronounced legally dead {timefmt} ago.'.format(
-            nick=self.nick_dead, timefmt=self.format(tim - tod)
-        )
+        time_of_death = self.get_time_of_death()
+        time_now = int(time.time())
+        timefmt = self.format(time_now - time_of_death)
 
-    """
-        Let's face it, from this point on this is going to be code that will
-        never even run in production.
-    """
+        return f'{self.nick_dead} has been pronounced legally dead {timefmt} ago.'
+
     @irc3.event(r".*:(?P<nick>\S+)!\S+@\S+ PRIVMSG #(?P<channel>\S+)")
     def handle_revival(self, nick, channel):
         if nick != self.nick_dead or channel.lower() != self.channel.lower():
             return
 
         tim = int(time.time())
-        old_tod = self.get_tod()
-        self.update_tod(tim)
+        old_tod = self.get_time_of_death()
+        self.set_time_of_death(tim)
 
         if (tim - old_tod) > self.notify_time:
-            txt = "{nick} has miraculously returned from the dead {timefmt} later".format(
-                nick=self.nick_dead, timefmt=self.format(tim - old_tod)
-            )
+            timefmt = self.time_format(tim - old_tod)
 
-            self.bot.privmsg('#'+channel, txt)
+            return f'{self.nick_dead} has miraculously returned from the dead {timefmt} later.'
