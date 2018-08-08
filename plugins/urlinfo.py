@@ -1,9 +1,9 @@
 import cgi
+import concurrent
 import ipaddress
 import socket
 import time
 from contextlib import closing
-from multiprocessing.pool import ThreadPool
 
 import html
 import random
@@ -106,49 +106,42 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
 
 def _parse_url(url):
     hostname = urlparse(url).hostname
-    try:
-        for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
-            ip = ipaddress.ip_address(sockaddr[0])
-            if not ip.is_global:
-                raise InvalidIPAddress('{0} is not a publicly routable address.'.format(hostname))
-    except (socket.gaierror, ValueError, InvalidIPAddress) as err:
-        return hostname, None, None, None, err
+    for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
+        ip = ipaddress.ip_address(sockaddr[0])
+        if not ip.is_global:
+            raise InvalidIPAddress('{0} is not a publicly routable address.'.format(hostname))
 
     hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
-    try:
-        with closing(requests.get(url, **REQUEST_OPTIONS)) as response:
-            if response.status_code != requests.codes.ok:
-                response.raise_for_status()
+    with closing(requests.get(url, **REQUEST_OPTIONS)) as response:
+        if response.status_code != requests.codes.ok:
+            response.raise_for_status()
 
-            content_type = response.headers.get('Content-Type')
-            if content_type:
-                content_type, _ = cgi.parse_header(content_type)
-                main_type = content_type.split('/')[0]
-                if main_type not in ALLOWED_CONTENT_TYPES:
-                    return hostname, None, None, None, ContentTypeNotAllowed('{0} not in {1}'.format(
-                        main_type, ALLOWED_CONTENT_TYPES))
+        content_type = response.headers.get('Content-Type')
+        if content_type:
+            content_type, _ = cgi.parse_header(content_type)
+            main_type = content_type.split('/')[0]
+            if main_type not in ALLOWED_CONTENT_TYPES:
+                raise ContentTypeNotAllowed('{0} not in {1}'.format(main_type, ALLOWED_CONTENT_TYPES))
 
-            title = None
-            size = int(response.headers.get('Content-Length', 0))
-            content_disposition = response.headers.get('Content-Disposition')
-            if content_disposition:
-                _, params = cgi.parse_header(content_disposition)
-                title = params.get('filename')
-            elif content_type in HTML_MIMETYPES or content_type == 'text/plain':
-                content = _read_stream(response)
-                try:
-                    title = BeautifulSoup(content, 'html.parser').title.string
-                except AttributeError:
-                    if content and content_type not in HTML_MIMETYPES:
-                        title = re.sub('\s+', ' ', ' '.join(content.split('\n')))
+        title = None
+        size = int(response.headers.get('Content-Length', 0))
+        content_disposition = response.headers.get('Content-Disposition')
+        if content_disposition:
+            _, params = cgi.parse_header(content_disposition)
+            title = params.get('filename')
+        elif content_type in HTML_MIMETYPES or content_type == 'text/plain':
+            content = _read_stream(response)
+            try:
+                title = BeautifulSoup(content, 'html.parser').title.string
+            except AttributeError:
+                if content and content_type not in HTML_MIMETYPES:
+                    title = re.sub('\s+', ' ', ' '.join(content.split('\n')))
 
-            if title:
-                title = html.unescape(title).strip()
-                if len(title) > MAX_TITLE_LENGTH:
-                    title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
-    except requests.RequestException as err:
-        return hostname, None, None, None, err
-    return hostname, title, content_type, size, None
+        if title:
+            title = html.unescape(title).strip()
+            if len(title) > MAX_TITLE_LENGTH:
+                title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
+    return hostname, title, content_type, size
 
 
 def _clean_url(url):
@@ -200,30 +193,32 @@ class UrlInfo(object):
         urls = urls[:3]
 
         messages = []
-        with ThreadPool(len(urls)) as threadpool:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
             self.bot.log.debug('Retrieving page titles for {0}'.format(urls))
-            for hostname, title, mimetype, size, err in threadpool.imap_unordered(_parse_url, urls):
-                try:
-                    # Lets me handle exceptions properly rather than as a bunch of if checks
-                    if err:
-                        raise err
-                except ContentTypeNotAllowed as err:
-                    self.bot.log.debug(err)
-                except (socket.gaierror, ValueError, InvalidIPAddress) as err:
-                    self.bot.log.error(err)
-                    messages.append('[ {0} ] {1}'.format(self.bot.format(hostname, color=self.bot.color.RED),
-                                                         self.bot.format(err, bold=True)))
+            future_to_url = {executor.submit(_parse_url, url): url for url in urls}
+            for future in concurrent.futures.as_completed(future_to_url):
+                url = future_to_url[future]
+                hostname = urlparse(url).hostname
 
-                except requests.RequestException as err:
-                    self.bot.log.error(err)
-                    if err.response is not None and err.response.reason is not None:
+                try:
+                    hostname, title, mimetype, size = future.result()
+                except ContentTypeNotAllowed as ex:
+                    self.bot.log.debug(ex)
+                except (socket.gaierror, ValueError, InvalidIPAddress) as ex:
+                    self.bot.log.error(ex)
+                    messages.append('[ {0} ] {1}'.format(self.bot.format(hostname, color=self.bot.color.RED),
+                                                         self.bot.format(ex, bold=True)))
+
+                except requests.RequestException as ex:
+                    self.bot.log.error(ex)
+                    if ex.response is not None and ex.response.reason is not None:
                         messages.append('[ {0} ] {1} {2}'.format(
                             self.bot.format(hostname, color=self.bot.color.RED),
-                            self.bot.format(err.response.status_code, bold=True),
-                            self.bot.format(err.response.reason, bold=True)))
+                            self.bot.format(ex.response.status_code, bold=True),
+                            self.bot.format(ex.response.reason, bold=True)))
                     else:
                         messages.append('[ {0} ] {1}'.format(
-                            self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(err, bold=True)))
+                            self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(ex, bold=True)))
                 else:
                     reply = '[ {0} ]'.format(self.bot.format(hostname, color=self.bot.color.GREEN))
 
@@ -237,4 +232,4 @@ class UrlInfo(object):
                     messages.append(reply)
 
         if messages:
-            self.bot.privmsg(target, ' | '.join(messages))
+            self.bot.privmsg(target, self.bot.format(' | ', color=self.bot.color.LIGHT_GRAY, reset=True).join(messages))
