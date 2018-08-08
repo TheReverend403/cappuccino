@@ -95,7 +95,7 @@ class BotUI(object):
             %%psa <message>...
         """
         for channel in self.bot.channels:
-            self.bot.privmsg(channel, '[Broadcast] {0}'.format(' '.join(args['<message>'])))
+            self.bot.privmsg(channel, '[PSA] {0}'.format(' '.join(args['<message>'])))
 
     @command(permission='view')
     def ping(self, mask, target, args):
