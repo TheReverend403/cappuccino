@@ -1,3 +1,5 @@
+import re
+
 import irc3
 import time
 from datetime import timedelta
@@ -28,9 +30,11 @@ class ChannelAutopsy(object):
         self.bot.set_user_value(self.nick_dead, "deadsince", time)
 
     def time_format(self, seconds):
-        delta = timedelta(seconds=seconds)
-        
-        return str(delta)
+        delta = str(timedelta(seconds=seconds))
+
+        # Remove microseconds in string representation
+        delta = re.sub(r'\.[0-9]+', '', delta)
+        return delta
 
     @command(permission='view')
     def died(self, mask, target, args):
