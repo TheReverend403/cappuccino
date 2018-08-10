@@ -40,8 +40,8 @@ class ChannelAutopsy(object):
         """
 
         time_of_death = self.get_time_of_death()
-        time_now = int(time.time())
-        timefmt = self.format(time_now - time_of_death)
+        time_now = time.time()
+        timefmt = self.time_format(time_now - time_of_death)
 
         return f'{self.nick_dead} has been pronounced legally dead {timefmt} ago.'
 
@@ -50,11 +50,11 @@ class ChannelAutopsy(object):
         if nick != self.nick_dead or channel.lower() != self.channel.lower():
             return
 
-        tim = int(time.time())
-        old_tod = self.get_time_of_death()
-        self.set_time_of_death(tim)
+        current_time = time.time()
+        old_time_of_death = self.get_time_of_death()
+        self.set_time_of_death(current_time)
 
-        if (tim - old_tod) > self.notify_time:
-            timefmt = self.time_format(tim - old_tod)
+        if (current_time - old_time_of_death) > self.notify_time:
+            timefmt = self.time_format(current_time - old_time_of_death)
 
             return f'{self.nick_dead} has miraculously returned from the dead {timefmt} later.'
