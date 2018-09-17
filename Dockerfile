@@ -12,9 +12,7 @@ FROM base
 
 COPY --from=builder /install /usr/local
 COPY config.ini /app/
-COPY data/ /app/data/
 COPY plugins/*.py /app/plugins/
-
 WORKDIR /app
 
-CMD ["irc3", "-dr", "config.ini"]
+CMD ["irc3", "-d", "-r", "config.ini"]
