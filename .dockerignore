@@ -1,0 +1,4 @@
+venv
+config.ini.dist
+data
+_pycache__
