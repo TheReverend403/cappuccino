@@ -18,7 +18,7 @@ docker build -t ricedb .
 docker run --mount type=bind,source=(pwd)/data,target=/app/data ricedb
 
 # Run automatically in the background when dockerd starts.
-docker run -d --name ricedb --restart unless-stopped --mount type=bind,source=$(pwd)/data,target=/app/data ricedb
+docker run -d --name ricedb --restart unless-stopped -v $(pwd)/data:/app/data ricedb
 
 docker (start|stop|restart|logs) ricedb
 ```
