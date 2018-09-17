@@ -14,5 +14,6 @@ COPY --from=builder /install /usr/local
 COPY config.ini /app/
 COPY plugins/*.py /app/plugins/
 WORKDIR /app
+VOLUME /app/data
 
 CMD ["irc3", "-r", "config.ini"]
