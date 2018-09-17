@@ -1,5 +1,4 @@
 FROM python:3.6-alpine as base
-
 FROM base as builder
 
 RUN mkdir /install
@@ -14,7 +13,7 @@ FROM base
 COPY --from=builder /install /usr/local
 COPY config.ini /app/
 COPY data/ /app/data/
-COPY plugins/ /app/plugins/
+COPY plugins/*.py /app/plugins/
 
 WORKDIR /app
 
