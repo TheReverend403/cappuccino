@@ -12,15 +12,11 @@ ricedb was developed against Python 3.6, but *should* run on Python 3.5.
 
 
 ```sh
-docker build -t ricedb .
-
 # Run in the foreground.
-docker run --mount type=bind,source=(pwd)/data,target=/app/data ricedb
+docker-compose up
 
-# Run automatically in the background when dockerd starts.
-docker run -d --name ricedb --restart unless-stopped -v $(pwd)/data:/app/data ricedb
-
-docker (start|stop|restart|logs) ricedb
+# Run and detach (daemonise).
+docker-compose up -d
 ```
 
 ## Standalone

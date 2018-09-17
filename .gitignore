@@ -93,3 +93,5 @@ config.ini
 data.json
 data/
 .vscode/
+
+docker-compose.*.yml
