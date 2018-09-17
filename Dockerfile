@@ -15,4 +15,4 @@ COPY config.ini /app/
 COPY plugins/*.py /app/plugins/
 WORKDIR /app
 
-CMD ["irc3", "-d", "-r", "config.ini"]
+CMD ["irc3", "-r", "config.ini"]
