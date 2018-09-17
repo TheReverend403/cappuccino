@@ -8,7 +8,22 @@ ricedb was developed against Python 3.6, but *should* run on Python 3.5.
 
 # Installation
 
-As with all Python programs, I recommend you familiarise yourself with, and run this program inside of, a [virtualenv](https://virtualenv.pypa.io/en/stable) or [conda environment](https://github.com/conda/conda) running the latest supported Python release.
+## Docker
+
+
+```sh
+docker build -t ricedb .
+
+# Run in the foreground.
+docker run --mount type=bind,source=(pwd)/data,target=/app/data ricedb
+
+# Run automatically in the background when dockerd starts.
+docker run -d --name ricedb --restart unless-stopped --mount type=bind,source=$(pwd)/data,target=/app/data ricedb
+
+docker (start|stop|restart|logs) ricedb
+```
+
+## Standalone
 
 ```sh
 pip install -r requirements.txt
