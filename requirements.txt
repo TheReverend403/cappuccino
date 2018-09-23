@@ -1,5 +1,5 @@
 beautifulsoup4==4.6.*
-irc3==1.*
-pylast==2.*
-requests==2.*
-markovify==0.*
+irc3==1.1.*
+pylast==2.4.*
+requests==2.19.*
+markovify==0.7.*
