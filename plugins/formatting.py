@@ -1,5 +1,6 @@
 import re
 
+from enum import Enum
 import irc3
 
 
@@ -7,7 +8,7 @@ import irc3
 class Formatting(object):
     irc_codes_regex = re.compile('\x1f|\x02|\x1D|\x03(?:\d{1,2}(?:,\d{1,2})?)?', re.UNICODE)
 
-    class Color(object):
+    class Color(Enum):
         RESET = '\x0f'
         WHITE = '00'
         BLACK = '01'
@@ -35,9 +36,9 @@ class Formatting(object):
         if bold:
             text = '\x02{0}'.format(text)
         if color:
-            text = '\x03{0}{1}'.format(color, text)
+            text = '\x03{0}{1}'.format(color.value, text)
         if reset:
-            text += self.bot.color.RESET
+            text += self.bot.color.RESET.value
         return text
 
     @irc3.extend
