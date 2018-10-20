@@ -10,6 +10,8 @@ RUN pip install --install-option="--prefix=/install" -r /requirements.txt
 
 FROM base
 
+RUN apk add sed
+
 COPY --from=builder /install /usr/local
 COPY config.ini /app/
 COPY plugins/*.py /app/plugins/
