@@ -1,4 +1,5 @@
 import platform
+from enum import Enum
 
 import irc3
 from irc3.plugins.command import command
@@ -12,15 +13,26 @@ class BotUI(object):
         'irc3.plugins.userlist'
     ]
 
+    class NickPrefix(Enum):
+        VOICE = '+'
+        HALF_OP = '%'
+        OP = '@'
+        SUPER_OP = '&'
+        OWNER = '~'
+
     def __init__(self, bot):
         self.bot = bot
+        self.bot.nickprefix = self.NickPrefix
 
     @irc3.extend
     def is_chanop(self, channel, nick):
-        op_modes = ['@', '&', '~', '%']
-        for mode in op_modes:
+        for mode in self.NickPrefix:
+            # Voiced users aren't channel operators.
+            if mode is self.bot.nickprefix.VOICE:
+                continue
+
             try:
-                if nick in self.bot.channels[channel].modes[mode]:
+                if nick in self.bot.channels[channel].modes[mode.value]:
                     return True
             except (KeyError, AttributeError):
                 continue
