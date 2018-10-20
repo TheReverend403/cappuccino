@@ -14,7 +14,7 @@ ssl = true
 # ssl_verify = CERT_NONE
 
 # uncomment this if you want to use sasl authentication
-# sasl_username = ricedb
+# sasl_username = cappuccino_test
 # sasl_password = yourpassword
 
 # uncomment this if you have a nickserv account
