@@ -119,7 +119,10 @@ class Ai(object):
                 line_count, channel_line_count, target, channel_percentage)
 
         if not self.bot.is_chanop(target, mask.nick):
-            return 'You must be a channel operator (% and above) to do that.'
+            prefixes = [prefix.value for prefix in self.bot.nickprefix if prefix is not self.bot.nickprefix.VOICE]
+            op_prefixes = ', '.join(prefixes)
+
+            return f'You must be a channel operator ({op_prefixes}) to do that.'
 
         self.toggle(target)
         return 'Chatbot activated.' if self.is_active(target) else 'Shutting up!'
