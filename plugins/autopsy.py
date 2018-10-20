@@ -49,9 +49,10 @@ class ChannelAutopsy(object):
 
         return f'{self.nick_dead} has been pronounced legally dead {timefmt} ago.'
 
-    @irc3.event(r".*:(?P<nick>\S+)!\S+@\S+ PRIVMSG #(?P<channel>\S+)")
-    def handle_revival(self, nick, channel):
-        if nick != self.nick_dead or channel.lower() != self.channel.lower():
+    @irc3.event(irc3.rfc.PRIVMSG)
+    def handle_revival(self, target, event, mask, data):
+        nick = mask.nick
+        if nick != self.nick_dead or target.lower() != self.channel.lower():
             return
 
         current_time = time.time()
