@@ -11,7 +11,7 @@ import irc3
 import markovify
 from irc3.plugins.command import command
 
-CMD_PREFIX_PATTERN = re.compile(r'^\s*(\.|!|~|`|\$)+')
+CMD_PATTERN = re.compile(r'^\s*(\.|!|~|`|\$)+')
 SED_CHECKER = re.compile(r'^\s*s[/|\\!.,\\].+')
 
 
@@ -19,7 +19,7 @@ def should_ignore_message(line):
     if not line:
         return
 
-    return CMD_PREFIX_PATTERN.match(line) or SED_CHECKER.match(line) or line.startswith('[') or line.startswith('\x01ACTION ')
+    return CMD_PATTERN.match(line) or SED_CHECKER.match(line) or line.startswith('[') or line.startswith('\x01ACTION ')
 
 
 @irc3.plugin
@@ -53,7 +53,7 @@ class Ai(object):
         except FileNotFoundError:
             if not os.path.exists(self.datadir):
                 os.mkdir(self.datadir)
-                self.bot.log.debug('Created {0}/ directory'.format(self.datadir))
+                self.bot.log.debug(f'Created {self.datadir} directory')
 
         self._init_db()
 
@@ -71,7 +71,8 @@ class Ai(object):
     def _get_lines(self, channel=None):
         cursor = self.conn.cursor()
         if channel:
-            cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?', (channel, self.max_loaded_lines))
+            cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?',
+                           (channel, self.max_loaded_lines))
         else:
             cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (self.max_loaded_lines,))
 
@@ -114,9 +115,9 @@ class Ai(object):
             if channel_line_count >= 0 and line_count >= 0:
                 channel_percentage = int(round(100 * float(channel_line_count) / float(line_count), ndigits=0))
 
-            return 'Chatbot is currently {0} for {3}. Channel/global line count: {2}/{1} ({4}%).'.format(
-                'enabled' if self.is_active(target) else 'disabled',
-                line_count, channel_line_count, target, channel_percentage)
+            ai_status = 'enabled' if self.is_active(target) else 'disabled'
+            return f'Chatbot is currently {ai_status} for {target}.' \
+                   f'Channel/global line count: {channel_line_count}/{line_count} ({channel_percentage}%).'
 
         if not self.bot.is_chanop(target, mask.nick):
             prefixes = [prefix.value for prefix in self.bot.nickprefix if prefix is not self.bot.nickprefix.VOICE]

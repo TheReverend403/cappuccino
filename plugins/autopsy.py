@@ -8,7 +8,6 @@ from irc3.plugins.command import command
 
 @irc3.plugin
 class ChannelAutopsy(object):
-
     requires = [
         'plugins.userdb'
     ]

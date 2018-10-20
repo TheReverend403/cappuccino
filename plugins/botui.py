@@ -7,7 +7,6 @@ from irc3.plugins.command import command
 
 @irc3.plugin
 class BotUI(object):
-
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.userlist'
@@ -45,7 +44,8 @@ class BotUI(object):
 
             %%bots
         """
-        yield 'Reporting in! [Python {0}] https://github.com/FoxDev/cappuccino'.format(platform.python_version())
+        pyver = platform.python_version()
+        yield f'Reporting in! [Python {pyver}] https://github.com/FoxDev/cappuccino'
 
     @command(permission='admin', show_in_help_list=False)
     def join(self, mask, target, args):

@@ -27,7 +27,7 @@ class LastFM(object):
     def now_playing(self, mask, target, args):
         """View currently playing track info.
 
-            %%np [--full | -f] [(-s | --set) <username> | <username>]
+            %%np [(-s | --set) <username> | <username>]
         """
 
         try:
@@ -41,27 +41,31 @@ class LastFM(object):
                     self.bot.set_user_value(mask.nick, 'lastfm', lastfm_username)
                     return 'last.fm username set.'
 
+            base_command = self.bot.config.cmd + 'np'
             irc_username = args['<username>'] or mask.nick
             lastfm_username = self.bot.get_user_value(irc_username, 'lastfm')
+
             if not lastfm_username:
                 if irc_username == mask.nick:
-                    return 'You have no last.fm username set. Please set one with {0}np --set <username>'.format(
-                        self.bot.config.cmd)
-                return '{0} has no last.fm username set. Ask them to set one with {1}np --set <username>'.format(
-                    irc_username, self.bot.config.cmd)
+                    return f'You have no last.fm username set. ' + \
+                           f'Please set one with {base_command} --set <username>'
+
+                return f'{irc_username} has no last.fm username set. ' + \
+                       f'Ask them to set one with {base_command} --set <username>'
+
             try:
                 lastfm_user = self.lastfm.get_user(lastfm_username)
             except pylast.WSError:
-                return 'No such last.fm user ({0}). Please set a valid user with {1}np --set <username>'.format(
-                        lastfm_username, self.bot.config.cmd)
+                return f'No such last.fm user ({lastfm_username}). ' + \
+                       f'Please set a valid user with {base_command} --set <username>'
 
-            printed_name = irc_username
+            formatted_name = irc_username
             if irc_username.lower() != lastfm_username.lower():
-                printed_name += f' ({lastfm_username})'
+                formatted_name += f' ({lastfm_username})'
 
             current_track = lastfm_user.get_now_playing()
             if not current_track:
-                return '{0} is not listening to anything right now.'.format(printed_name)
+                return f'{formatted_name} is not listening to anything right now.'
 
             artist = current_track.get_artist().get_name().strip()
             title = current_track.get_title().strip()
@@ -71,15 +75,12 @@ class LastFM(object):
             if len(title) > MAX_TRACK_TITLE_LEN:
                 title = ''.join(title[:MAX_TRACK_TITLE_LEN]) + '...'
 
-            track_info = '{1} by {0}'.format(self.bot.format(artist, bold=True), self.bot.format(title, bold=True))
-
-            currently_listening = current_track.get_listener_count() - 1
-            if currently_listening and (args['--full'] or args['-f']):
-                track_info += ', and so {0} {1} other {2}.'.format(
-                    'has' if currently_listening is 1 else 'have', currently_listening,
-                    'user' if currently_listening is 1 else 'users')
+            artist = self.bot.format(artist, bold=True)
+            title = self.bot.format(title, bold=True)
+            track_info = f'{title} by {artist}'
 
         except (pylast.NetworkError, pylast.MalformedResponseError, pylast.WSError) as err:
-            return '{0}: A last.fm error occurred: {1}'.format(mask.nick, self.bot.format(err, bold=True))
+            error = self.bot.format(err, bold=True)
+            return f'{mask.nick}: A last.fm error occurred: {error}'
 
-        return '{0} is now playing {1}'.format(printed_name, track_info)
+        return f'{formatted_name} is now playing {track_info}'

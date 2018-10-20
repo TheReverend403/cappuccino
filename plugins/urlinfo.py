@@ -99,7 +99,7 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
         if '</title>' in content.getvalue():
             break
         if content_length > max_bytes:
-            raise ResponseBodyTooLarge('Couldn\'t find page title in less than {0}'.format(size_fmt(content_length)))
+            raise ResponseBodyTooLarge(f'Couldn\'t find page title in less than {size_fmt(content_length)}')
 
     return content.getvalue()
 
@@ -109,7 +109,7 @@ def _parse_url(url):
     for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
         ip = ipaddress.ip_address(sockaddr[0])
         if not ip.is_global:
-            raise InvalidIPAddress('{0} is not a publicly routable address.'.format(hostname))
+            raise InvalidIPAddress(f'{hostname} is not a publicly routable address.')
 
     hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
     with closing(requests.get(url, **REQUEST_OPTIONS)) as response:
@@ -121,7 +121,7 @@ def _parse_url(url):
             content_type, _ = cgi.parse_header(content_type)
             main_type = content_type.split('/')[0]
             if main_type not in ALLOWED_CONTENT_TYPES:
-                raise ContentTypeNotAllowed('{0} not in {1}'.format(main_type, ALLOWED_CONTENT_TYPES))
+                raise ContentTypeNotAllowed(f'{main_type} not in {ALLOWED_CONTENT_TYPES}')
 
         title = None
         size = int(response.headers.get('Content-Length', 0))
@@ -172,7 +172,7 @@ class UrlInfo(object):
             self.ignore_nicks = []
 
         try:
-            self.ignore_hostnames= self.bot.config[__name__]['ignore_hostnames'].split()
+            self.ignore_hostnames = self.bot.config[__name__]['ignore_hostnames'].split()
         except KeyError:
             self.ignore_hostnames = []
 
@@ -192,9 +192,10 @@ class UrlInfo(object):
         random.shuffle(urls)
         urls = urls[:3]
 
-        messages = []
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-            self.bot.log.debug('Retrieving page titles for {0}'.format(urls))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(urls)) as executor:
+            messages = []
+            self.bot.log.debug(f'Retrieving page titles for {urls}')
+
             future_to_url = {executor.submit(_parse_url, url): url for url in urls}
             for future in concurrent.futures.as_completed(future_to_url):
                 url = future_to_url[future]
@@ -204,32 +205,32 @@ class UrlInfo(object):
                     hostname, title, mimetype, size = future.result()
                 except ContentTypeNotAllowed as ex:
                     self.bot.log.debug(ex)
-                except (socket.gaierror, ValueError, InvalidIPAddress) as ex:
+                except (socket.gaierror, ValueError, InvalidIPAddress, requests.RequestException) as ex:
                     self.bot.log.error(ex)
-                    messages.append('[ {0} ] {1}'.format(self.bot.format(hostname, color=self.bot.color.RED),
-                                                         self.bot.format(ex, bold=True)))
+                    formatted_hostname = self.bot.format(hostname, color=self.bot.color.RED)
+                    formatted_error = self.bot.format(ex, bold=True)
 
-                except requests.RequestException as ex:
-                    self.bot.log.error(ex)
-                    if ex.response is not None and ex.response.reason is not None:
-                        messages.append('[ {0} ] {1} {2}'.format(
-                            self.bot.format(hostname, color=self.bot.color.RED),
-                            self.bot.format(ex.response.status_code, bold=True),
-                            self.bot.format(ex.response.reason, bold=True)))
+                    if type(ex) == requests.RequestException:
+                        if ex.response is not None and ex.response.reason is not None:
+                            formatted_status_code = self.bot.format(ex.response.status_code, bold=True)
+                            status_code_name = self.bot.format(ex.response.reason, bold=True)
+                            messages.append(f'[ {formatted_hostname} ] {formatted_status_code} {status_code_name}.')
+                        return
                     else:
-                        messages.append('[ {0} ] {1}'.format(
-                            self.bot.format(hostname, color=self.bot.color.RED), self.bot.format(ex, bold=True)))
+                        messages.append(f'[ {formatted_hostname} ] {formatted_error}.')
+                # no exception
                 else:
-                    reply = '[ {0} ]'.format(self.bot.format(hostname, color=self.bot.color.GREEN))
+                    formatted_hostname = self.bot.format(hostname, color=self.bot.color.GREEN)
+                    if title is not None and mimetype is not None:
+                        formatted_title = self.bot.format(title, bold=True)
+                        reply = f'[ {formatted_hostname} ] {formatted_title} ({mimetype})'
 
-                    if title:
-                        reply += ' {0}'.format(self.bot.format(title, bold=True))
-                    if mimetype:
-                        reply += ' ({0})'.format(mimetype)
-                    if size and mimetype not in HTML_MIMETYPES:
-                        reply += ' ({0})'.format(size_fmt(size))
+                        if size and mimetype not in HTML_MIMETYPES:
+                            reply += f' ({size_fmt(size)})'
 
-                    messages.append(reply)
+                        messages.append(reply)
 
-        if messages:
-            self.bot.privmsg(target, self.bot.format(' | ', color=self.bot.color.LIGHT_GRAY, reset=True).join(messages))
+            # Send all parsed URLs now that we have them all.
+            if messages:
+                pipe_character = self.bot.format(' | ', color=self.bot.color.LIGHT_GRAY, reset=True)
+                self.bot.privmsg(target, pipe_character.join(messages))

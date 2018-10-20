@@ -34,9 +34,9 @@ class Formatting(object):
     @irc3.extend
     def format(self, text, color=None, bold=False, reset=True):
         if bold:
-            text = '\x02{0}'.format(text)
+            text = f'\x02{text}'
         if color:
-            text = '\x03{0}{1}'.format(color.value, text)
+            text = f'\x03{color.value}{text}'
         if reset:
             text += self.bot.color.RESET.value
         return text

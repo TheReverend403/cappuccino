@@ -22,7 +22,7 @@ class UserDB(dict):
             # Database file itself doesn't need to exist on first run, it will be created on first write.
             if not os.path.exists(datadir):
                 os.mkdir(datadir)
-                self.__bot.log.debug('Created {0}/ directory'.format(datadir))
+                self.__bot.log.debug(f'Created {datadir} directory')
 
     @irc3.extend
     def get_user_value(self, username, key):

@@ -2,7 +2,6 @@ import inspect
 import re
 
 import irc3
-import random
 from irc3.plugins.command import command
 
 MAX_USER_VALUES = 6
@@ -33,40 +32,41 @@ class RiceDB(object):
     def _generic_db(self, mask, target, args):
         # Get name of command _generic_db is being called from.
         mode = inspect.stack()[1][3]
-        self.bot.log.debug('{0} called by {1} with args: {2}'.format(mode, mask, args))
         mode = mode if mode.endswith('s') else mode + 's'
 
         if args['<values>']:
             args['<values>'] = [arg.strip() for arg in args['<values>'] if arg.strip()]
 
             if len(args['<values>']) == 0:
-                return '{0} cannot be empty!'.format(mode)
+                return f'{mode} cannot be empty!'
 
         if args['--add'] or args['-a']:
             values = self.bot.get_user_value(mask.nick, mode) or []
             if len(values) + len(args['<values>']) > MAX_USER_VALUES:
-                return 'You can only set {0} {1}! Consider deleting or replacing some.'.format(MAX_USER_VALUES, mode)
+                return f'You can only set {MAX_USER_VALUES} {mode}! Consider deleting or replacing some.'
             for value in args['<values>']:
                 values.append(value)
             self.bot.set_user_value(mask.nick, mode, values)
-            return '{0} updated.'.format(mode)
+            return f'{mode} updated.'
 
         if args['--set'] or args['-s']:
             values = args['<values>']
             if len(values) > MAX_USER_VALUES:
-                return 'You can only set {0} {1}! Consider deleting or replacing some.'.format(MAX_USER_VALUES, mode)
+                return f'You can only set {MAX_USER_VALUES} {mode}! Consider deleting or replacing some.'
             self.bot.set_user_value(mask.nick, mode, values)
-            return '{0} updated.'.format(mode)
+            return f'{mode} updated.'
 
         if args['--delete'] or args['-d']:
             values = self.bot.get_user_value(mask.nick, mode)
             if not values:
-                return 'You do not have any {0} to remove.'.format(mode)
+                return f'You do not have any {mode} to remove.'
+
             indexes = set(args['<ids>'])
             if '*' in indexes:
                 self.bot.set_user_value(mask.nick, mode, [])
-                return 'Removed all of your {0}.'.format(mode)
+                return f'Removed all of your {mode}.'
             deleted = []
+
             # Delete values in descending order to prevent re-ordering of the list while deleting.
             for index in sorted(indexes, reverse=True):
                 index = from_user_index(index)
@@ -75,10 +75,14 @@ class RiceDB(object):
                     del values[index]
                 except IndexError:
                     pass
+
             if not deleted:
-                return 'No {0} were removed. Maybe you supplied the wrong IDs?'.format(mode)
+                return f'No {mode} were removed. Maybe you supplied the wrong IDs?'
+
             self.bot.set_user_value(mask.nick, mode, values)
-            return 'Removed {0}.'.format(', '.join(deleted))
+
+            deleted_list = ', '.join(deleted)
+            return f'Removed {deleted_list}.'
 
         if args['--replace'] or args['-r']:
             index = from_user_index(args['<id>'])
@@ -87,12 +91,13 @@ class RiceDB(object):
                 return 'Replacement cannot be empty!'
             values = self.bot.get_user_value(mask.nick, mode)
             if not values:
-                return 'You do not have any {0} to replace.'.format(mode)
+                return f'You do not have any {mode} to replace.'
             try:
                 old_value = values[index]
                 values[index] = replacement
                 self.bot.set_user_value(mask.nick, mode, values)
-                return 'Replaced {0} with {1}'.format(old_value, replacement)
+
+                return f'Replaced {old_value} with {replacement}'
             except IndexError:
                 return 'Invalid ID.'
 
@@ -107,19 +112,23 @@ class RiceDB(object):
                 value = self.bot.get_user_value(mask.nick, mode)[index]
             except IndexError:
                 return 'Invalid ID.'
-            else:
-                return '{0} [{1}]'.format(value, mask.nick)
+
+            return f'{value} [{mask.nick}]'
 
         values = self.bot.get_user_value(user, mode)
         if values:
             indexed_values = []
             for index, item in enumerate(values):
-                indexed_values.append('({0}) {1}'.format(
-                        self.bot.format(to_user_index(index), bold=True), self.bot.format(item, reset=True)))
-            return '{0} [{1}]'.format(' | '.join(indexed_values), self.bot.format(user, color=self.bot.color.GREEN))
+                index = self.bot.format(to_user_index(index), bold=True)
+                item = self.bot.format(item, reset=True)
+                indexed_values.append(f'({index}) {item}')
 
-        return '{0} no {1}.'.format(user + ' has' if user != mask.nick else 'You have',
-                                    'reason to live' if random.random() <= 0.05 else mode)
+            formatted_values = ' | '.join(indexed_values)
+            formatted_user = self.bot.format(user, color=self.bot.color.GREEN)
+
+            return f'{formatted_values} [{formatted_user}]'
+
+        return f'{user} has no {mode}.'
 
     @command(permission='view')
     def station(self, mask, target, args):
