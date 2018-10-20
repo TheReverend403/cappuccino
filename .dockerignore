@@ -2,3 +2,10 @@ venv
 config.ini.dist
 data
 _pycache__
+.git/
+build
+dist
+*.egg-info
+*.egg/
+*.pyc
+*.swp
