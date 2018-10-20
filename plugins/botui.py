@@ -33,7 +33,7 @@ class BotUI(object):
 
             %%bots
         """
-        yield 'Reporting in! [Python {0}] https://github.com/TheReverend403/ricedb'.format(platform.python_version())
+        yield 'Reporting in! [Python {0}] https://github.com/FoxDev/cappuccino'.format(platform.python_version())
 
     @command(permission='admin', show_in_help_list=False)
     def join(self, mask, target, args):

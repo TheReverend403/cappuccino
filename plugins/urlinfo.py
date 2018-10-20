@@ -20,7 +20,7 @@ URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE)
 BRACES = [('{', '}'), ('<', '>'), ('[', ']'), ('(', ')')]
 DEFAULT_MAX_BYTES = 655360  # 64K
 MAX_TITLE_LENGTH = 128
-USER_AGENT = 'ricedb/urlinfo.py (https://github.com/TheReverend403/ricedb)'
+USER_AGENT = 'cappuccino/urlinfo.py (https://github.com/FoxDev/cappuccino/plugins/urlinfo.py)'
 REQUEST_TIMEOUT = 5
 HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.IGNORECASE)
 

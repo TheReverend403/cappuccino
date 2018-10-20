@@ -1,10 +1,10 @@
-RiceDB
+Cappuccino
 ======
 
 An IRC bot designed to maintain a database of user submitted links to various subjects including desktops, mobile phone homescreens, dotfiles and operating systems  
 Primarily designed with [#rice@irc.rizon.net](https://qchat.rizon.net/?channels=rice) in mind.
 
-ricedb was developed against Python 3.6, but *should* run on Python 3.5.
+Cappuccino is currently developed against Python 3.7 and not tested on earlier versions.
 
 # Installation
 

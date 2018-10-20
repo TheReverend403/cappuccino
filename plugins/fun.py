@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 from irc3.plugins.command import command
 
-USER_AGENT = 'ricedb/fun.py (https://github.com/TheReverend403/ricedb)'
+USER_AGENT = 'cappuccino/fun.py (https://github.com/FoxDev/cappuccino/plugins/fun.py)'
 DEFAULT_HEADERS = {
     'User-Agent': USER_AGENT,
     'Accept-Language': 'en-GB, en-US, en'

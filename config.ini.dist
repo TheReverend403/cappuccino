@@ -1,7 +1,7 @@
 [bot]
-nick = ricedb
-username = ricedb
-realname = ricedb
+nick = cappuccino_test
+username = cappuccino_test
+realname = cappuccino_test
 # Server password, not nickserv
 password =
 
@@ -56,7 +56,7 @@ autojoins =
 storage = json://data.json
 
 [ctcp]
-version = ricedb (https://github.com/TheReverend403/ricedb)
+version = cappuccino (https://github.com/FoxDev/cappuccino)
 
 [plugins.nickserv]
 password =
@@ -72,11 +72,6 @@ api_key =
 [plugins.urlinfo]
 ignore_nicks = Nick1 Nick2
 ignore_hostnames = example.com
-
-[plugins.unixporn]
-channel = ricedb
-reddit_client_id =
-reddit_client_secret =
 
 [plugins.ai]
 ignore_nicks = ExampleUser
