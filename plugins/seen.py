@@ -38,7 +38,11 @@ class ChannelAutopsy(object):
 
             %%seen <nick>
         """
+
         nick = args['<nick>']
+
+        if nick == self.bot.nick:
+            return 'I\'m right here, idiot. -_-'
 
         if not self.bot.get_user_value(nick, DB_KEY):
             return f'I haven\'t seen any activity from {nick} yet.'
@@ -51,4 +55,7 @@ class ChannelAutopsy(object):
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def update_last_seen(self, target, event, mask, data):
+        if mask.nick == self.bot.nick:
+            return
+
         self.set_last_seen(mask.nick, time.time())
