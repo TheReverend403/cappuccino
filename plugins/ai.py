@@ -112,7 +112,7 @@ class Ai(object):
             channel_percentage = 0
 
             # Percentage of global lines the current channel accounts for.
-            if channel_line_count >= 0 and line_count >= 0:
+            if channel_line_count > 0 and line_count > 0:
                 channel_percentage = int(round(100 * float(channel_line_count) / float(line_count), ndigits=0))
 
             ai_status = 'enabled' if self.is_active(target) else 'disabled'
