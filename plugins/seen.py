@@ -35,7 +35,7 @@ class Seen(object):
 
     @command(permission='view', aliases=['died'])
     def seen(self, mask, target, args):
-        """Check when a user was last seen talking in any channel.
+        """Check when a user was last seen active in any channel.
 
             %%seen <nick>
         """
