@@ -17,7 +17,7 @@ def time_format(seconds):
 
 
 @irc3.plugin
-class ChannelAutopsy(object):
+class Seen(object):
     requires = [
         'irc3.plugins.command',
         'plugins.userdb'
