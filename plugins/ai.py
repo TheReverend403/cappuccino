@@ -54,7 +54,7 @@ class Ai(object):
         self.db_conn = sqlite3.connect(self.database)
         cursor = self.db_conn.cursor()
         cursor.execute('CREATE TABLE IF NOT EXISTS corpus (line TEXT PRIMARY KEY, channel TEXT NOT NULL)')
-        cursor.execute('CREATE TABLE IF NOT EXISTS channels (name TEXT UNIQUE NOT NULL, status INT DEFAULT 0)')
+        cursor.execute('CREATE TABLE IF NOT EXISTS channels (name TEXT PRIMARY KEY, status INT DEFAULT 0)')
         self.db_conn.commit()
 
     def _add_line(self, line, channel):
@@ -116,7 +116,7 @@ class Ai(object):
                 channel_percentage = int(round(100 * float(channel_line_count) / float(line_count), ndigits=0))
 
             ai_status = 'enabled' if self.is_active(target) else 'disabled'
-            return f'Chatbot is currently {ai_status} for {target}.' \
+            return f'Chatbot is currently {ai_status} for {target}. ' \
                    f'Channel/global line count: {channel_line_count}/{line_count} ({channel_percentage}%).'
 
         if not self.bot.is_chanop(target, mask.nick):
