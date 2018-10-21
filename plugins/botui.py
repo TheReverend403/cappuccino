@@ -5,6 +5,14 @@ import irc3
 from irc3.plugins.command import command
 
 
+class NickPrefix(Enum):
+    VOICE = '+'
+    HALF_OP = '%'
+    OP = '@'
+    SUPER_OP = '&'
+    OWNER = '~'
+
+
 @irc3.plugin
 class BotUI(object):
 
@@ -13,22 +21,14 @@ class BotUI(object):
         'irc3.plugins.userlist'
     ]
 
-    class NickPrefix(Enum):
-        VOICE = '+'
-        HALF_OP = '%'
-        OP = '@'
-        SUPER_OP = '&'
-        OWNER = '~'
-
     def __init__(self, bot):
         self.bot = bot
-        self.bot.nickprefix = self.NickPrefix
 
     @irc3.extend
     def is_chanop(self, channel, nick):
-        for mode in self.NickPrefix:
+        for mode in NickPrefix:
             # Voiced users aren't channel operators.
-            if mode is self.bot.nickprefix.VOICE:
+            if mode is NickPrefix.VOICE:
                 continue
 
             try:
