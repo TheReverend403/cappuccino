@@ -63,7 +63,7 @@ class RiceDB(object):
 
             indexes = set(args['<ids>'])
             if '*' in indexes:
-                self.bot.set_user_value(mask.nick, mode, [])
+                self.bot.del_user_value(mask.nick, mode)
                 return f'Removed all of your {mode}.'
             deleted = []
 
