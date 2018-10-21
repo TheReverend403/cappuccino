@@ -65,7 +65,7 @@ class Seen(object):
         self.set_last_seen(mask.nick, time.time())
 
     @irc3.event(irc3.rfc.JOIN)
-    def on_join(self, tags, mask, channel):
+    def on_join(self, mask, channel):
         if mask.nick == self.bot.nick:
             return
 
