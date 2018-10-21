@@ -44,6 +44,9 @@ class ChannelAutopsy(object):
         if nick == self.bot.nick:
             return 'I\'m right here, idiot. -_-'
 
+        if nick == mask.nick:
+            return 'Are you seriously asking me that?'
+
         if not self.bot.get_user_value(nick, DB_KEY):
             return f'I haven\'t seen any activity from {nick} yet.'
 
