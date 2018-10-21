@@ -7,58 +7,26 @@ SED_PRIVMSG = r'\s*s[/|\\!\.,\\].+'
 SED_CHECKER = re.compile('^' + SED_PRIVMSG)
 
 
-class Editor(object):
-    """
-    Wrapper to provide ed-style line editing.
-    https://gist.github.com/rduplain/3441687
-    Ron DuPlain <ron.duplain@gmail.com>
-    """
+def _sed_wrapper(text, command):
+    # Must be GNU sed
+    arguments = ['sed', '--sandbox', '--posix', '--regexp-extended', command]
+    sed = Popen(arguments, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    sed.stdin.write(bytes(text.strip(), 'UTF-8'))
+    sed.stdin.close()
+    returncode = sed.wait()
 
-    def __init__(self, command):
-        """A wrapper around UNIX sed, for operating on strings with sed expressions.
+    if returncode != 0:
+        # Unix integer returncode, where 0 is success.
+        raise EditorException(sed.stderr.read().decode('UTF-8').strip().replace('sed: -e ', ''))
 
-        Args:
-            command: Any valid sed s/ expression.
+    return sed.stdout.read().decode('UTF-8').strip()
 
-        Example:
-            >>> editor = Editor('s/Hello/Greetings/')
-            >>> print(editor.edit('Hello World!'))
-            "Greetings World!"
-            >>> print(editor.edit('Hello World!', 's/World!/World\./'))
-            "Hello World."
-            >>> print(editor.edit('Hello, World'))
-            "Greetings, World"
-        """
 
-        self.command = command
-
-    def _sed_wrapper(self, text, command=None):
-        # Must be GNU sed
-        arguments = ['sed', '--sandbox', '--posix', '--regexp-extended', command or self.command]
-        sed = Popen(arguments, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        sed.stdin.write(bytes(text.strip(), 'UTF-8'))
-        sed.stdin.close()
-        returncode = sed.wait()
-        if returncode != 0:
-            # Unix integer returncode, where 0 is success.
-            raise EditorException(sed.stderr.read().decode('UTF-8').strip().replace('sed: -e ', ''))
-        return sed.stdout.read().decode('UTF-8').strip()
-
-    def edit(self, text, command=None):
-        """Run this Editor's sed command against :text.
-
-        Args:
-            text: Text to run sed command against.
-            command: An optional command to use for this specific operation.
-        Returns:
-            Resulting text after sed operation.
-        Raises:
-            EditorException: Details of sed errors.
-        """
-        output = self._sed_wrapper(text, command or self.command)
-        if not output or output == text:
-            return text
-        return output
+def edit(text, command):
+    output = _sed_wrapper(text, command)
+    if not output or output == text:
+        return text
+    return output
 
 
 class EditorException(Exception):
@@ -92,16 +60,15 @@ class Sed(object):
         queue.append(line)
         self.history_buffer.update({target: queue})
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<_sed>{0})'.format(SED_PRIVMSG))
-    def sed(self, mask, target, _sed):
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<command>{0})'.format(SED_PRIVMSG))
+    def sed(self, mask, target, command):
         if target not in self.history_buffer:
             return
 
-        editor = Editor(_sed)
         for target_user, message in reversed(self.history_buffer[target]):
             message = message.strip()
             try:
-                new_message = editor.edit(message)
+                new_message = edit(message, command)
             except EditorException as error:
                 self.bot.log.error(error)
                 self.bot.notice(mask.nick, str(error))
