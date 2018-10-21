@@ -2,6 +2,7 @@ import irc3
 import pylast
 from irc3.plugins.command import command
 
+DB_KEY = 'lastfm'
 MAX_TRACK_ARTIST_LEN = 32
 MAX_TRACK_TITLE_LEN = 75
 
@@ -38,12 +39,12 @@ class LastFM(object):
                 except pylast.WSError:
                     return 'No such last.fm user. Are you trying to trick me? :^)'
                 else:
-                    self.bot.set_user_value(mask.nick, 'lastfm', lastfm_username)
+                    self.bot.set_user_value(mask.nick, DB_KEY, lastfm_username)
                     return 'last.fm username set.'
 
             base_command = self.bot.config.cmd + 'np'
             irc_username = args['<username>'] or mask.nick
-            lastfm_username = self.bot.get_user_value(irc_username, 'lastfm')
+            lastfm_username = self.bot.get_user_value(irc_username, DB_KEY)
 
             if not lastfm_username:
                 if irc_username == mask.nick:
