@@ -155,6 +155,7 @@ def _clean_url(url):
 
 @irc3.plugin
 class UrlInfo(object):
+
     requires = [
         'plugins.formatting'
     ]

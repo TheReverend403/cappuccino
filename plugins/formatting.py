@@ -3,10 +3,11 @@ import re
 from enum import Enum
 import irc3
 
+IRC_CODES_REGEX = re.compile('\x1f|\x02|\x1D|\x03(?:\d{1,2}(?:,\d{1,2})?)?', re.UNICODE)
+
 
 @irc3.plugin
 class Formatting(object):
-    irc_codes_regex = re.compile('\x1f|\x02|\x1D|\x03(?:\d{1,2}(?:,\d{1,2})?)?', re.UNICODE)
 
     class Color(Enum):
         RESET = '\x0f'
@@ -43,4 +44,4 @@ class Formatting(object):
 
     @irc3.extend
     def strip_formatting(self, string):
-        return self.irc_codes_regex.sub('', string)
+        return IRC_CODES_REGEX.sub('', string)

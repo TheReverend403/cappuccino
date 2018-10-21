@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 class UserDB(dict):
+
     def __init__(self, bot, **kwargs):
         super().__init__(**kwargs)
 

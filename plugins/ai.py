@@ -24,6 +24,7 @@ def should_ignore_message(line):
 
 @irc3.plugin
 class Ai(object):
+
     requires = [
         'plugins.botui',
         'plugins.formatting'

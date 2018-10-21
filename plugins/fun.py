@@ -25,6 +25,7 @@ EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.', 
 
 @irc3.plugin
 class Fun(object):
+
     requires = [
         'plugins.formatting'
     ]

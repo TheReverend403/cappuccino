@@ -18,6 +18,7 @@ def time_format(seconds):
 
 @irc3.plugin
 class Seen(object):
+
     requires = [
         'irc3.plugins.command',
         'plugins.userdb'

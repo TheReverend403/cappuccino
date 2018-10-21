@@ -20,6 +20,7 @@ def from_user_index(index):
 
 @irc3.plugin
 class Rice(object):
+
     requires = [
         'irc3.plugins.command',
         'plugins.formatting',
