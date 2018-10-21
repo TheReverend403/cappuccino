@@ -1,7 +1,3 @@
-try:
-    import ujson as json
-except ImportError:
-    import json
 from pathlib import Path
 import random
 import re
