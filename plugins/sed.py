@@ -9,7 +9,7 @@ SED_CHECKER = re.compile('^' + SED_PRIVMSG)
 
 def _sed_wrapper(text, command):
     # Must be GNU sed
-    arguments = ['sed', '--sandbox', '--posix', '--regexp-extended', command]
+    arguments = ['sed', '--sandbox', '--regexp-extended', command]
     sed = Popen(arguments, stdin=PIPE, stdout=PIPE, stderr=PIPE)
     sed.stdin.write(bytes(text.strip(), 'UTF-8'))
     sed.stdin.close()
