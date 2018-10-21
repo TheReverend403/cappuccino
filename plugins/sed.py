@@ -35,6 +35,7 @@ class EditorException(Exception):
 
 @irc3.plugin
 class Sed(object):
+
     requires = [
         'plugins.formatting'
     ]

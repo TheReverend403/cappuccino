@@ -58,7 +58,14 @@ class Seen(object):
         return f'{nick} was last seen {timefmt} ago.'
 
     @irc3.event(irc3.rfc.PRIVMSG)
-    def update_last_seen(self, target, event, mask, data):
+    def on_privmsg(self, target, event, mask, data):
+        if mask.nick == self.bot.nick or event == 'NOTICE':
+            return
+
+        self.set_last_seen(mask.nick, time.time())
+
+    @irc3.event(irc3.rfc.JOIN)
+    def on_join(self, tags, mask, channel):
         if mask.nick == self.bot.nick:
             return
 
