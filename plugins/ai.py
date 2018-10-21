@@ -2,7 +2,7 @@ try:
     import ujson as json
 except ImportError:
     import json
-import os
+from pathlib import Path
 import random
 import re
 import sqlite3
@@ -31,9 +31,9 @@ class Ai(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.datadir = 'data'
-        self.channel_file = os.path.join(self.datadir, 'ai.json')
-        self.active_channels = []
+        self.datadir = Path('data')
+        self.database = self.datadir / 'ai.sqlite'
+        self.db_conn = None
         self.ignore_nicks = []
         self.max_loaded_lines = 20000
 
@@ -47,29 +47,26 @@ class Ai(object):
         except KeyError:
             pass
 
-        try:
-            with open(self.channel_file, 'r') as fd:
-                self.active_channels = json.load(fd)
-        except FileNotFoundError:
-            if not os.path.exists(self.datadir):
-                os.mkdir(self.datadir)
-                self.bot.log.debug(f'Created {self.datadir} directory')
+        if not self.database.exists():
+            self.datadir.mkdir(exist_ok=True)
+            self.bot.log.debug(f'Created {self.datadir} directory')
 
         self._init_db()
 
     def _init_db(self):
-        self.conn = sqlite3.connect(os.path.join(self.datadir, 'ai.sqlite'))
-        cursor = self.conn.cursor()
-        cursor.execute('CREATE TABLE IF NOT EXISTS corpus (line TEXT PRIMARY KEY, channel TEXT)')
-        self.conn.commit()
+        self.db_conn = sqlite3.connect(self.database)
+        cursor = self.db_conn.cursor()
+        cursor.execute('CREATE TABLE IF NOT EXISTS corpus (line TEXT PRIMARY KEY, channel TEXT NOT NULL)')
+        cursor.execute('CREATE TABLE IF NOT EXISTS channels (name TEXT UNIQUE NOT NULL, status INT DEFAULT 0)')
+        self.db_conn.commit()
 
     def _add_line(self, line, channel):
-        cursor = self.conn.cursor()
+        cursor = self.db_conn.cursor()
         cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (line, channel))
-        self.conn.commit()
+        self.db_conn.commit()
 
     def _get_lines(self, channel=None):
-        cursor = self.conn.cursor()
+        cursor = self.db_conn.cursor()
         if channel:
             cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?',
                            (channel, self.max_loaded_lines))
@@ -80,7 +77,7 @@ class Ai(object):
         return lines if len(lines) > 0 else None
 
     def _line_count(self, channel=None):
-        cursor = self.conn.cursor()
+        cursor = self.db_conn.cursor()
         if channel:
             cursor.execute('SELECT COUNT(*) FROM corpus WHERE channel=?', (channel,))
         else:
@@ -88,16 +85,22 @@ class Ai(object):
         return cursor.fetchone()[0]
 
     def is_active(self, channel):
-        return channel in self.active_channels
+        cursor = self.db_conn.cursor()
+        cursor.execute('SELECT status FROM channels WHERE name=?', (channel,))
+        result = cursor.fetchone()
+        if not result:
+            cursor.execute('INSERT INTO channels VALUES (?,?)', (channel, False))
+            self.db_conn.commit()
+            return False
+        return result[0]
 
     def toggle(self, channel):
-        try:
-            self.active_channels.remove(channel)
-        except ValueError:
-            self.active_channels.append(channel)
-
-        with open(self.channel_file, 'w') as fd:
-            json.dump(self.active_channels, fd)
+        cursor = self.db_conn.cursor()
+        if self.is_active(channel):
+            cursor.execute('UPDATE channels SET status=0 WHERE name=?', (channel,))
+        else:
+            cursor.execute('UPDATE channels SET status=1 WHERE name=?', (channel,))
+        self.db_conn.commit()
 
     @command
     def ai(self, mask, target, args):
