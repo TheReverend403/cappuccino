@@ -1,4 +1,4 @@
-from subprocess import Popen, PIPE
+import subprocess
 import collections
 import irc3
 import re
@@ -10,16 +10,14 @@ SED_CHECKER = re.compile('^' + SED_PRIVMSG)
 def _sed_wrapper(text, command):
     # Must be GNU sed
     arguments = ['sed', '--sandbox', '--regexp-extended', command]
-    sed = Popen(arguments, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    sed.stdin.write(bytes(text.strip(), 'UTF-8'))
-    sed.stdin.close()
-    returncode = sed.wait()
+    sed_input = text.strip().encode('UTF-8')
+    sed = subprocess.run(arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=sed_input)
 
-    if returncode != 0:
+    if sed.returncode != 0:
         # Unix integer returncode, where 0 is success.
-        raise EditorException(sed.stderr.read().decode('UTF-8').strip().replace('sed: -e ', ''))
+        raise EditorException(sed.stderr.decode('UTF-8').strip().replace('sed: -e ', ''))
 
-    return sed.stdout.read().decode('UTF-8').strip()
+    return sed.stdout.decode('UTF-8').strip()
 
 
 def edit(text, command):
@@ -72,7 +70,7 @@ class Sed(object):
                 new_message = edit(message, command)
             except EditorException as error:
                 self.bot.log.error(error)
-                self.bot.notice(mask.nick, str(error))
+                self.bot.notice(mask.nick, error)
                 # Don't even check the rest if the sed command is invalid.
                 return
 

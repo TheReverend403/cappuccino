@@ -10,7 +10,7 @@ RUN pip install --install-option="--prefix=/install" -r /requirements.txt
 
 FROM base
 
-RUN apk add sed
+RUN apk add sed curl
 
 COPY --from=builder /install /usr/local
 COPY config.ini /app/

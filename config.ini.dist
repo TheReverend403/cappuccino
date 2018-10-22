@@ -30,6 +30,7 @@ includes =
     plugins.fun
     plugins.sed
     plugins.urlinfo
+    plugins.execshell
 
 # the bot will join #null
 # ${hash} is replaced by the # char
