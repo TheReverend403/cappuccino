@@ -7,9 +7,7 @@ def _exec_wrapper(cmd, input_data=None):
     if input_data:
         input_data = input_data.encode('UTF-8')
 
-    proc = subprocess.run(cmd,
-                          input=input_data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=5)
-
+    proc = subprocess.run(cmd, input=input_data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=5)
     if proc.returncode == 0:
         return proc.stdout.decode('UTF-8')
 
