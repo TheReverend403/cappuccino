@@ -3,6 +3,11 @@ import irc3
 from irc3.plugins.command import command
 
 
+def is_multiline_string(text):
+    # Check if the output contains a newline after removing the last one for single line output ending with \n.
+    return '\n' in text.strip()
+
+
 def _exec_wrapper(cmd, input_data=None):
     if input_data:
         input_data = input_data.encode('UTF-8')
@@ -32,13 +37,12 @@ class ExecShell(object):
 
         output = None
         try:
-            output = _exec_wrapper(args['<command>'])
+            output = _exec_wrapper(args['<command>']).strip()
             if not output:
                 return f'{mask.nick}: Command returned no output.'
 
             # Don't paste single line outputs.
-            # Check if the output contains a newline after removing the last one for single-line output ending with \n
-            if '\n' not in output[:-1]:
+            if not is_multiline_string(output):
                 return f'{mask.nick}: {output}'
 
             result = _exec_wrapper(['curl', '--silent', '-F', 'f:1=@-', 'ix.io'], output)
