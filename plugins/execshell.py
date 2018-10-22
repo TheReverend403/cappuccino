@@ -36,7 +36,12 @@ class ExecShell(object):
             if not output:
                 return f'{mask.nick}: Command returned no output.'
 
-            paste_url = _exec_wrapper(['curl', '--silent', '-F', 'f:1=@-', 'ix.io'], output)
+            # Don't paste single line outputs.
+            # Check if the output contains a newline after removing the last one for single-line output ending with \n
+            if '\n' not in output[:-1]:
+                return f'{mask.nick}: {output}'
+
+            result = _exec_wrapper(['curl', '--silent', '-F', 'f:1=@-', 'ix.io'], output)
         except subprocess.TimeoutExpired:
             if output:
                 return f'{mask.nick}: ix.io timed out.'
@@ -45,4 +50,4 @@ class ExecShell(object):
         except FileNotFoundError as ex:
             return f'{mask.nick}: {ex}'
 
-        return f'{mask.nick}: {paste_url}'
+        return f'{mask.nick}: {result}'
