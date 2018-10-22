@@ -42,5 +42,7 @@ class ExecShell(object):
                 return f'{mask.nick}: ix.io timed out.'
 
             return f'{mask.nick}: Command timed out.'
+        except FileNotFoundError as ex:
+            return f'{mask.nick}: {ex}'
 
         return f'{mask.nick}: {paste_url}'
