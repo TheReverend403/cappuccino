@@ -30,8 +30,14 @@ class ExecShell(object):
             %%exec <command>...
         """
 
-        cmd = args['<command>']
-        output = _exec_wrapper(cmd, shell=True)
-        paste_url = _exec_wrapper(['curl', '--silent', '-F', 'f:1=@-', 'ix.io'], output)
+        output = None
+        try:
+            output = _exec_wrapper(args['<command>'], shell=True)
+            paste_url = _exec_wrapper(['curl', '--silent', '-F', 'f:1=@-', 'ix.io'], output)
+        except subprocess.TimeoutExpired:
+            if output:
+                return f'{mask.nick}: ix.io timed out.'
+
+            return f'{mask.nick}: Command timed out.'
 
         return f'{mask.nick}: {paste_url}'
