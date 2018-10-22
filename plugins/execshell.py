@@ -3,11 +3,11 @@ import irc3
 from irc3.plugins.command import command
 
 
-def _exec_wrapper(cmd, input_data=None, shell=False):
+def _exec_wrapper(cmd, input_data=None):
     if input_data:
         input_data = input_data.encode('UTF-8')
 
-    proc = subprocess.run(cmd, input=input_data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=5, shell=shell)
+    proc = subprocess.run(cmd, input=input_data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=5)
     if proc.returncode == 0:
         return proc.stdout.decode('UTF-8')
 
@@ -32,7 +32,10 @@ class ExecShell(object):
 
         output = None
         try:
-            output = _exec_wrapper(args['<command>'], shell=True)
+            output = _exec_wrapper(args['<command>'])
+            if not output:
+                return f'{mask.nick}: Command returned no output.'
+
             paste_url = _exec_wrapper(['curl', '--silent', '-F', 'f:1=@-', 'ix.io'], output)
         except subprocess.TimeoutExpired:
             if output:
