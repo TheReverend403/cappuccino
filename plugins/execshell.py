@@ -17,8 +17,7 @@ def _exec_wrapper(cmd, input_data=None):
 @irc3.plugin
 class ExecShell(object):
     requires = [
-        'irc3.plugins.command',
-        'plugins.formatting'
+        'irc3.plugins.command'
     ]
 
     def __init__(self, bot):
