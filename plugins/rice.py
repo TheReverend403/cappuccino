@@ -45,15 +45,19 @@ class Rice(object):
             values = self.bot.get_user_value(mask.nick, mode) or []
             if len(values) + len(args['<values>']) > MAX_USER_VALUES:
                 return f'You can only set {MAX_USER_VALUES} {mode}! Consider deleting or replacing some.'
+
             for value in args['<values>']:
                 values.append(value)
+
             self.bot.set_user_value(mask.nick, mode, values)
             return f'{mode} updated.'
 
         if args['--set'] or args['-s']:
             values = args['<values>']
+
             if len(values) > MAX_USER_VALUES:
                 return f'You can only set {MAX_USER_VALUES} {mode}! Consider deleting or replacing some.'
+
             self.bot.set_user_value(mask.nick, mode, values)
             return f'{mode} updated.'
 
@@ -66,8 +70,8 @@ class Rice(object):
             if '*' in indexes:
                 self.bot.del_user_value(mask.nick, mode)
                 return f'Removed all of your {mode}.'
-            deleted = []
 
+            deleted = []
             # Delete values in descending order to prevent re-ordering of the list while deleting.
             for index in sorted(indexes, reverse=True):
                 index = from_user_index(index)
@@ -81,18 +85,20 @@ class Rice(object):
                 return f'No {mode} were removed. Maybe you supplied the wrong IDs?'
 
             self.bot.set_user_value(mask.nick, mode, values)
-
             deleted_list = ', '.join(deleted)
             return f'Removed {deleted_list}.'
 
         if args['--replace'] or args['-r']:
             index = from_user_index(args['<id>'])
             replacement = args['<value>'].strip()
+
             if not replacement:
                 return 'Replacement cannot be empty!'
+
             values = self.bot.get_user_value(mask.nick, mode)
             if not values:
                 return f'You do not have any {mode} to replace.'
+
             try:
                 old_value = values[index]
                 values[index] = replacement
