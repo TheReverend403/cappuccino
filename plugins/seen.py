@@ -30,8 +30,8 @@ class Seen(object):
     def get_last_seen(self, nick):
         return self.bot.get_user_value(nick, DB_KEY)
 
-    def set_last_seen(self, nick, time):
-        self.bot.set_user_value(nick, DB_KEY, time)
+    def set_last_seen(self, nick, timestamp):
+        self.bot.set_user_value(nick, DB_KEY, timestamp)
 
     @command(permission='view', aliases=['died'])
     def seen(self, mask, target, args):
