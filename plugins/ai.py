@@ -32,7 +32,7 @@ class Ai(object):
         self.database = self.datadir / 'ai.sqlite'
         self.db_conn = None
         self.ignore_nicks = []
-        self.max_loaded_lines = 20000
+        self.max_loaded_lines = 10000
 
         try:
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
