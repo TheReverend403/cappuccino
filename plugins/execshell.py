@@ -1,5 +1,6 @@
 import subprocess
 import irc3
+import requests
 from irc3.plugins.command import command
 
 
@@ -35,7 +36,6 @@ class ExecShell(object):
             %%exec <command>...
         """
 
-        output = None
         try:
             output = _exec_wrapper(args['<command>']).strip()
             if not output:
@@ -45,13 +45,10 @@ class ExecShell(object):
             if not is_multiline_string(output):
                 return f'{mask.nick}: {output}'
 
-            result = _exec_wrapper(['curl', '--silent', '-F', 'f:1=@-', 'ix.io'], output)
-        except subprocess.TimeoutExpired:
-            if output:
-                return f'{mask.nick}: ix.io timed out.'
+            # Upload result of command to ix.io to avoid flooding channels with long output.
+            result = requests.post('http://ix.io', data={'f:1': output})
 
-            return f'{mask.nick}: Command timed out.'
-        except FileNotFoundError as ex:
-            return f'{mask.nick}: {ex}'
+        except (FileNotFoundError, requests.RequestException) as ex:
+            return f'{mask.nick}: {ex}.'
 
-        return f'{mask.nick}: {result}'
+        return f'{mask.nick}: {result.text}'

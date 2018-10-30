@@ -10,8 +10,8 @@ RUN pip install --install-option="--prefix=/install" -r /requirements.txt
 
 FROM base
 
-# For plugins.execshell and plugins.sed
-RUN apk add sed curl
+# For plugins.sed
+RUN apk add sed
 
 # Some basic tools to make plugins.execshell a little more useful.
 RUN apk add nmap drill iputils coreutils
