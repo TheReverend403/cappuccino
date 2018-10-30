@@ -92,9 +92,6 @@ class Rice(object):
             index = from_user_index(args['<id>'])
             replacement = args['<value>'].strip()
 
-            if not replacement:
-                return 'Please specify a replacement. If you\'re trying to delete an item, use -d/--delete instead.'
-
             values = self.bot.get_user_value(mask.nick, mode)
             if not values:
                 return f'You do not have any {mode} to replace.'
