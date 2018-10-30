@@ -45,7 +45,7 @@ class ExecShell(object):
             # Upload result of command to ix.io to avoid flooding channels with long output.
             result = requests.post('http://ix.io', data={'f:1': output})
 
-        except (FileNotFoundError, requests.RequestException) as ex:
+        except (FileNotFoundError, requests.RequestException, subprocess.TimeoutExpired) as ex:
             return f'{mask.nick}: {ex}.'
 
         return f'{mask.nick}: {result.text}'
