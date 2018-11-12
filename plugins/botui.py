@@ -25,7 +25,7 @@ class BotUI(object):
         self.bot = bot
 
     @irc3.extend
-    def is_chanop(self, channel, nick):
+    def is_chanop(self, channel: str, nick: str):
         for mode in NickPrefix:
             # Voiced users aren't channel operators.
             if mode is NickPrefix.VOICE:

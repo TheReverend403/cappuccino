@@ -4,17 +4,16 @@ import requests
 from irc3.plugins.command import command
 
 
-def is_multiline_string(text):
-    # Check if the output contains a newline after removing the last one for single line output ending with \n.
-    return '\n' in text.strip()
+def is_multiline_string(text: str):
+    return text.count('\n') > 1  # require minimum 2 newlines to account for the newline at the end of command output.
 
 
-def _exec_wrapper(cmd, input_data=None):
+def _exec_wrapper(cmd: dict, input_data: str=None):
     if input_data:
         input_data = input_data.encode('UTF-8')
 
     proc = subprocess.run(cmd, input=input_data, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
-    return proc.stdout.decode('UTF-8')
+    return proc.stdout.decode('UTF-8').strip()
 
 
 @irc3.plugin
@@ -34,7 +33,7 @@ class ExecShell(object):
         """
 
         try:
-            output = _exec_wrapper(args['<command>']).strip()
+            output = _exec_wrapper(args['<command>'])
             if not output:
                 return f'{mask.nick}: Command returned no output.'
 

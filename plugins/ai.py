@@ -57,12 +57,12 @@ class Ai(object):
         cursor.execute('CREATE TABLE IF NOT EXISTS channels (name TEXT PRIMARY KEY, status INT DEFAULT 0)')
         self.db_conn.commit()
 
-    def _add_line(self, line, channel):
+    def _add_line(self, line: str, channel: str):
         cursor = self.db_conn.cursor()
         cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (line, channel))
         self.db_conn.commit()
 
-    def _get_lines(self, channel=None):
+    def _get_lines(self, channel: str=None) -> list:
         cursor = self.db_conn.cursor()
         if channel:
             cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?',
@@ -73,7 +73,7 @@ class Ai(object):
         lines = [self.bot.strip_formatting(line[0]) for line in cursor.fetchall()]
         return lines if len(lines) > 0 else None
 
-    def _line_count(self, channel=None):
+    def _line_count(self, channel: str=None) -> int:
         cursor = self.db_conn.cursor()
         if channel:
             cursor.execute('SELECT COUNT(*) FROM corpus WHERE channel=?', (channel,))
@@ -81,7 +81,7 @@ class Ai(object):
             cursor.execute('SELECT COUNT(*) FROM corpus')
         return cursor.fetchone()[0]
 
-    def is_active(self, channel):
+    def is_active(self, channel: str) -> bool:
         cursor = self.db_conn.cursor()
         cursor.execute('SELECT status FROM channels WHERE name=?', (channel,))
         result = cursor.fetchone()
@@ -91,7 +91,7 @@ class Ai(object):
             return False
         return result[0]
 
-    def toggle(self, channel):
+    def toggle(self, channel: str):
         cursor = self.db_conn.cursor()
         if self.is_active(channel):
             cursor.execute('UPDATE channels SET status=0 WHERE name=?', (channel,))

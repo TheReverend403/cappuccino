@@ -104,7 +104,7 @@ def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
     return content.getvalue()
 
 
-def _parse_url(url):
+def _parse_url(url: str):
     hostname = urlparse(url).hostname
     for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
         ip = ipaddress.ip_address(sockaddr[0])
@@ -144,7 +144,7 @@ def _parse_url(url):
     return hostname, title, content_type, size
 
 
-def _clean_url(url):
+def _clean_url(url: str):
     if url:
         url = url.rstrip('\'.,"')
         for left_brace, right_brace in BRACES:

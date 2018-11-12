@@ -24,7 +24,7 @@ includes =
     irc3.plugins.ctcp
     plugins.nickserv
     plugins.botui
-    plugins.ricedb
+    plugins.rice
     plugins.lastfm
     plugins.crypto
     plugins.fun
