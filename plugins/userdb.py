@@ -7,6 +7,7 @@ import irc3
 from pathlib import Path
 
 
+@irc3.plugin
 class UserDB(dict):
 
     def __init__(self, bot, **kwargs):
