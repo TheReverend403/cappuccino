@@ -105,19 +105,23 @@ class Rice(object):
             except IndexError:
                 return 'Invalid ID.'
 
-        user = args['<user>'] or mask.nick
-
-        if re.match('^https?://.*', user, re.IGNORECASE | re.DOTALL):
+        if args['<user>'] is not None and re.match('^https?://.*', args['<user>'], re.IGNORECASE | re.DOTALL):
             return 'Did you mean to use --add (-a) or --set (-s) there?'
 
-        if user.isdigit():  # Support .command <id> syntax
-            index = from_user_index(int(user))
+        if args['<user>'] is not None and args['<user>'].isdigit() and args['<id>'] is None:
+            args['<user>'], args['<id>'] = None, args['<user>']
+
+        user = args['<user>'] or mask.nick
+        formatted_user = self.bot.format(user, color=self.bot.color.GREEN)
+
+        if args['<id>'] is not None:
             try:
-                value = self.bot.get_user_value(mask.nick, mode)[index]
-            except IndexError:
+                index = from_user_index(int(args['<id>']))
+                value = self.bot.get_user_value(user, mode)[index]
+            except (ValueError, IndexError):
                 return 'Invalid ID.'
 
-            return f'{value} [{mask.nick}]'
+            return f'{value} [{formatted_user}]'
 
         values = self.bot.get_user_value(user, mode)
         if values:
@@ -128,7 +132,6 @@ class Rice(object):
                 indexed_values.append(f'({index}) {item}')
 
             formatted_values = ' | '.join(indexed_values)
-            formatted_user = self.bot.format(user, color=self.bot.color.GREEN)
 
             return f'{formatted_values} [{formatted_user}]'
 
@@ -137,62 +140,62 @@ class Rice(object):
     @command(permission='view')
     def station(self, mask, target, args):
         """
-            %%station [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%station [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view', aliases=['desktop', 'dt'])
     def dtop(self, mask, target, args):
         """
-            %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view', aliases=['git'])
     def dotfiles(self, mask, target, args):
         """
-            %%dotfiles [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%dotfiles [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view', aliases=['hw'])
     def handwriting(self, mask, target, args):
         """
-            %%handwriting [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%handwriting [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
     def distro(self, mask, target, args):
         """
-            %%distro [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%distro [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view', aliases=['hscr'])
     def homescreen(self, mask, target, args):
         """
-            %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
     def selfie(self, mask, target, args):
         """
-            %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view')
     def pet(self, mask, target, args):
         """
-            %%pet [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%pet [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
     @command(permission='view', aliases=['site'])
     def website(self, mask, target, args):
         """
-            %%website [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | <user>]
+            %%website [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
