@@ -1,3 +1,4 @@
+import re
 import time
 from contextlib import closing
 
@@ -95,9 +96,22 @@ class Fun(object):
     def same(self, target):
         self.reply(target, self.bot.format('same', bold=True))
 
-    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*benis$')
+    @irc3.event(r'.*PRIVMSG (?P<target>\S+) :(?i)\s*benis$')
     def benis(self, target):
         self.reply(target, self.bot.format('3===D', bold=True))
+
+    @irc3.event(irc3.rfc.PRIVMSG)
+    def not_the_only_one(self, target, event, mask, data):
+        if event != 'PRIVMSG' or not target.is_channel:
+            return
+
+        if re.match(r'(?i)does any\s?(body|one) else.*', data):
+            self.bot.privmsg(target, f'{mask.nick}: No, you are literally the only one in the world.')
+            return
+
+        if re.match(r'(?i)am i the only one.*', data):
+            self.bot.privmsg(target, f'{mask.nick}: Statistically, probably not.')
+            return
 
     @irc3.event(r':TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#(?i)DontJoinItsATrap) :.*PART THE CHANNEL.*')
     def antitrap(self, target):

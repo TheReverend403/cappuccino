@@ -128,8 +128,12 @@ class Ai(object):
         self.toggle(target)
         return 'Chatbot activated.' if self.is_active(target) else 'Shutting up!'
 
-    @irc3.event(r'.*:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<channel>#\S+) :\s*(?P<data>\S+.*)$')
-    def handle_line(self, mask, channel, data):
+    @irc3.event(irc3.rfc.PRIVMSG)
+    def handle_line(self, target, event, mask, data):
+        if not target.is_channel:
+            return
+
+        channel = target
         if mask.nick in self.ignore_nicks or mask.nick == self.bot.nick:
             return
 
