@@ -11,7 +11,7 @@ def _sed_wrapper(text, command):
     # Must be GNU sed
     arguments = ['sed', '--sandbox', '--regexp-extended', command]
     sed_input = text.strip().encode('UTF-8')
-    sed = subprocess.run(arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=sed_input)
+    sed = subprocess.run(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, input=sed_input)
 
     if sed.returncode != 0:
         # Unix integer returncode, where 0 is success.
