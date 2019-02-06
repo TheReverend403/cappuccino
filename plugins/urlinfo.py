@@ -204,9 +204,11 @@ class UrlInfo(object):
 
                 try:
                     hostname, title, mimetype, size = future.result()
+                except InvalidIPAddress:
+                    return
                 except ContentTypeNotAllowed as ex:
                     self.bot.log.debug(ex)
-                except (socket.gaierror, ValueError, InvalidIPAddress, requests.RequestException) as ex:
+                except (socket.gaierror, ValueError, requests.RequestException) as ex:
                     self.bot.log.error(ex)
                     formatted_hostname = self.bot.format(hostname, color=self.bot.color.RED)
                     formatted_error = self.bot.format(ex, bold=True)
