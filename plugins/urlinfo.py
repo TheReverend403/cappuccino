@@ -77,7 +77,7 @@ def getaddrinfo_wrapper(host, port, family=0, type=0, proto=0, flags=0):
     return original_getaddrinfo(host, port, family, type, proto, flags)
 
 
-def size_fmt(num, suffix='B'):
+def size_fmt(num: int, suffix: str = 'B') -> str:
     # https://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
     for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
         if abs(num) < 1024.0:
@@ -86,7 +86,7 @@ def size_fmt(num, suffix='B'):
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
-def _read_stream(response, max_bytes=DEFAULT_MAX_BYTES):
+def _read_stream(response: requests.Response, max_bytes: int = DEFAULT_MAX_BYTES) -> str:
     start_time = time.time()
     content = StringIO()
 

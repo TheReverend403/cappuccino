@@ -7,12 +7,12 @@ from irc3.plugins.command import command
 MAX_USER_VALUES = 6
 
 
-def to_user_index(index):
+def to_user_index(index: int):
     """Converts a zero-indexed value to a user-friendly value starting from 1"""
     return index + 1
 
 
-def from_user_index(index):
+def from_user_index(index: int):
     """Converts a user-supplied index to a value suitable for zero-indexed arrays"""
     index = int(index)
     return index - 1 if index >= 1 else index

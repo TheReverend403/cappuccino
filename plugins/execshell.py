@@ -8,7 +8,7 @@ def is_multiline_string(text: str):
     return text.count('\n') > 1  # require minimum 2 newlines to account for the newline at the end of command output.
 
 
-def _exec_wrapper(cmd: dict, input_data: str=None):
+def _exec_wrapper(cmd: dict, input_data: str = None) -> str:
     if input_data:
         input_data = input_data.encode('UTF-8')
 
@@ -45,6 +45,6 @@ class ExecShell(object):
             result = requests.post('http://ix.io', data={'f:1': output})
 
         except (FileNotFoundError, requests.RequestException, subprocess.TimeoutExpired) as ex:
-            return f'{mask.nick}: {ex}.'
+            return f'{mask.nick}: {ex}'
 
         return f'{mask.nick}: {result.text}'

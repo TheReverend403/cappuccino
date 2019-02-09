@@ -25,7 +25,7 @@ class BotUI(object):
         self.bot = bot
 
     @irc3.extend
-    def is_chanop(self, channel: str, nick: str):
+    def is_chanop(self, channel: str, nick: str) -> bool:
         for mode in NickPrefix:
             # Voiced users aren't channel operators.
             if mode is NickPrefix.VOICE:
@@ -57,7 +57,7 @@ class BotUI(object):
 
         channel = args['<channel>']
         if args['<password>']:
-            channel += ' %s' % args['<password>']
+            channel += f' {args["<password>"]}'
 
         self.bot.join(channel)
 
@@ -107,8 +107,9 @@ class BotUI(object):
 
             %%psa <message>...
         """
+        message = ' '.join(args['<message>'])
         for channel in self.bot.channels:
-            self.bot.privmsg(channel, '[PSA] {0}'.format(' '.join(args['<message>'])))
+            self.bot.privmsg(channel, f'[PSA] {message}')
 
     @command(permission='view')
     def ping(self, mask, target, args):
