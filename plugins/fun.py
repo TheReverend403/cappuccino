@@ -1,11 +1,8 @@
 import re
-import time
-from contextlib import closing
 
 import irc3
 import random
-import requests
-from bs4 import BeautifulSoup
+
 from irc3.plugins.command import command
 
 USER_AGENT = 'cappuccino/fun.py (https://github.com/FoxDev/cappuccino/plugins/fun.py)'
