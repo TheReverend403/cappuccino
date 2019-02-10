@@ -8,7 +8,7 @@ from irc3.plugins.command import command
 DB_KEY = 'last_seen'
 
 
-def time_format(seconds):
+def time_format(seconds: int):
     delta = str(timedelta(seconds=seconds))
 
     # Remove microseconds in string representation
@@ -27,10 +27,10 @@ class Seen(object):
     def __init__(self, bot):
         self.bot = bot
 
-    def get_last_seen(self, nick):
+    def get_last_seen(self, nick: str):
         return self.bot.get_user_value(nick, DB_KEY)
 
-    def set_last_seen(self, nick, timestamp):
+    def set_last_seen(self, nick: str, timestamp: float):
         self.bot.set_user_value(nick, DB_KEY, timestamp)
 
     @command(permission='view', aliases=['died'])

@@ -7,7 +7,7 @@ SED_PRIVMSG = r'\s*s[/|\\!\.,\\].+'
 SED_CHECKER = re.compile('^' + SED_PRIVMSG)
 
 
-def _sed_wrapper(text, command):
+def _sed_wrapper(text: str, command: str) -> str:
     # Must be GNU sed
     arguments = ['sed', '--sandbox', '--regexp-extended', command]
     sed_input = text.strip().encode('UTF-8')
@@ -20,7 +20,7 @@ def _sed_wrapper(text, command):
     return sed.stdout.decode('UTF-8').strip()
 
 
-def edit(text, command):
+def edit(text: str, command: str) -> str:
     output = _sed_wrapper(text, command)
     if not output or output == text:
         return text

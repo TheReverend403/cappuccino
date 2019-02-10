@@ -33,7 +33,7 @@ class Fun(object):
     def __init__(self, bot):
         self.bot = bot
 
-    def reply(self, target, message):
+    def reply(self, target: str, message: str):
         # Only reply a certain percentage of the time. AKA rate-limiting. Sort of.
         if random.random() <= self.random_chance:
             self.bot.privmsg(target, message)

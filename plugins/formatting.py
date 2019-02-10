@@ -34,7 +34,7 @@ class Formatting(object):
         self.bot.color = Color
 
     @irc3.extend
-    def format(self, text, color=None, bold=False, reset=True):
+    def format(self, text: str, color: Color = None, bold: bool = False, reset: bool = True) -> str:
         if bold:
             text = f'\x02{text}'
         if color:
@@ -44,5 +44,5 @@ class Formatting(object):
         return text
 
     @irc3.extend
-    def strip_formatting(self, string):
+    def strip_formatting(self, string: str) -> str:
         return IRC_CODES_REGEX.sub('', string)

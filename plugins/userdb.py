@@ -35,14 +35,14 @@ class UserDB(dict):
                     self.__bot.log.debug(f'Created {self.__root} directory')
 
     @irc3.extend
-    def get_user_value(self, username, key):
+    def get_user_value(self, username: str, key: str):
         try:
             return self.get(username)[key]
         except (KeyError, TypeError):
             return None
 
     @irc3.extend
-    def del_user_value(self, username, key):
+    def del_user_value(self, username: str, key: str):
         try:
             del self[username][key]
         except KeyError:
@@ -51,7 +51,7 @@ class UserDB(dict):
             json.dump(self, fd)
 
     @irc3.extend
-    def set_user_value(self, username, key, value):
+    def set_user_value(self, username: str, key: str, value):
         data = {key: value}
         try:
             self[username].update(data)
