@@ -75,9 +75,9 @@ class BotUI(object):
 
     @command(permission='admin', show_in_help_list=False)
     def quit(self, mask, target, args):
-        """Change nickname of the bot.
+        """Shut the bot down.
 
-            %%nick <nick>
+            %%quit
         """
 
         self.bot.quit()
