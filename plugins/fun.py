@@ -100,6 +100,7 @@ class Fun(object):
     @irc3.event(r'.*PRIVMSG (?P<target>\S+) :(?i)\s*loli$')
     def loli(self, target):
         self.reply(target, self.bot.format('https://pedo.help')
+        return
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def not_the_only_one(self, target, event, mask, data):
