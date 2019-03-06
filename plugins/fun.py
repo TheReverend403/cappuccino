@@ -97,7 +97,7 @@ class Fun(object):
     def benis(self, target):
         self.reply(target, self.bot.format('3===D', bold=True))
 
-    @irc3.event(r'.*PRIVMSG (?P<target>\S+) :(?i)\s*loli$')
+    @irc3.event(r'.*PRIVMSG (?P<target>\S+) :(?i).*loli.*')
     def loli(self, target):
         self.reply(target, self.bot.format('https://pedo.help'))
 
