@@ -15,14 +15,14 @@ import irc3
 import re
 import requests
 
-URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE)
+URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
 
 BRACES = [('{', '}'), ('<', '>'), ('[', ']'), ('(', ')')]
 DEFAULT_MAX_BYTES = 655360  # 64K
 MAX_TITLE_LENGTH = 128
 USER_AGENT = 'cappuccino/urlinfo.py (https://github.com/FoxDev/cappuccino/plugins/urlinfo.py)'
 REQUEST_TIMEOUT = 5
-HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.IGNORECASE)
+HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.IGNORECASE | re.UNICODE)
 
 FORCE_IPV4_HOSTNAMES = ['www.youtube.com', 'youtube.com', 'youtu.be']
 
@@ -177,7 +177,7 @@ class UrlInfo(object):
         except KeyError:
             self.ignore_hostnames = []
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?i)(?P<data>.*{0}).*'.format(URL_FINDER.pattern))
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{0}).*'.format(URL_FINDER.pattern))
     def on_url(self, mask, target, data):
         if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd):
             return
