@@ -12,8 +12,8 @@ def _exec_wrapper(cmd: dict, input_data: str = None) -> str:
     if input_data:
         input_data = input_data.encode('UTF-8')
 
-    cmd = [_cmd.encode('UTF-8').decode('UTF-8') for _cmd in cmd]
-    proc = subprocess.run(cmd, input=input_data, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
+    cmd = [_cmd.encode('UTF-8') for _cmd in cmd]
+    proc = subprocess.run(cmd, input=input_data, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5, shell=True)
     return proc.stdout.decode('UTF-8').strip()
 
 
