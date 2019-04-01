@@ -12,7 +12,7 @@ class NickServ(object):
         try:
             password = self.bot.config[__name__]['password']
         except KeyError:
-            self.bot.log.warn('This nick is registered but no nickserv password is set in config.ini')
+            self.bot.log.error('This nick is registered but no nickserv password is set in config.ini')
         else:
             self.bot.privmsg(nickserv, f'IDENTIFY {password}')
 

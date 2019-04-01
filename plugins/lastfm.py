@@ -21,7 +21,7 @@ class LastFM(object):
         try:
             self.lastfm = pylast.LastFMNetwork(api_key=self.bot.config[__name__]['api_key'])
         except KeyError:
-            self.bot.log.warn('Missing last.fm API key')
+            self.bot.log.error('Missing last.fm API key')
             return
 
     @command(name='np', permission='view', aliases=['lastfm'])

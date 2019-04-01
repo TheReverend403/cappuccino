@@ -15,7 +15,7 @@ class Sentry(object):
         try:
             sentry_sdk.init(self.bot.config[__name__]['dsn'])
         except KeyError:
-            self.bot.log.warn('Missing Sentry DSN')
+            self.bot.log.error('Missing Sentry DSN')
             return
 
     @command(name='testsentry', permission='admin', show_in_help_list=False)
