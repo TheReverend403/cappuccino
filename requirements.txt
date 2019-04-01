@@ -8,7 +8,8 @@ irc3==1.1.2
 markovify==0.7.1
 pylast==3.1.0
 requests==2.21.0
-soupsieve==1.8
+sentry-sdk==0.7.9
+soupsieve==1.9
 unidecode==1.0.23
 urllib3==1.24.1
 venusian==1.2.0
