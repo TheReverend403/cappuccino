@@ -88,3 +88,7 @@ guard = irc3.plugins.command.mask_based_policy
 # change your nickname and uncomment the line below
 # user!*@* = all_permissions
 * = view
+
+# https://sentry.io
+[plugins.sentry]
+dsn =
