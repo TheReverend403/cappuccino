@@ -12,6 +12,7 @@ class BotUI(object):
 
     requires = [
         'irc3.plugins.command',
+        'plugins.formatting'
     ]
 
     def __init__(self, bot):
