@@ -13,12 +13,15 @@ def _sed_wrapper(text: str, command: str) -> str:
     sed_input = text.strip().encode('UTF-8')
     sed = subprocess.run(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, input=sed_input)
 
-    if sed.returncode != 0:
-        stream = sed.stderr if sed.stderr else sed.stdout
-        # Unix integer returncode, where 0 is success.
-        raise EditorException(stream.decode('UTF-8').strip().replace('sed: -e ', ''))
+    stream = sed.stderr if sed.stderr else sed.stdout
+    stream = stream.decode('UTF-8').strip()
 
-    return sed.stdout.decode('UTF-8').strip()
+    if sed.returncode != 0:
+        if not stream:
+            return 'Unknown sed error.'
+        raise EditorException(stream.replace('sed: -e ', ''))
+
+    return stream
 
 
 def edit(text: str, command: str) -> str:
@@ -70,8 +73,7 @@ class Sed(object):
             try:
                 new_message = edit(message, command)
             except EditorException as error:
-                self.bot.log.error(error)
-                self.bot.notice(mask.nick, error)
+                self.bot.notice(mask.nick, str(error))
                 # Don't even check the rest if the sed command is invalid.
                 return
 

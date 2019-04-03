@@ -135,7 +135,7 @@ def _parse_url(url: str):
                 title = BeautifulSoup(content, 'html.parser').title.string
             except AttributeError:
                 if content and content_type not in HTML_MIMETYPES:
-                    title = re.sub('\s+', ' ', ' '.join(content.split('\n')))
+                    title = re.sub(r'\s+', ' ', ' '.join(content.split('\n')))
 
         if title:
             title = html.unescape(title).strip()
@@ -209,7 +209,6 @@ class UrlInfo(object):
                 except ContentTypeNotAllowed as ex:
                     self.bot.log.debug(ex)
                 except (socket.gaierror, ValueError, requests.RequestException) as ex:
-                    self.bot.log.error(ex)
                     formatted_hostname = self.bot.format(hostname, color=self.bot.color.RED)
                     formatted_error = self.bot.format(ex, bold=True)
 
