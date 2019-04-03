@@ -14,8 +14,9 @@ def _sed_wrapper(text: str, command: str) -> str:
     sed = subprocess.run(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, input=sed_input)
 
     if sed.returncode != 0:
+        stream = sed.stderr if sed.stderr else sed.stdout
         # Unix integer returncode, where 0 is success.
-        raise EditorException(sed.stderr.decode('UTF-8').strip().replace('sed: -e ', ''))
+        raise EditorException(stream.decode('UTF-8').strip().replace('sed: -e ', ''))
 
     return sed.stdout.decode('UTF-8').strip()
 
