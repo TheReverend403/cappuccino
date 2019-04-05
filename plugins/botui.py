@@ -23,6 +23,7 @@ class BotUI(object):
 
     def __init__(self, bot):
         self.bot = bot
+        self.bot.nickprefix = NickPrefix
 
     @irc3.extend
     def is_chanop(self, channel: str, nick: str) -> bool:
