@@ -12,6 +12,7 @@ pylast = "*"
 requests = "*"
 markovify = "*"
 sentry-sdk = "*"
+ujson = "*"
 
 [requires]
 python_version = "3.7"
