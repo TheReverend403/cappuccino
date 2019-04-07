@@ -20,6 +20,7 @@ REQUEST_OPTIONS = {
     'headers': REQUEST_HEADERS
 }
 
+
 @irc3.plugin
 class BotUI(object):
 

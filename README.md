@@ -21,6 +21,15 @@ docker-compose up -d
 ## Standalone
 
 ```sh
+pipenv install
+cp config.ini.dist config.ini
+$EDITOR config.ini
+pipenv run irc3 config.ini
+```
+
+Or if you're still living in the past...
+
+```sh
 pip install -r requirements.txt
 cp config.ini.dist config.ini
 $EDITOR config.ini
