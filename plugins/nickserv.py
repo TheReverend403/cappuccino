@@ -12,7 +12,7 @@ class NickServ(object):
         try:
             password = self.bot.config[__name__]['password']
         except KeyError:
-            self.bot.log.error('This nick is registered but no nickserv password is set in config.ini')
+            self.bot.log.warn('This nick is registered but no nickserv password is set in config.ini')
         else:
             self.bot.privmsg(nickserv, f'IDENTIFY {password}')
 
@@ -22,4 +22,4 @@ class NickServ(object):
 
     @irc3.event(r':(?P<mask>NickServ!\S+@\S+) NOTICE .* :Password incorrect.*')
     def login_failed(self, mask):
-        self.bot.log.error(f'Failed to authenticate with {mask} due to an incorrect password')
+        self.bot.log.warn(f'Failed to authenticate with {mask} due to an incorrect password')
