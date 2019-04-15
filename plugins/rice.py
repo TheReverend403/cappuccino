@@ -178,7 +178,7 @@ class Rice(object):
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view', aliases=['hscr'])
+    @command(permission='view', aliases=['hscr', 'hs'])
     def homescreen(self, mask, target, args):
         """
             %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
