@@ -124,7 +124,7 @@ class Rice(object):
             try:
                 index = from_user_index(args['<id>'])
                 value = self.bot.get_user_value(user, mode)[index]
-            except (ValueError, IndexError):
+            except (ValueError, IndexError, TypeError):
                 return 'Invalid ID.'
 
             return f'{value} [{formatted_user}]'
