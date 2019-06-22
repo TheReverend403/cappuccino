@@ -7,8 +7,9 @@ from requests import RequestException
 def before_send(event, hint):
     if 'exc_info' in hint:
         exc_type, exc_value, tb = hint['exc_info']
-        if isinstance(exc_value, RequestException):
+        if isinstance(exc_value, (RequestException, TimeoutError)):
             return None
+
     return event
 
 
