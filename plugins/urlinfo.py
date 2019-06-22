@@ -146,7 +146,7 @@ def _parse_url(url: str):
 
 def _clean_url(url: str):
     if url:
-        url = url.rstrip('\'.,"')
+        url = url.rstrip('\'.,"\1')
         for left_brace, right_brace in BRACES:
             if left_brace not in url and url.endswith(right_brace):
                 url = url.rstrip(right_brace)
