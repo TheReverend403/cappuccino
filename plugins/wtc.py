@@ -39,7 +39,7 @@ class BotUI(object):
 
         try:
             with closing(requests.get('https://whatthecommit.com/index.txt', **REQUEST_OPTIONS)) as response:
-                yield f'git commit -m "{response.text}"'
+                yield f'git commit -m "{response.text.strip()}"'
         except RequestException as ex:
             yield ex.strerror
 
