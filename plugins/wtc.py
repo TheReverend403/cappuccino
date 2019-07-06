@@ -2,12 +2,10 @@ from contextlib import closing
 
 import irc3
 import requests
-from bs4 import BeautifulSoup
 from irc3.plugins.command import command
 from requests import RequestException
 
 USER_AGENT = 'cappuccino/wtc.py (https://github.com/FoxDev/cappuccino/plugins/wtc.py)'
-REQUEST_TIMEOUT = 5
 
 REQUEST_HEADERS = {
     'User-Agent': USER_AGENT,
@@ -15,7 +13,7 @@ REQUEST_HEADERS = {
 }
 
 REQUEST_OPTIONS = {
-    'timeout': REQUEST_TIMEOUT,
+    'timeout': 3,
     'allow_redirects': True,
     'headers': REQUEST_HEADERS
 }
@@ -40,10 +38,8 @@ class BotUI(object):
         """
 
         try:
-            with closing(requests.get('https://whatthecommit.com/', **REQUEST_OPTIONS)) as response:
-                commit_message = BeautifulSoup(response.text, 'html.parser').find('p').text.strip()
-                commit_message = self.bot.format(commit_message, bold=True)
+            with closing(requests.get('https://whatthecommit.com/index.txt', **REQUEST_OPTIONS)) as response:
+                yield f'git commit -m "{response.text}"'
         except RequestException as ex:
             yield ex.strerror
 
-        yield f'git commit -m "{commit_message}"'
