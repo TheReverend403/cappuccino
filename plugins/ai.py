@@ -51,7 +51,7 @@ class Ai(object):
         self._init_db()
 
     def _init_db(self):
-        self.db_conn = sqlite3.connect(self.database)
+        self.db_conn = sqlite3.connect(str(self.database))
         cursor = self.db_conn.cursor()
         cursor.execute('CREATE TABLE IF NOT EXISTS corpus (line TEXT PRIMARY KEY, channel TEXT NOT NULL)')
         cursor.execute('CREATE TABLE IF NOT EXISTS channels (name TEXT PRIMARY KEY, status INT DEFAULT 0)')
