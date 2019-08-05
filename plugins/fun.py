@@ -5,7 +5,7 @@ import random
 
 from irc3.plugins.command import command
 
-USER_AGENT = 'cappuccino/fun.py (https://github.com/FoxDev/cappuccino/plugins/fun.py)'
+USER_AGENT = 'cappuccino (https://github.com/FoxDev/cappuccino)'
 DEFAULT_HEADERS = {
     'User-Agent': USER_AGENT,
     'Accept-Language': 'en-GB, en-US, en'

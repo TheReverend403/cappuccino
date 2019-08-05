@@ -5,7 +5,7 @@ import requests
 from irc3.plugins.command import command
 from requests import RequestException
 
-USER_AGENT = 'cappuccino/wtc.py (https://github.com/FoxDev/cappuccino/plugins/wtc.py)'
+USER_AGENT = 'cappuccino (https://github.com/FoxDev/cappuccino)'
 
 REQUEST_HEADERS = {
     'User-Agent': USER_AGENT,
