@@ -20,7 +20,7 @@ URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
 BRACES = [('{', '}'), ('<', '>'), ('[', ']'), ('(', ')')]
 DEFAULT_MAX_BYTES = 655360  # 64K
 MAX_TITLE_LENGTH = 128
-USER_AGENT = 'cappuccino (https://github.com/FoxDev/cappuccino'
+USER_AGENT = 'cappuccino (https://github.com/FoxDev/cappuccino)'
 REQUEST_TIMEOUT = 5
 HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.IGNORECASE | re.UNICODE)
 
