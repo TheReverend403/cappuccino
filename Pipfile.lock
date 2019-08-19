@@ -41,7 +41,6 @@
         },
         "docopt": {
             "hashes": [
-                "sha256:3f0e1bd540bcaf9691374731eee616c5a8b35767701fc69807bccf98aef56db2",
                 "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"
             ],
             "version": "==0.6.2"
@@ -86,18 +85,18 @@
         },
         "sentry-sdk": {
             "hashes": [
-                "sha256:d491aa6399eaa3eded433972751a9770180730fd8b4c225b0b7f49c4fa2af70b",
-                "sha256:d68003cdffbbfcadaa2c445b72e1050b0a44406f94199866f192986c016b23f5"
+                "sha256:79e8352b5097aa06014871c6daad0933f59d1fcccc586339464ea86e4877b2ab",
+                "sha256:aeaaf6ae7cc4030d390e5c95797ac1a2a79ac2c8b687709293975ee808c68784"
             ],
             "index": "pypi",
-            "version": "==0.10.2"
+            "version": "==0.11.1"
         },
         "soupsieve": {
             "hashes": [
-                "sha256:72b5f1aea9101cf720a36bb2327ede866fd6f1a07b1e87c92a1cc18113cbc946",
-                "sha256:e4e9c053d59795e440163733a7fec6c5972210e1790c507e4c7b051d6c5259de"
+                "sha256:8662843366b8d8779dec4e2f921bebec9afd856a5ff2e82cd419acc5054a1a92",
+                "sha256:a5a6166b4767725fd52ae55fee8c8b6137d9a51e9f1edea461a062a759160118"
             ],
-            "version": "==1.9.2"
+            "version": "==1.9.3"
         },
         "ujson": {
             "hashes": [
