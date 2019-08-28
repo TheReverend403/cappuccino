@@ -1,9 +1,0 @@
-version: '3.3'
-services:
-  bot:
-    container_name: cappuccino
-    network_mode: "host"
-    build: .
-    volumes:
-      - ./data:/app/data/
-    restart: unless-stopped
