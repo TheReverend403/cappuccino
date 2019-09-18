@@ -38,7 +38,7 @@ class UserDB(dict):
         db_copy = self.copy()
         for user, data in db_copy.items():
             if any(c.isupper() for c in user):
-                self[user.lower()] = self.pop(user)
+                self.set_user_value(user, self.pop(user))
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
