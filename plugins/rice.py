@@ -118,8 +118,7 @@ class Rice(object):
             args['<user>'], args['<id>'] = None, args['<user>']
 
         user = args['<user>'] or mask.nick
-        user = user.lower()
-        formatted_user = self.bot.format(user, color=self.bot.color.GREEN)
+        formatted_user = self.bot.format(user.lower(), color=self.bot.color.GREEN)
 
         if args['<id>'] is not None:
             try:
