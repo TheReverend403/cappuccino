@@ -81,7 +81,7 @@ class UserDB(object):
             with self.file.open('w') as fd:
                 json.dump(self.data, fd)
             self.last_write = datetime.now()
-            self.bot.log.info('Synced database to disk.')
+            self.bot.log.debug('Synced database to disk.')
 
     def _shutdown_hook(self, *args):
         self.sync(force=True)
