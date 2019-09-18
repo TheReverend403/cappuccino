@@ -1,4 +1,3 @@
-import atexit
 import signal
 import sys
 from datetime import datetime
@@ -21,7 +20,7 @@ class UserDB(object):
         self.file = self.root / 'userdb.json'
         self.data = {}
         self.last_write = None
-        atexit.register(self.sync, force=True)
+
         for sig in (signal.SIGINT, signal.SIGTERM):
             signal.signal(sig, self._shutdown_hook)
 
