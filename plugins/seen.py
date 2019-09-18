@@ -40,7 +40,7 @@ class Seen(object):
             %%seen <nick>
         """
 
-        nick = args['<nick>']
+        nick = args['<nick>'].lower()
 
         if nick == self.bot.nick:
             return 'I\'m right here, idiot. -_-'

@@ -1,4 +1,5 @@
 import atexit
+import signal
 from datetime import datetime
 
 try:
@@ -20,6 +21,8 @@ class UserDB(object):
         self.data = {}
         self.last_write = None
         atexit.register(self.sync, force=True)
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            signal.signal(sig, self._shutdown_hook)
 
         try:
             with self.file.open('r') as fd:
@@ -79,3 +82,6 @@ class UserDB(object):
                 json.dump(self.data, fd)
             self.last_write = datetime.now()
             self.bot.log.info('Synced database to disk.')
+
+    def _shutdown_hook(self):
+        self.sync(force=True)
