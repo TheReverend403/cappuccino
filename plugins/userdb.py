@@ -1,3 +1,5 @@
+from datetime import datetime
+
 try:
     import ujson as json
 except ImportError:
@@ -16,6 +18,7 @@ class UserDB(dict):
         self.__bot = bot
         self.__root = Path('data')
         self.__file = self.__root / 'userdb.json'
+        self.__last_write = None
 
         try:
             with self.__file.open('r') as fd:
@@ -53,8 +56,8 @@ class UserDB(dict):
             del self[username.lower()][key]
         except KeyError:
             pass
-        with self.__file.open('w') as fd:
-            json.dump(self, fd)
+
+        self.sync()
 
     @irc3.extend
     def set_user_value(self, username: str, key, value=None):
@@ -65,5 +68,12 @@ class UserDB(dict):
             self[username].update(data)
         except KeyError:
             self[username] = data
-        with self.__file.open('w') as fd:
-            json.dump(self, fd)
+
+        self.sync()
+
+    def sync(self):
+        # Only write to disk once every 5 minutes so seen.py doesn't kill performance with constant writes.
+        if not self.__last_write or abs((datetime.now() - self.__last_write).seconds) >= 60 * 5:
+            with self.__file.open('w') as fd:
+                json.dump(self, fd)
+            self.__last_write = datetime.now()
