@@ -1,3 +1,4 @@
+import atexit
 import signal
 import sys
 from datetime import datetime
@@ -11,6 +12,10 @@ import irc3
 from pathlib import Path
 
 
+def shutdown_hook(signo, frame):
+    sys.exit(0)
+
+
 @irc3.plugin
 class UserDB(object):
 
@@ -22,7 +27,9 @@ class UserDB(object):
         self.last_write = datetime.now()
 
         for sig in (signal.SIGINT, signal.SIGTERM):
-            signal.signal(sig, self._shutdown_hook)
+            signal.signal(sig, shutdown_hook)
+
+        atexit.register(self.sync, force=True)
 
         try:
             with self.file.open('r') as fd:
@@ -82,7 +89,3 @@ class UserDB(object):
                 json.dump(self.data, fd)
             self.last_write = datetime.now()
             self.bot.log.debug('Synced database to disk.')
-
-    def _shutdown_hook(self, *args):
-        self.sync(force=True)
-        sys.exit(0)
