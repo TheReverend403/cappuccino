@@ -34,25 +34,33 @@ class UserDB(dict):
                     self.__file.touch(exist_ok=True)
                     self.__bot.log.debug(f'Created {self.__root} directory')
 
+        # If any user has an uppercase in their nick, convert the whole DB to lowercase.
+        db_copy = self.copy()
+        for user, data in db_copy.items():
+            if any(c.isupper() for c in user):
+                self[user.lower()] = self.pop(user)
+
     @irc3.extend
     def get_user_value(self, username: str, key: str):
         try:
-            return self.get(username)[key]
+            return self.get(username.lower())[key]
         except (KeyError, TypeError):
             return None
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
         try:
-            del self[username][key]
+            del self[username.lower()][key]
         except KeyError:
             pass
         with self.__file.open('w') as fd:
             json.dump(self, fd)
 
     @irc3.extend
-    def set_user_value(self, username: str, key: str, value):
-        data = {key: value}
+    def set_user_value(self, username: str, key, value=None):
+        data = {key: value} if value else key
+        username = username.lower()
+
         try:
             self[username].update(data)
         except KeyError:
