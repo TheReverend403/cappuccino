@@ -1,3 +1,4 @@
+import atexit
 from datetime import datetime
 
 try:
@@ -10,50 +11,50 @@ from pathlib import Path
 
 
 @irc3.plugin
-class UserDB(dict):
+class UserDB(object):
 
-    def __init__(self, bot, **kwargs):
-        super().__init__(**kwargs)
-
-        self.__bot = bot
-        self.__root = Path('data')
-        self.__file = self.__root / 'userdb.json'
-        self.__last_write = None
+    def __init__(self, bot):
+        self.bot = bot
+        self.root = Path('data')
+        self.file = self.root / 'userdb.json'
+        self.data = {}
+        self.last_write = None
+        atexit.register(self.sync, force=True)
 
         try:
-            with self.__file.open('r') as fd:
-                self.update(json.load(fd))
+            with self.file.open('r') as fd:
+                self.data.update(json.load(fd))
         except FileNotFoundError:
             # Database file itself doesn't need to exist on first run, it will be created on first write.
-            if not self.__file.exists():
+            if not self.file.exists():
                 # Copy ricedb.json from old installations if it exists.
-                old_db_file = Path(self.__root) / 'ricedb.json'
+                old_db_file = Path(self.root) / 'ricedb.json'
                 if old_db_file.exists():
-                    old_db_file.replace(self.__file)
-                    with self.__file.open('r') as fd:
-                        self.update(json.load(fd))
+                    old_db_file.replace(self.file)
+                    with self.file.open('r') as fd:
+                        self.data.update(json.load(fd))
                 else:
-                    self.__root.mkdir(exist_ok=True)
-                    self.__file.touch(exist_ok=True)
-                    self.__bot.log.debug(f'Created {self.__root} directory')
+                    self.root.mkdir(exist_ok=True)
+                    self.file.touch(exist_ok=True)
+                    self.bot.log.debug(f'Created {self.root} directory')
 
         # If any user has an uppercase in their nick, convert the whole DB to lowercase.
-        db_copy = self.copy()
+        db_copy = self.data.copy()
         for user, data in db_copy.items():
             if any(c.isupper() for c in user):
-                self.set_user_value(user, self.pop(user))
+                self.set_user_value(user, self.data.pop(user))
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
         try:
-            return self.get(username.lower())[key]
+            return self.data.get(username.lower())[key]
         except (KeyError, TypeError):
             return None
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
         try:
-            del self[username.lower()][key]
+            del self.data[username.lower()][key]
         except KeyError:
             pass
 
@@ -65,15 +66,15 @@ class UserDB(dict):
         username = username.lower()
 
         try:
-            self[username].update(data)
+            self.data[username].update(data)
         except KeyError:
-            self[username] = data
+            self.data[username] = data
 
         self.sync()
 
-    def sync(self):
+    def sync(self, force=False):
         # Only write to disk once every 5 minutes so seen.py doesn't kill performance with constant writes.
-        if not self.__last_write or abs((datetime.now() - self.__last_write).seconds) >= 60 * 5:
-            with self.__file.open('w') as fd:
-                json.dump(self, fd)
-            self.__last_write = datetime.now()
+        if force or not self.last_write or abs((datetime.now() - self.last_write).seconds) >= 60 * 5:
+            with self.file.open('w') as fd:
+                json.dump(self.data, fd)
+            self.last_write = datetime.now()
