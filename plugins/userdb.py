@@ -1,5 +1,6 @@
 import atexit
 import signal
+import sys
 from datetime import datetime
 
 try:
@@ -85,3 +86,4 @@ class UserDB(object):
 
     def _shutdown_hook(self, *args):
         self.sync(force=True)
+        sys.exit(0)
