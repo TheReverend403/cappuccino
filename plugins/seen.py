@@ -42,10 +42,10 @@ class Seen(object):
 
         nick = args['<nick>'].lower()
 
-        if nick == self.bot.nick:
+        if nick == self.bot.nick.lower():
             return 'I\'m right here, idiot. -_-'
 
-        if nick == mask.nick:
+        if nick == mask.nick.lower():
             return 'Are you seriously asking me that?'
 
         if not self.bot.get_user_value(nick, DB_KEY):
