@@ -19,7 +19,7 @@ class UserDB(object):
         self.root = Path('data')
         self.file = self.root / 'userdb.json'
         self.data = {}
-        self.last_write = None
+        self.last_write = datetime.now()
 
         for sig in (signal.SIGINT, signal.SIGTERM):
             signal.signal(sig, self._shutdown_hook)
