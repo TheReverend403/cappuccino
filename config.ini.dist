@@ -92,3 +92,8 @@ guard = irc3.plugins.command.mask_based_policy
 # https://sentry.io
 [plugins.sentry]
 dsn =
+
+[plugins.userdb]
+enable_http_server = false
+http_host = 127.0.0.1
+http_port = 8080
