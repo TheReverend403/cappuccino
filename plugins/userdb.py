@@ -83,6 +83,6 @@ class UserDB(object):
             self.last_write = datetime.now()
             self.bot.log.debug('Synced database to disk.')
 
-    def _shutdown_hook(self, *args):
+    def _shutdown_hook(self, signo, frame):
         self.sync(force=True)
         sys.exit(0)
