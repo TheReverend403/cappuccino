@@ -104,6 +104,8 @@ class UserDB(object):
             self.data[username].update(data)
         except KeyError:
             self.data[username] = data
+        except ValueError:
+            self.del_user_value(username, key)
 
         self.sync()
 
