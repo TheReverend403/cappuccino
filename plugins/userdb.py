@@ -109,7 +109,6 @@ class UserDB(object):
 
         self.sync()
 
-    @command()
     def sync(self, force=False):
         # Only write to disk once every 5 minutes so seen.py doesn't kill performance with constant writes.
         if force or abs((datetime.now() - self.last_write).seconds) >= 60 * 5:
