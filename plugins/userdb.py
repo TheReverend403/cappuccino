@@ -22,7 +22,7 @@ def strip_path():
 def http_json_dump(data: dict):
     bottle.response.content_type = 'application/json'
 
-    return json.dumps(dict(sorted(data.items())))
+    return json.dumps(dict(reversed(sorted(data.items()))))
 
 
 @irc3.plugin
