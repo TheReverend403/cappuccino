@@ -75,7 +75,7 @@ class Fun(object):
 
         return f'{mask.nick}: {random.choice(EIGHTBALL_RESPONSES)}'
 
-    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*\[(?P<data>[A-Za-z0-9-_ \'"!]+)\]$')
+    @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*\[+(?P<data>[A-Za-z0-9-_ \'"!]+)\]+$')
     def intensify(self, target, data):
         data = data.strip().upper()
         if not data.endswith('INTENSIFIES'):
