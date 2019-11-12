@@ -7,8 +7,8 @@ import irc3
 import markovify
 from irc3.plugins.command import command
 
-CMD_PATTERN = re.compile(r'^\s*(\.|!|~|`|\$)+')
-SED_CHECKER = re.compile(r'^\s*s[/|\\!.,\\].+')
+CMD_PATTERN = re.compile(r'^\s*([.!~`$])+')
+SED_CHECKER = re.compile(r"^\s*s[/|\\!.,].+")
 
 
 def should_ignore_message(line):
