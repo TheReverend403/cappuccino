@@ -25,7 +25,6 @@ includes =
     plugins.nickserv
     plugins.botui
     plugins.rice
-    plugins.crypto
     plugins.fun
     plugins.sed
     plugins.urlinfo
