@@ -75,7 +75,7 @@ description = "A simple, extensible Markov chain generator. Uses include generat
 name = "markovify"
 optional = true
 python-versions = "*"
-version = "0.7.2"
+version = "0.8.0"
 
 [package.dependencies]
 unidecode = "*"
@@ -115,16 +115,25 @@ description = "Python client for Sentry (https://getsentry.com)"
 name = "sentry-sdk"
 optional = true
 python-versions = "*"
-version = "0.11.2"
+version = "0.14.0"
 
 [package.dependencies]
 certifi = "*"
-urllib3 = "*"
+urllib3 = ">=1.10.0"
 
 [package.extras]
+aiohttp = ["aiohttp (>=3.5)"]
+beam = ["beam (>=2.12)"]
 bottle = ["bottle (>=0.12.13)"]
+celery = ["celery (>=3)"]
+django = ["django (>=1.8)"]
 falcon = ["falcon (>=1.4)"]
-flask = ["flask (>=0.8)", "blinker (>=1.1)"]
+flask = ["flask (>=0.11)", "blinker (>=1.1)"]
+pyspark = ["pyspark (>=2.4.4)"]
+rq = ["0.6"]
+sanic = ["sanic (>=0.8)"]
+sqlalchemy = ["sqlalchemy (>=1.2)"]
+tornado = ["tornado (>=5)"]
 
 [[package]]
 category = "main"
@@ -181,7 +190,7 @@ lastfm = ["pylast"]
 sentry = ["sentry-sdk"]
 
 [metadata]
-content-hash = "40c3713cce25fc266b874a7125679dbc07a2b4d8fdc39026a241426336a97ad5"
+content-hash = "69d0eb31d0a628743b6fef5942898c4faddb9998ba5bb42116d4bfce42a611c9"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -214,7 +223,7 @@ irc3 = [
     {file = "irc3-1.1.4.tar.gz", hash = "sha256:17da0ac1ecdbc4f097913cc4205749dd232435b0476f5396efcf65c29867f996"},
 ]
 markovify = [
-    {file = "markovify-0.7.2.tar.gz", hash = "sha256:d0fe35af9d90492fb6e2d50ed99b96ff6425ccabed308200a51640da5512fd22"},
+    {file = "markovify-0.8.0.tar.gz", hash = "sha256:c533a2e1aba8148bb98031b7159e8bf1a276c61db53d2e882ecb74fa5603a4f4"},
 ]
 pylast = [
     {file = "pylast-3.2.0-py2.py3-none-any.whl", hash = "sha256:fd92e969fc7dafb2b693e7124ed6cd6c4fc3382c9eaa273025a845f9410ddcd5"},
@@ -225,8 +234,8 @@ requests = [
     {file = "requests-2.22.0.tar.gz", hash = "sha256:11e007a8a2aa0323f5a921e9e6a2d7e4e67d9877e85773fba9ba6419025cbeb4"},
 ]
 sentry-sdk = [
-    {file = "sentry-sdk-0.11.2.tar.gz", hash = "sha256:b4edcb1296fee107439345d0f8b23432b8732b7e28407f928367d0a4a36301a9"},
-    {file = "sentry_sdk-0.11.2-py2.py3-none-any.whl", hash = "sha256:528f936118679e9a52dacb96bfefe20acb5d63e0797856c64a582cc3c2bc1f9e"},
+    {file = "sentry-sdk-0.14.0.tar.gz", hash = "sha256:8e2d38dc58dc992280487e553ec3d97a424e4d179f4fad802ef3b08f64ccf4d8"},
+    {file = "sentry_sdk-0.14.0-py2.py3-none-any.whl", hash = "sha256:9b59e155229ea7d46a52b5c025d8c3c6d591e9dd9bb5f5f47310b2bb430038a8"},
 ]
 soupsieve = [
     {file = "soupsieve-1.9.5-py2.py3-none-any.whl", hash = "sha256:bdb0d917b03a1369ce964056fc195cfdff8819c40de04695a80bc813c3cfa1f5"},
