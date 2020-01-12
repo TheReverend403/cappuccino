@@ -29,33 +29,17 @@ from urllib.parse import urlparse
 import irc3
 import re
 import requests
+from requests import Session
 
 URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
-
 BRACES = [('{', '}'), ('<', '>'), ('[', ']'), ('(', ')')]
 DEFAULT_MAX_BYTES = 655360  # 64K
 MAX_TITLE_LENGTH = 128
-USER_AGENT = 'cappuccino (https://github.com/FoxDev/cappuccino)'
 REQUEST_TIMEOUT = 5
 HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.IGNORECASE | re.UNICODE)
-
 FORCE_IPV4_HOSTNAMES = ['www.youtube.com', 'youtube.com', 'youtu.be']
-
 HTML_MIMETYPES = ['text/html', 'application/xhtml+xml']
 REQUEST_CHUNK_SIZE = 256  # Bytes
-REQUEST_HEADERS = {
-    'User-Agent': USER_AGENT,
-    'Accept-Language': 'en-GB,en-US,en;q=0.5'
-}
-
-REQUEST_OPTIONS = {
-    'timeout': REQUEST_TIMEOUT,
-    'stream': True,
-    'allow_redirects': True,
-    'verify': False,
-    'headers': REQUEST_HEADERS
-}
-
 ALLOWED_CONTENT_TYPES = ['text', 'video', 'application']
 
 
@@ -107,19 +91,19 @@ def _read_stream(response: requests.Response, max_bytes: int = DEFAULT_MAX_BYTES
 
     for chunk in response.iter_content(REQUEST_CHUNK_SIZE):
         if time.time() - start_time >= REQUEST_TIMEOUT:
-            raise RequestTimeout('Request timed out')
+            raise RequestTimeout(f'Request timed out ({REQUEST_TIMEOUT} seconds).')
         if not chunk:  # filter out keep-alive new chunks
             continue
         content_length = content.write(chunk.decode('UTF-8', errors='ignore'))
         if '</title>' in content.getvalue():
             break
         if content_length > max_bytes:
-            raise ResponseBodyTooLarge(f'Couldn\'t find page title in less than {size_fmt(content_length)}')
+            raise ResponseBodyTooLarge(f'Couldn\'t find the page title within {size_fmt(content_length)}.')
 
     return content.getvalue()
 
 
-def _parse_url(url: str):
+def _parse_url(url: str, session=requests):
     hostname = urlparse(url).hostname
     for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
         ip = ipaddress.ip_address(sockaddr[0])
@@ -127,7 +111,7 @@ def _parse_url(url: str):
             raise InvalidIPAddress(f'{hostname} is not a publicly routable address.')
 
     hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
-    with closing(requests.get(url, **REQUEST_OPTIONS)) as response:
+    with session.get(url) as response:
         if response.status_code != requests.codes.ok:
             response.raise_for_status()
 
@@ -172,25 +156,35 @@ def _clean_url(url: str):
 class UrlInfo(object):
 
     requires = [
-        'plugins.formatting'
+        'plugins.formatting',
+        'plugins.botui'
     ]
 
     def __init__(self, bot):
         self.bot = bot
         self.load_config()
         socket.getaddrinfo = getaddrinfo_wrapper
+
+        self.ignore_nicks = []
+        self.ignore_hostnames = []
+
         requests.packages.urllib3.disable_warnings()
+        self.session = Session()
+
+        request_headers = self.bot.request_headers.copy()
+        request_headers.update({'stream': 'true', 'verify': 'false'})
+        self.session.headers.update(request_headers)
 
     def load_config(self):
         try:
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
         except KeyError:
-            self.ignore_nicks = []
+            pass
 
         try:
             self.ignore_hostnames = self.bot.config[__name__]['ignore_hostnames'].split()
         except KeyError:
-            self.ignore_hostnames = []
+            pass
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{0}).*'.format(URL_FINDER.pattern))
     def on_url(self, mask, target, data):
@@ -212,7 +206,7 @@ class UrlInfo(object):
             messages = []
             self.bot.log.debug(f'Retrieving page titles for {urls}')
 
-            future_to_url = {executor.submit(_parse_url, url): url for url in urls}
+            future_to_url = {executor.submit(_parse_url, url, self.session): url for url in urls}
             for future in concurrent.futures.as_completed(future_to_url):
                 url = future_to_url[future]
                 hostname = urlparse(url).hostname

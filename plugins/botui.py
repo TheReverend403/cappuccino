@@ -41,7 +41,13 @@ class BotUI(object):
         self.bot = bot
         self.bot.nickprefix = NickPrefix
         self.bot.version = subprocess.check_output(['git', 'describe']).decode('UTF-8').strip()
-
+        self.bot.request_headers = {
+            'User-Agent': 'cappuccino (https://github.com/FoxDev/cappuccino)',
+            'Accept-Language': 'en-GB,en-US,en;q=0.5',
+            'timeout': '5',
+            'allow_redirects': 'true',
+        }
+        
     @irc3.extend
     def is_chanop(self, channel: str, nick: str) -> bool:
         for mode in NickPrefix:

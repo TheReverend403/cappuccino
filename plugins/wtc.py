@@ -13,37 +13,23 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-from contextlib import closing
-
 import irc3
-import requests
 from irc3.plugins.command import command
-from requests import RequestException
-
-USER_AGENT = 'cappuccino (https://github.com/FoxDev/cappuccino)'
-
-REQUEST_HEADERS = {
-    'User-Agent': USER_AGENT,
-    'Accept-Language': 'en-GB,en-US,en;q=0.5'
-}
-
-REQUEST_OPTIONS = {
-    'timeout': 3,
-    'allow_redirects': True,
-    'headers': REQUEST_HEADERS
-}
+from requests import RequestException, Session
 
 
 @irc3.plugin
 class BotUI(object):
-
     requires = [
         'irc3.plugins.command',
-        'plugins.formatting'
+        'plugins.formatting',
+        'plugins.botui'
     ]
 
     def __init__(self, bot):
         self.bot = bot
+        self.session = Session()
+        self.session.headers.update(self.bot.request_headers)
 
     @command(permission='view', aliases=['whatthecommit'])
     def wtc(self, mask, target, args):
@@ -53,8 +39,7 @@ class BotUI(object):
         """
 
         try:
-            with closing(requests.get('https://whatthecommit.com/index.txt', **REQUEST_OPTIONS)) as response:
+            with self.session.get('https://whatthecommit.com/index.txt') as response:
                 yield f'git commit -m "{response.text.strip()}"'
         except RequestException as ex:
             yield ex.strerror
-
