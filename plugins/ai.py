@@ -24,13 +24,18 @@ from irc3.plugins.command import command
 
 CMD_PATTERN = re.compile(r'^\s*([.!~`$])+')
 SED_CHECKER = re.compile(r"^\s*s[/|\\!.,].+")
+URL_CHECKER = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
 
 
 def should_ignore_message(line):
     if not line:
         return
 
-    return CMD_PATTERN.match(line) or SED_CHECKER.match(line) or line.startswith('[') or line.startswith('\x01ACTION ')
+    return CMD_PATTERN.match(line) or\
+        SED_CHECKER.match(line) or\
+        URL_CHECKER.match(line) or\
+        line.startswith('[') or\
+        line.startswith('\x01ACTION ')
 
 
 @irc3.plugin
@@ -74,7 +79,7 @@ class Ai(object):
 
     def _add_line(self, line: str, channel: str):
         cursor = self.db_conn.cursor()
-        cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (line, channel))
+        cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (self.bot.strip_formatting(line), channel))
         self.db_conn.commit()
 
     def _get_lines(self, channel: str = None) -> list:
@@ -85,7 +90,7 @@ class Ai(object):
         else:
             cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (self.max_loaded_lines,))
 
-        lines = [self.bot.strip_formatting(line[0]) for line in cursor.fetchall()]
+        lines = [self.bot.strip_formatting(line[0]) for line in cursor.fetchall() if not URL_CHECKER.match(line[0])]
         return lines if len(lines) > 0 else None
 
     def _line_count(self, channel: str = None) -> int:
