@@ -75,6 +75,8 @@ class Ai(object):
         cursor = self.db_conn.cursor()
         cursor.execute('CREATE TABLE IF NOT EXISTS corpus (line TEXT PRIMARY KEY, channel TEXT NOT NULL)')
         cursor.execute('CREATE TABLE IF NOT EXISTS channels (name TEXT PRIMARY KEY, status INT DEFAULT 0)')
+        # Delete any lines containing URLs to clear up the DB for commit 1c9792d0bb8fcc56883ba94b50bdafd52532d9fe
+        cursor.execute("DELETE FROM corpus WHERE line LIKE '%://%'")
         self.db_conn.commit()
 
     def _add_line(self, line: str, channel: str):
@@ -90,7 +92,7 @@ class Ai(object):
         else:
             cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (self.max_loaded_lines,))
 
-        lines = [self.bot.strip_formatting(line[0]) for line in cursor.fetchall() if not URL_CHECKER.match(line[0])]
+        lines = [self.bot.strip_formatting(line[0]) for line in cursor.fetchall()]
         return lines if len(lines) > 0 else None
 
     def _line_count(self, channel: str = None) -> int:
