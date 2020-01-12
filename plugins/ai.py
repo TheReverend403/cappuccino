@@ -24,7 +24,7 @@ from irc3.plugins.command import command
 
 CMD_PATTERN = re.compile(r'^\s*([.!~`$])+')
 SED_CHECKER = re.compile(r"^\s*s[/|\\!.,].+")
-URL_CHECKER = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
+URL_CHECKER = re.compile(r'.*https?://.*', re.IGNORECASE | re.UNICODE)
 
 
 def should_ignore_message(line):
