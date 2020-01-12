@@ -1,9 +1,10 @@
 Cappuccino
 ======
 
-An IRC bot providing various utilities primarily for [#rice@irc.rizon.net](https://qchat.rizon.net/?channels=rice). 
+A set of [irc3](https://github.com/gawel/irc3) plugins providing various utilities primarily for [#rice@irc.rizon.net](https://qchat.rizon.net/?channels=rice). 
 
 Requires Python 3.6 or above.
+
 
 # Installation
 
