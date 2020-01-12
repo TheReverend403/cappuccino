@@ -39,10 +39,9 @@ class Sentry(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.version = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('UTF-8')
 
         try:
-            sentry_sdk.init(self.bot.config[__name__]['dsn'], before_send=before_send, release=self.version)
+            sentry_sdk.init(self.bot.config[__name__]['dsn'], before_send=before_send, release=self.bot.version)
         except KeyError:
             self.bot.log.warn('Missing Sentry DSN')
             return

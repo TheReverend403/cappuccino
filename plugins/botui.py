@@ -14,6 +14,7 @@
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
 import platform
+import subprocess
 from enum import Enum
 
 import irc3
@@ -39,6 +40,7 @@ class BotUI(object):
     def __init__(self, bot):
         self.bot = bot
         self.bot.nickprefix = NickPrefix
+        self.bot.version = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('UTF-8')
 
     @irc3.extend
     def is_chanop(self, channel: str, nick: str) -> bool:
@@ -62,7 +64,7 @@ class BotUI(object):
             %%bots
         """
         pyver = platform.python_version()
-        yield f'Reporting in! [Python {pyver}] https://github.com/FoxDev/cappuccino'
+        yield f'Reporting in! [cappuccino {self.bot.version}, Python {pyver}] https://github.com/FoxDev/cappuccino'
 
     @command(permission='admin', show_in_help_list=False)
     def join(self, mask, target, args):
