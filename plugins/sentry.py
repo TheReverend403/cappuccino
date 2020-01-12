@@ -35,6 +35,7 @@ class Sentry(object):
 
     requires = [
         'irc3.plugins.command',
+        'plugins.botui'
     ]
 
     def __init__(self, bot):
