@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ricedb"
+name = "cappuccino"
 version = "0.1.0"
 description = ""
 authors = ["Lee Watson <rev@revthefox.co.uk>"]
