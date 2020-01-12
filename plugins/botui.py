@@ -40,7 +40,7 @@ class BotUI(object):
     def __init__(self, bot):
         self.bot = bot
         self.bot.nickprefix = NickPrefix
-        self.bot.version = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('UTF-8').strip()
+        self.bot.version = subprocess.check_output(['git', 'describe']).decode('UTF-8').strip()
 
     @irc3.extend
     def is_chanop(self, channel: str, nick: str) -> bool:
