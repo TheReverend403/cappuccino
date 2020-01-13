@@ -12,7 +12,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
-
+import os
 import random
 import re
 
@@ -46,8 +46,8 @@ class Ai(object):
     ]
 
     metadata = MetaData()
-    corpus = Table('corpus', metadata, Column('line', String, primary_key=True), Column('channel', String))
-    channels = Table('channels', metadata, Column('name', String, primary_key=True), Column('status', Boolean))
+    corpus = Table('ai_corpus', metadata, Column('line', String, primary_key=True), Column('channel', String))
+    channels = Table('ai_channels', metadata, Column('name', String, primary_key=True), Column('status', Boolean))
 
     def __init__(self, bot):
         self.bot = bot
@@ -62,6 +62,7 @@ class Ai(object):
             pass
 
         self.metadata.create_all(self.db)
+        self.migrate()
 
     def _add_line(self, line: str, channel: str):
         try:
@@ -106,6 +107,33 @@ class Ai(object):
             update_stmt = self.channels.update().where(self.channels.c.name == channel).values(status=1)
 
         self.db.execute(update_stmt)
+
+    def migrate(self):
+        if not self.bot.config[__name__]['database'].startswith('sqlite://') and os.path.exists('data/ai.sqlite'):
+            self.bot.log.info('Found ai.sqlite, migrating data.')
+            sqlite_db = create_engine('sqlite:///data/ai.sqlite')
+
+            corpus_results = sqlite_db.execute('SELECT * FROM corpus')
+            channel_results = sqlite_db.execute('SELECT * FROM channels')
+
+            corpus_insert = self.corpus.insert(). \
+                values([
+                    {'line': row[0], 'channel': row[1]} for row in corpus_results
+                ])
+
+            channels_insert = self.channels.insert(). \
+                values([
+                    {'name': row[0], 'status': row[1]} for row in channel_results
+                ])
+
+            try:
+                self.db.execute(corpus_insert)
+                self.db.execute(channels_insert)
+            except IntegrityError:
+                pass
+
+            self.bot.log.info('Migration complete, renaming old sqlite database.')
+            os.rename('data/ai.sqlite', 'data/ai.sqlite.bak')
 
     @command
     def ai(self, mask, target, args):
