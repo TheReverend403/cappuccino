@@ -13,7 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import os
 import platform
 import subprocess
 from enum import Enum
@@ -52,8 +51,6 @@ class BotUI(object):
             'allow_redirects': 'true',
             'verify': 'false'
         })
-
-        os.makedirs('data', exist_ok=True)
 
     @irc3.extend
     def is_chanop(self, channel: str, nick: str) -> bool:
