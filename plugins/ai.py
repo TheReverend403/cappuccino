@@ -126,13 +126,13 @@ class Ai(object):
                 values([
                     {'line': row[0], 'channel': row[1]}
                     for row in corpus_results if not formatting_codes_regex.match(row[0])
-            ])
+                ])
 
             channels_insert = self.channels.insert(). \
                 values([
                     {'name': row[0], 'status': row[1]}
                     for row in channel_results if row[0].startswith('#')
-            ])
+                ])
 
             try:
                 self.db.execute(channels_insert)
