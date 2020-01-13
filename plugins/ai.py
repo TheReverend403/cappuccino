@@ -12,6 +12,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
+
 import os
 import random
 import re
@@ -109,7 +110,7 @@ class Ai(object):
         self.db.execute(update_stmt)
 
     def migrate(self):
-        if not self.bot.config[__name__]['database'].startswith('sqlite://') and os.path.exists('data/ai.sqlite'):
+        if not self.db.url.startswith('sqlite://') and os.path.exists('data/ai.sqlite'):
             self.bot.log.info('Found ai.sqlite, migrating data.')
             sqlite_db = create_engine('sqlite:///data/ai.sqlite')
 
