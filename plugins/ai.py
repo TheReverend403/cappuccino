@@ -24,7 +24,7 @@ from sqlalchemy import Boolean, Column, MetaData, String, Table, create_engine, 
 from sqlalchemy.exc import IntegrityError
 
 CMD_PATTERN = re.compile(r'^\s*([.!~`$])+')
-SED_CHECKER = re.compile(r"^\s*s[/|\\!.,].+")
+SED_CHECKER = re.compile(r'^\s*s[/|\\!.,].+')
 URL_CHECKER = re.compile(r'.*https?://.*', re.IGNORECASE | re.UNICODE)
 
 
@@ -50,10 +50,11 @@ class Ai(object):
     corpus = Table('ai_corpus', metadata, Column('line', String, primary_key=True), Column('channel', String))
     channels = Table('ai_channels', metadata, Column('name', String, primary_key=True), Column('status', Boolean))
 
+    ignore_nicks = []
+    max_loaded_lines = 25000
+
     def __init__(self, bot):
         self.bot = bot
-        self.ignore_nicks = []
-        self.max_loaded_lines = 10000
         self.db = create_engine(self.bot.config[__name__]['database'])
 
         try:
