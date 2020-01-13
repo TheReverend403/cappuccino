@@ -13,14 +13,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-from pathlib import Path
 import random
 import re
-import sqlite3
 
 import irc3
 import markovify
 from irc3.plugins.command import command
+from sqlalchemy import Boolean, Column, MetaData, String, Table, create_engine, func, select
+from sqlalchemy.exc import IntegrityError
 
 CMD_PATTERN = re.compile(r'^\s*([.!~`$])+')
 SED_CHECKER = re.compile(r"^\s*s[/|\\!.,].+")
@@ -31,95 +31,81 @@ def should_ignore_message(line):
     if not line:
         return
 
-    return CMD_PATTERN.match(line) or\
-        SED_CHECKER.match(line) or\
-        URL_CHECKER.match(line) or\
-        line.startswith('[') or\
+    return CMD_PATTERN.match(line) or \
+        SED_CHECKER.match(line) or \
+        URL_CHECKER.match(line) or \
+        line.startswith('[') or \
         line.startswith('\x01ACTION ')
 
 
 @irc3.plugin
 class Ai(object):
-
     requires = [
         'plugins.botui',
         'plugins.formatting'
     ]
 
+    metadata = MetaData()
+    corpus = Table('corpus', metadata, Column('line', String, primary_key=True), Column('channel', String))
+    channels = Table('channels', metadata, Column('name', String, primary_key=True), Column('status', Boolean))
+
     def __init__(self, bot):
         self.bot = bot
-        self.datadir = Path('data')
-        self.database = self.datadir / 'ai.sqlite'
-        self.db_conn = None
         self.ignore_nicks = []
         self.max_loaded_lines = 10000
+        self.db = create_engine(self.bot.config[__name__]['database'])
 
         try:
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
-        except KeyError:
-            pass
-
-        try:
             self.max_loaded_lines = self.bot.config[__name__]['max_loaded_lines']
         except KeyError:
             pass
 
-        if not self.database.exists():
-            self.datadir.mkdir(exist_ok=True)
-            self.bot.log.debug(f'Created {self.datadir} directory')
-
-        self._init_db()
-
-    def _init_db(self):
-        self.db_conn = sqlite3.connect(str(self.database))
-        cursor = self.db_conn.cursor()
-        cursor.execute('CREATE TABLE IF NOT EXISTS corpus (line TEXT PRIMARY KEY, channel TEXT NOT NULL)')
-        cursor.execute('CREATE TABLE IF NOT EXISTS channels (name TEXT PRIMARY KEY, status INT DEFAULT 0)')
-        # Delete any lines containing URLs to clear up the DB for commit 1c9792d0bb8fcc56883ba94b50bdafd52532d9fe
-        cursor.execute("DELETE FROM corpus WHERE line LIKE '%://%'")
-        self.db_conn.commit()
+        self.metadata.create_all(self.db)
 
     def _add_line(self, line: str, channel: str):
-        cursor = self.db_conn.cursor()
-        cursor.execute('INSERT OR IGNORE INTO corpus VALUES (?,?)', (self.bot.strip_formatting(line), channel))
-        self.db_conn.commit()
+        try:
+            insert_stmt = self.corpus.insert().values(line=self.bot.strip_formatting(line), channel=channel)
+            self.db.execute(insert_stmt)
+        except IntegrityError:
+            pass
 
     def _get_lines(self, channel: str = None) -> list:
-        cursor = self.db_conn.cursor()
+        select_stmt = select([self.corpus.c.line])
         if channel:
-            cursor.execute('SELECT * FROM corpus WHERE channel=? ORDER BY RANDOM() LIMIT ?',
-                           (channel, self.max_loaded_lines))
+            select_stmt = select_stmt.where(self.corpus.c.channel == channel)\
+                .order_by(func.random()).limit(self.max_loaded_lines)
         else:
-            cursor.execute('SELECT * FROM corpus ORDER BY RANDOM() LIMIT ?', (self.max_loaded_lines,))
+            select_stmt = select_stmt.order_by(func.random()).limit(self.max_loaded_lines)
 
-        lines = [self.bot.strip_formatting(line[0]) for line in cursor.fetchall()]
+        lines = [self.bot.strip_formatting(result.line) for result in self.db.execute(select_stmt)]
         return lines if len(lines) > 0 else None
 
     def _line_count(self, channel: str = None) -> int:
-        cursor = self.db_conn.cursor()
+        select_stmt = select([func.count(self.corpus.c.line)])
         if channel:
-            cursor.execute('SELECT COUNT(*) FROM corpus WHERE channel=?', (channel,))
-        else:
-            cursor.execute('SELECT COUNT(*) FROM corpus')
-        return cursor.fetchone()[0]
+            select_stmt = select_stmt.where(self.corpus.c.channel == channel)
+
+        return self.db.execute(select_stmt).scalar()
 
     def is_active(self, channel: str) -> bool:
-        cursor = self.db_conn.cursor()
-        cursor.execute('SELECT status FROM channels WHERE name=?', (channel,))
-        result = cursor.fetchone()
+        select_stmt = select([self.channels.c.status]).where(self.channels.c.name == channel)
+        result = self.db.execute(select_stmt).first()
+
         if not result:
-            cursor.execute('INSERT INTO channels VALUES (?,?)', (channel, False))
-            self.db_conn.commit()
+            insert_stmt = self.channels.insert().values(name=channel, status=0)
+            self.db.execute(insert_stmt)
             return False
-        return result[0]
+
+        return result.status
 
     def toggle(self, channel: str):
-        cursor = self.db_conn.cursor()
         if self.is_active(channel):
-            cursor.execute('UPDATE channels SET status=0 WHERE name=?', (channel,))
+            update_stmt = self.channels.update().where(self.channels.c.name == channel).values(status=0)
         else:
-            cursor.execute('UPDATE channels SET status=1 WHERE name=?', (channel,))
-        self.db_conn.commit()
+            update_stmt = self.channels.update().where(self.channels.c.name == channel).values(status=1)
+
+        self.db.execute(update_stmt)
 
     @command
     def ai(self, mask, target, args):

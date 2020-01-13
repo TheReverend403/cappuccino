@@ -53,8 +53,6 @@ autojoins =
 # Default to 1
 # flood_rate_delay = 5
 
-storage = json://data.json
-
 [ctcp]
 version = cappuccino (https://github.com/FoxDev/cappuccino)
 
@@ -69,11 +67,10 @@ ignore_nicks = Nick1 Nick2
 ignore_hostnames = example.com
 
 [plugins.ai]
+database = sqlite:///data/ai.sqlite
 ignore_nicks = ExampleUser
 
 [irc3.plugins.command]
-# command plugin configuration
-
 # set command char
 cmd = .
 
