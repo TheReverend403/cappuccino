@@ -91,6 +91,9 @@ class Ai(object):
         return self.db.execute(select_stmt).scalar()
 
     def is_active(self, channel: str) -> bool:
+        if not channel.startswith('#'):
+            return False
+
         select_stmt = select([self.channels.c.status]).where(self.channels.c.name == channel)
         result = self.db.execute(select_stmt).scalar()
 
