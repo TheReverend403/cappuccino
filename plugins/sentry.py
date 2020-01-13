@@ -17,6 +17,7 @@ import irc3
 import sentry_sdk
 from irc3.plugins.command import command
 from requests import RequestException
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
 
 def _before_send(event, hint):
@@ -39,7 +40,10 @@ class Sentry(object):
         self.bot = bot
 
         try:
-            sentry_sdk.init(self.bot.config[__name__]['dsn'], before_send=_before_send, release=self.bot.version)
+            sentry_sdk.init(self.bot.config[__name__]['dsn'],
+                            before_send=_before_send,
+                            release=self.bot.version,
+                            integrations=[SqlalchemyIntegration()])
         except KeyError:
             self.bot.log.warn('Missing Sentry DSN')
             return
