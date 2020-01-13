@@ -117,13 +117,14 @@ class Ai(object):
         if not str(self.db.url).startswith('sqlite://') and os.path.exists('data/ai.sqlite'):
             self.bot.log.info('Found ai.sqlite, migrating data.')
             sqlite_db = create_engine('sqlite:///data/ai.sqlite')
+            irc_codes_regex = re.compile(r'\x1f|\x02|\x1D|\x03(?:\d{1,2}(?:,\d{1,2})?)?', re.UNICODE)
 
             corpus_results = sqlite_db.execute('SELECT * FROM corpus')
             channel_results = sqlite_db.execute('SELECT * FROM channels')
-
             corpus_insert = self.corpus.insert(). \
                 values([
-                    {'line': self.bot.strip_formatting(row[0]), 'channel': row[1]} for row in corpus_results
+                    {'line': self.bot.strip_formatting(row[0]), 'channel': row[1]}
+                    for row in corpus_results if not irc_codes_regex.match(row[0])
                 ])
 
             channels_insert = self.channels.insert(). \
