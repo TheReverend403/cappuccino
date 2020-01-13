@@ -80,7 +80,7 @@ class Ai(object):
         else:
             select_stmt = select_stmt.order_by(func.random()).limit(self.max_loaded_lines)
 
-        lines = [self.bot.strip_formatting(result.line) for result in self.db.execute(select_stmt)]
+        lines = [result.line for result in self.db.execute(select_stmt)]
         return lines if len(lines) > 0 else None
 
     def _line_count(self, channel: str = None) -> int:
@@ -119,7 +119,7 @@ class Ai(object):
 
             corpus_insert = self.corpus.insert(). \
                 values([
-                    {'line': row[0], 'channel': row[1]} for row in corpus_results
+                    {'line': self.bot.strip_formatting(row[0]), 'channel': row[1]} for row in corpus_results
                 ])
 
             channels_insert = self.channels.insert(). \
@@ -136,7 +136,7 @@ class Ai(object):
             self.bot.log.info('Migration complete, renaming old sqlite database.')
             os.rename('data/ai.sqlite', 'data/ai.sqlite.bak')
 
-    @command
+    @command()
     def ai(self, mask, target, args):
         """Toggles chattiness.
 
