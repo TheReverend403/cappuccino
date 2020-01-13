@@ -15,20 +15,18 @@
 
 import cgi
 import concurrent
+import html
 import ipaddress
+import random
+import re
 import socket
 import time
-from contextlib import closing
-
-import html
-import random
-from bs4 import BeautifulSoup
 from io import StringIO
 from urllib.parse import urlparse
 
 import irc3
-import re
 import requests
+from bs4 import BeautifulSoup
 from requests import Session
 
 URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
@@ -111,7 +109,7 @@ def _parse_url(url: str, session=requests):
             raise InvalidIPAddress(f'{hostname} is not a publicly routable address.')
 
     hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
-    with session.get(url) as response:
+    with session.get(url, stream=True) as response:
         if response.status_code != requests.codes.ok:
             response.raise_for_status()
 
@@ -172,7 +170,7 @@ class UrlInfo(object):
         self.session = Session()
 
         request_headers = self.bot.request_headers.copy()
-        request_headers.update({'stream': 'true', 'verify': 'false'})
+        request_headers.update({'verify': 'false'})
         self.session.headers.update(request_headers)
 
     def load_config(self):
