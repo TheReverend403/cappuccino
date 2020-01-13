@@ -16,6 +16,7 @@
 import os
 import random
 import re
+import sys
 
 import irc3
 import markovify
@@ -133,8 +134,9 @@ class Ai(object):
             try:
                 self.db.execute(corpus_insert)
                 self.db.execute(channels_insert)
-            except IntegrityError:
-                pass
+            except IntegrityError as exc:
+                self.bot.log.error(exc)
+                sys.exit(1)
 
             self.bot.log.info('Migration complete, renaming old sqlite database.')
             os.rename('data/ai.sqlite', 'data/ai.sqlite.bak')
