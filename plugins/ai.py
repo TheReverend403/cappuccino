@@ -128,7 +128,8 @@ class Ai(object):
 
             channels_insert = self.channels.insert(). \
                 values([
-                    {'name': row[0], 'status': row[1]} for row in channel_results
+                    {'name': row[0], 'status': row[1]}
+                    for row in channel_results if row[0].startswith('#')
                 ])
 
             try:
