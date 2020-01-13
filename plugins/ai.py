@@ -42,7 +42,7 @@ def _should_ignore_message(line):
 @irc3.plugin
 class Ai(object):
     requires = [
-        'plugins.botui',
+        'plugins.database',
         'plugins.formatting'
     ]
 
@@ -55,7 +55,7 @@ class Ai(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.db = create_engine(self.bot.config[__name__]['database'])
+        self.db = self.bot.database
 
         try:
             self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()

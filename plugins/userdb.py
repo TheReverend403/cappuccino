@@ -12,13 +12,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
-
-import signal
-import sys
+import os
 import threading
-from datetime import datetime
 
 import bottle
+from sqlalchemy import Column, JSON, MetaData, String, Table, desc, func, select
+from sqlalchemy.exc import IntegrityError
 
 try:
     import ujson as json
@@ -26,31 +25,29 @@ except ImportError:
     import json
 
 import irc3
-from pathlib import Path
 
 
 def _strip_path():
     bottle.request.environ['PATH_INFO'] = bottle.request.environ['PATH_INFO'].rstrip('/')
 
 
-def _http_json_dump(data: dict):
-    bottle.response.content_type = 'application/json'
-
-    return json.dumps(dict(sorted(data.items(), reverse=True)))
-
-
 @irc3.plugin
 class UserDB(object):
-    data = {}
+
+    requires = [
+        'plugins.database'
+    ]
+
+    metadata = MetaData()
+    ricedb = Table('ricedb', metadata,
+                   Column('nick', String, primary_key=True),
+                   Column('data', JSON))
 
     def __init__(self, bot):
         self.bot = bot
-        self.root = Path('data')
-        self.file = self.root / 'userdb.json'
-        self.last_write = datetime.now()
-
-        for sig in (signal.SIGINT, signal.SIGTERM):
-            signal.signal(sig, self._shutdown_hook)
+        self.db = self.bot.database
+        self.metadata.create_all(self.db)
+        self._migrate()
 
         try:
             self.config = self.bot.config[__name__]
@@ -60,31 +57,8 @@ class UserDB(object):
         except KeyError:
             host, port = '127.0.0.1', 8080
 
-        try:
-            with self.file.open('r') as fd:
-                self.data.update(json.load(fd))
-        except FileNotFoundError:
-            # Database file itself doesn't need to exist on first run, it will be created on first write.
-            if not self.file.exists():
-                # Copy ricedb.json from old installations if it exists.
-                old_db_file = Path(self.root) / 'ricedb.json'
-                if old_db_file.exists():
-                    old_db_file.replace(self.file)
-                    with self.file.open('r') as fd:
-                        self.data.update(json.load(fd))
-                else:
-                    self.root.mkdir(exist_ok=True)
-                    self.file.touch(exist_ok=True)
-                    self.bot.log.debug(f'Created {self.root} directory')
-
-        # If any user has an uppercase in their nick, convert the whole DB to lowercase.
-        db_copy = self.data.copy()
-        for user, data in db_copy.items():
-            if any(c.isupper() for c in user):
-                self.set_user_value(user, self.data.pop(user))
-
         bottle.hook('before_request')(_strip_path)
-        bottle.route('/')(lambda: _http_json_dump(self.data))
+        bottle.route('/')(lambda: self._json_dump())
         bottle_thread = threading.Thread(
             target=bottle.run,
             kwargs={'quiet': True, 'host': host, 'port': port},
@@ -95,42 +69,69 @@ class UserDB(object):
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
+        query = select([self.ricedb.c.data]).where(func.lower(self.ricedb.c.nick) == username.lower())
+        result = self.db.execute(query).scalar()
+        if result is None:
+            return None
+
         try:
-            return self.data.get(username.lower())[key]
+            return result[key]
         except (KeyError, TypeError):
             return None
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
+        query = select([self.ricedb.c.data]).where(func.lower(self.ricedb.c.nick) == username.lower())
+        result = self.db.execute(query).scalar()
+
         try:
-            del self.data[username.lower()][key]
+            del result[key]
         except KeyError:
             pass
 
-        self._sync()
+        update = self.ricedb.update().where(func.lower(self.ricedb.c.nick) == username.lower()).values(data=result)
+        self.db.execute(update)
 
     @irc3.extend
     def set_user_value(self, username: str, key, value=None):
+        query = select([self.ricedb.c.data]).where(func.lower(self.ricedb.c.nick) == username.lower())
+        result = self.db.execute(query).scalar()
         data = {key: value} if value else key
-        username = username.lower()
 
         try:
-            self.data[username].update(data)
+            result.update(data)
         except KeyError:
-            self.data[username] = data
+            result = data
         except ValueError:
             self.del_user_value(username, key)
+            return
 
-        self._sync()
+        update = self.ricedb.update().where(func.lower(self.ricedb.c.nick) == username.lower()).values(data=result)
+        self.db.execute(update)
 
-    def _sync(self, force=False):
-        # Only write to disk once every 5 minutes so seen.py doesn't kill performance with constant writes.
-        if force or abs((datetime.now() - self.last_write).seconds) >= 60 * 5:
-            with self.file.open('w') as fd:
-                json.dump(self.data, fd)
-            self.last_write = datetime.now()
-            self.bot.log.debug('Synced database to disk.')
+    def _migrate(self):
+        if os.path.exists('data/userdb.json'):
+            self.bot.log.info('Found userdb.json, migrating data.')
+            with open('data/userdb.json', 'r') as fd:
+                data = json.load(fd)
 
-    def _shutdown_hook(self, signo, frame):
-        self._sync(force=True)
-        sys.exit(0)
+                rice_insert = self.ricedb.insert(). \
+                    values([
+                        {'nick': user, 'data': data[user]}
+                        for user in data.keys()
+                    ])
+
+                try:
+                    self.db.execute(rice_insert)
+                except IntegrityError:
+                    pass
+
+                self.bot.log.info('Migration complete, renaming old file.')
+                os.rename('data/userdb.json', 'data/userdb.json.bak')
+
+    def _json_dump(self):
+        bottle.response.content_type = 'application/json'
+        result = self.db.execute(self.ricedb.select().order_by(desc(self.ricedb.c.nick)))
+        data = {row[0]: row[1] for row in result}
+
+        return json.dumps(dict(data.items()))
