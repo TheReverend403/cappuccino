@@ -91,14 +91,14 @@ class Ai(object):
 
     def is_active(self, channel: str) -> bool:
         select_stmt = select([self.channels.c.status]).where(self.channels.c.name == channel)
-        result = self.db.execute(select_stmt).first()
+        result = self.db.execute(select_stmt).scalar()
 
-        if not result:
+        if result is None:
             insert_stmt = self.channels.insert().values(name=channel, status=0)
             self.db.execute(insert_stmt)
             return False
 
-        return result.status
+        return result
 
     def toggle(self, channel: str):
         if self.is_active(channel):
