@@ -110,7 +110,7 @@ class Ai(object):
         self.db.execute(update_stmt)
 
     def migrate(self):
-        if not self.db.url.startswith('sqlite://') and os.path.exists('data/ai.sqlite'):
+        if not str(self.db.url).startswith('sqlite://') and os.path.exists('data/ai.sqlite'):
             self.bot.log.info('Found ai.sqlite, migrating data.')
             sqlite_db = create_engine('sqlite:///data/ai.sqlite')
 
