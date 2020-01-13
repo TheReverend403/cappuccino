@@ -69,15 +69,9 @@ class UserDB(object):
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
-        query = select([self.ricedb.c.data]).where(func.lower(self.ricedb.c.nick) == username.lower())
+        query = select([self.ricedb.c.data[key]]).where(func.lower(self.ricedb.c.nick) == username.lower())
         result = self.db.execute(query).scalar()
-        if result is None:
-            return None
-
-        try:
-            return result[key]
-        except (KeyError, TypeError):
-            return None
+        return result
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
