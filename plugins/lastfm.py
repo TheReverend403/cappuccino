@@ -17,14 +17,13 @@ import irc3
 import pylast
 from irc3.plugins.command import command
 
-DB_KEY = 'lastfm'
-MAX_TRACK_ARTIST_LEN = 32
-MAX_TRACK_TITLE_LEN = 75
+_DB_KEY = 'lastfm'
+_MAX_TRACK_ARTIST_LEN = 32
+_MAX_TRACK_TITLE_LEN = 75
 
 
 @irc3.plugin
 class LastFM(object):
-
     requires = [
         'irc3.plugins.command',
         'plugins.formatting',
@@ -54,12 +53,12 @@ class LastFM(object):
                 except pylast.WSError:
                     return 'No such last.fm user. Are you trying to trick me? :^)'
                 else:
-                    self.bot.set_user_value(mask.nick, DB_KEY, lastfm_username)
+                    self.bot.set_user_value(mask.nick, _DB_KEY, lastfm_username)
                     return 'last.fm username set.'
 
             base_command = self.bot.config.cmd + 'np'
             irc_username = args['<username>'] or mask.nick
-            lastfm_username = self.bot.get_user_value(irc_username, DB_KEY)
+            lastfm_username = self.bot.get_user_value(irc_username, _DB_KEY)
 
             if not lastfm_username:
                 if irc_username == mask.nick:
@@ -86,10 +85,10 @@ class LastFM(object):
             artist = current_track.get_artist().get_name().strip()
             title = current_track.get_title().strip()
 
-            if len(artist) > MAX_TRACK_ARTIST_LEN:
-                artist = ''.join(artist[:MAX_TRACK_ARTIST_LEN]) + '...'
-            if len(title) > MAX_TRACK_TITLE_LEN:
-                title = ''.join(title[:MAX_TRACK_TITLE_LEN]) + '...'
+            if len(artist) > _MAX_TRACK_ARTIST_LEN:
+                artist = ''.join(artist[:_MAX_TRACK_ARTIST_LEN]) + '...'
+            if len(title) > _MAX_TRACK_TITLE_LEN:
+                title = ''.join(title[:_MAX_TRACK_TITLE_LEN]) + '...'
 
             artist = self.bot.format(artist, bold=True)
             title = self.bot.format(title, bold=True)

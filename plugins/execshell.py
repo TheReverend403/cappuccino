@@ -18,10 +18,9 @@ import subprocess
 import irc3
 import requests
 from irc3.plugins.command import command
-from requests import Session
 
 
-def is_multiline_string(text: str):
+def _is_multiline_string(text: str):
     return text.count('\n') > 1  # require minimum 2 newlines to account for the newline at the end of command output.
 
 
@@ -42,8 +41,6 @@ class ExecShell(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.session = Session()
-        self.session.headers.update(self.bot.request_headers)
 
     @command(permission='admin', show_in_help_list=False, options_first=True, use_shlex=True)
     def exec(self, mask, target, args):
@@ -58,11 +55,11 @@ class ExecShell(object):
                 return f'{mask.nick}: Command returned no output.'
 
             # Don't paste single line outputs.
-            if not is_multiline_string(output):
+            if not _is_multiline_string(output):
                 return f'{mask.nick}: {output}'
 
             # Upload result of command to ix.io to avoid flooding channels with long output.
-            result = self.session.post('http://ix.io', data={'f:1': output})
+            result = self.bot.requests.post('http://ix.io', data={'f:1': output})
 
         except (FileNotFoundError, requests.RequestException, subprocess.TimeoutExpired) as ex:
             return f'{mask.nick}: {ex}'

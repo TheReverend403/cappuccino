@@ -18,7 +18,9 @@ import subprocess
 from enum import Enum
 
 import irc3
+import requests
 from irc3.plugins.command import command
+from requests import Session
 
 
 class NickPrefix(Enum):
@@ -31,7 +33,6 @@ class NickPrefix(Enum):
 
 @irc3.plugin
 class BotUI(object):
-
     requires = [
         'irc3.plugins.command',
         'irc3.plugins.userlist'
@@ -41,15 +42,18 @@ class BotUI(object):
         self.bot = bot
         self.bot.nickprefix = NickPrefix
         self.bot.version = subprocess.check_output(['git', 'describe']).decode('UTF-8').strip()
-        self.bot.request_headers = {
+        requests.packages.urllib3.disable_warnings()
+        self.bot.requests = Session()
+        self.bot.requests.headers.update({
             'User-Agent': 'cappuccino (https://github.com/FoxDev/cappuccino)',
             'Accept-Language': 'en-GB,en-US,en;q=0.5',
             'timeout': '5',
             'allow_redirects': 'true',
-        }
+            'verify': 'false'
+        })
 
         os.makedirs('data', exist_ok=True)
-        
+
     @irc3.extend
     def is_chanop(self, channel: str, nick: str) -> bool:
         for mode in NickPrefix:

@@ -23,20 +23,20 @@ from irc3.plugins.command import command
 from sqlalchemy import Boolean, Column, MetaData, String, Table, create_engine, func, select
 from sqlalchemy.exc import IntegrityError
 
-CMD_PATTERN = re.compile(r'^\s*([.!~`$])+')
-SED_CHECKER = re.compile(r'^\s*s[/|\\!.,].+')
-URL_CHECKER = re.compile(r'.*https?://.*', re.IGNORECASE | re.UNICODE)
+_CMD_PATTERN = re.compile(r'^\s*([.!~`$])+')
+_SED_CHECKER = re.compile(r'^\s*s[/|\\!.,].+')
+_URL_CHECKER = re.compile(r'.*https?://.*', re.IGNORECASE | re.UNICODE)
 
 
-def should_ignore_message(line):
+def _should_ignore_message(line):
     if not line:
         return
 
-    return CMD_PATTERN.match(line) or \
-        SED_CHECKER.match(line) or \
-        URL_CHECKER.match(line) or \
-        line.startswith('[') or \
-        line.startswith('\x01ACTION ')
+    return _CMD_PATTERN.match(line) or \
+           _SED_CHECKER.match(line) or \
+           _URL_CHECKER.match(line) or \
+           line.startswith('[') or \
+           line.startswith('\x01ACTION ')
 
 
 @irc3.plugin
@@ -64,7 +64,7 @@ class Ai(object):
             pass
 
         self.metadata.create_all(self.db)
-        self.migrate()
+        self._migrate()
 
     def _add_line(self, line: str, channel: str):
         try:
@@ -76,7 +76,7 @@ class Ai(object):
     def _get_lines(self, channel: str = None) -> list:
         select_stmt = select([self.corpus.c.line])
         if channel:
-            select_stmt = select_stmt.where(self.corpus.c.channel == channel)\
+            select_stmt = select_stmt.where(self.corpus.c.channel == channel) \
                 .order_by(func.random()).limit(self.max_loaded_lines)
         else:
             select_stmt = select_stmt.order_by(func.random()).limit(self.max_loaded_lines)
@@ -91,7 +91,7 @@ class Ai(object):
 
         return self.db.execute(select_stmt).scalar()
 
-    def is_active(self, channel: str) -> bool:
+    def _is_active(self, channel: str) -> bool:
         if not channel.startswith('#'):
             return False
 
@@ -105,15 +105,15 @@ class Ai(object):
 
         return result
 
-    def toggle(self, channel: str):
-        if self.is_active(channel):
+    def _toggle(self, channel: str):
+        if self._is_active(channel):
             update_stmt = self.channels.update().where(self.channels.c.name == channel).values(status=0)
         else:
             update_stmt = self.channels.update().where(self.channels.c.name == channel).values(status=1)
 
         self.db.execute(update_stmt)
 
-    def migrate(self):
+    def _migrate(self):
         if not str(self.db.url).startswith('sqlite://') and os.path.exists('data/ai.sqlite'):
             self.bot.log.info('Found ai.sqlite, migrating data.')
             sqlite_db = create_engine('sqlite:///data/ai.sqlite')
@@ -123,15 +123,15 @@ class Ai(object):
             channel_results = sqlite_db.execute('SELECT * FROM channels')
             corpus_insert = self.corpus.insert(). \
                 values([
-                    {'line': row[0], 'channel': row[1]}
-                    for row in corpus_results if not formatting_codes_regex.match(row[0])
-                ])
+                {'line': row[0], 'channel': row[1]}
+                for row in corpus_results if not formatting_codes_regex.match(row[0])
+            ])
 
             channels_insert = self.channels.insert(). \
                 values([
-                    {'name': row[0], 'status': row[1]}
-                    for row in channel_results if row[0].startswith('#')
-                ])
+                {'name': row[0], 'status': row[1]}
+                for row in channel_results if row[0].startswith('#')
+            ])
 
             try:
                 self.db.execute(channels_insert)
@@ -158,7 +158,7 @@ class Ai(object):
             if channel_line_count > 0 and line_count > 0:
                 channel_percentage = int(round(100 * float(channel_line_count) / float(line_count), ndigits=0))
 
-            ai_status = 'enabled' if self.is_active(target) else 'disabled'
+            ai_status = 'enabled' if self._is_active(target) else 'disabled'
             return f'Chatbot is currently {ai_status} for {target}. ' \
                    f'Channel/global line count: {channel_line_count}/{line_count} ({channel_percentage}%).'
 
@@ -168,8 +168,8 @@ class Ai(object):
 
             return f'You must be a channel operator ({op_prefixes}) to do that.'
 
-        self.toggle(target)
-        return 'Chatbot activated.' if self.is_active(target) else 'Shutting up!'
+        self._toggle(target)
+        return 'Chatbot activated.' if self._is_active(target) else 'Shutting up!'
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def handle_line(self, target, event, mask, data):
@@ -181,7 +181,7 @@ class Ai(object):
             return
 
         data = data.strip()
-        if should_ignore_message(data):
+        if _should_ignore_message(data):
             return
 
         # Only respond to messages mentioning the bot in an active channel
@@ -190,7 +190,7 @@ class Ai(object):
             self._add_line(data, channel)
             return
 
-        if not self.is_active(channel):
+        if not self._is_active(channel):
             return
 
         corpus = self._get_lines()

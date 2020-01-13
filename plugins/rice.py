@@ -22,12 +22,12 @@ from irc3.plugins.command import command
 MAX_USER_VALUES = 6
 
 
-def to_user_index(index: int):
+def _to_user_index(index: int):
     """Converts a zero-indexed value to a user-friendly value starting from 1"""
     return index + 1
 
 
-def from_user_index(index: int):
+def _from_user_index(index: int):
     """Converts a user-supplied index to a value suitable for zero-indexed arrays"""
     index = int(index)
     return index - 1 if index >= 1 else index
@@ -35,7 +35,6 @@ def from_user_index(index: int):
 
 @irc3.plugin
 class Rice(object):
-
     requires = [
         'irc3.plugins.command',
         'plugins.formatting',
@@ -90,7 +89,7 @@ class Rice(object):
             # Delete values in descending order to prevent re-ordering of the list while deleting.
             for index in sorted(indexes, reverse=True):
                 try:
-                    index = from_user_index(index)
+                    index = _from_user_index(index)
                     deleted.append(values[index])
                     del values[index]
                 except IndexError:
@@ -107,7 +106,7 @@ class Rice(object):
 
         if args['--replace'] or args['-r']:
             try:
-                index = from_user_index(args['<id>'])
+                index = _from_user_index(args['<id>'])
             except ValueError:
                 return 'Invalid ID'
 
@@ -137,7 +136,7 @@ class Rice(object):
 
         if args['<id>'] is not None:
             try:
-                index = from_user_index(args['<id>'])
+                index = _from_user_index(args['<id>'])
                 value = self.bot.get_user_value(user, mode)[index]
             except (ValueError, IndexError, TypeError):
                 return 'Invalid ID.'
@@ -148,7 +147,7 @@ class Rice(object):
         if values:
             indexed_values = []
             for index, item in enumerate(values):
-                index = self.bot.format(to_user_index(index), bold=True)
+                index = self.bot.format(_to_user_index(index), bold=True)
                 item = self.bot.format(item, reset=True)
                 indexed_values.append(f'({index}) {item}')
 

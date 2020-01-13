@@ -27,18 +27,17 @@ from urllib.parse import urlparse
 import irc3
 import requests
 from bs4 import BeautifulSoup
-from requests import Session
 
-URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
-BRACES = [('{', '}'), ('<', '>'), ('[', ']'), ('(', ')')]
-DEFAULT_MAX_BYTES = 655360  # 64K
-MAX_TITLE_LENGTH = 128
-REQUEST_TIMEOUT = 5
-HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.IGNORECASE | re.UNICODE)
-FORCE_IPV4_HOSTNAMES = ['www.youtube.com', 'youtube.com', 'youtu.be']
-HTML_MIMETYPES = ['text/html', 'application/xhtml+xml']
-REQUEST_CHUNK_SIZE = 256  # Bytes
-ALLOWED_CONTENT_TYPES = ['text', 'video', 'application']
+_URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
+_BRACES = [('{', '}'), ('<', '>'), ('[', ']'), ('(', ')')]
+_DEFAULT_MAX_BYTES = 655360  # 64K
+_MAX_TITLE_LENGTH = 128
+_REQUEST_TIMEOUT = 5
+_HOSTNAME_CLEANUP_REGEX = re.compile('^www\.', re.IGNORECASE | re.UNICODE)
+_FORCE_IPV4_HOSTNAMES = ['www.youtube.com', 'youtube.com', 'youtu.be']
+_HTML_MIMETYPES = ['text/html', 'application/xhtml+xml']
+_REQUEST_CHUNK_SIZE = 256  # Bytes
+_ALLOWED_CONTENT_TYPES = ['text', 'video', 'application']
 
 
 class ResponseBodyTooLarge(requests.RequestException):
@@ -60,7 +59,7 @@ class RequestTimeout(requests.RequestException):
 original_getaddrinfo = socket.getaddrinfo
 
 
-def getaddrinfo_wrapper(host, port, family=0, type=0, proto=0, flags=0):
+def _getaddrinfo_wrapper(host, port, family=0, type=0, proto=0, flags=0):
     """
     Some sites like YouTube like to block certain IPv6 ranges, so forcing IPv4 is necessary to get info on those URLs.
     Because neither requests, urllib, or HTTPRequest provide a way to do that, it's necessary to bypass them and
@@ -70,11 +69,11 @@ def getaddrinfo_wrapper(host, port, family=0, type=0, proto=0, flags=0):
     This function requires `socket.getaddrinfo = getaddrinfo_wrapper` somewhere early in a script's startup,
     preferably before any network requests are made.
     """
-    family = socket.AF_INET if host in FORCE_IPV4_HOSTNAMES else family
+    family = socket.AF_INET if host in _FORCE_IPV4_HOSTNAMES else family
     return original_getaddrinfo(host, port, family, type, proto, flags)
 
 
-def size_fmt(num: int, suffix: str = 'B') -> str:
+def _size_fmt(num: int, suffix: str = 'B') -> str:
     # https://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
     for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
         if abs(num) < 1024.0:
@@ -83,32 +82,32 @@ def size_fmt(num: int, suffix: str = 'B') -> str:
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
-def _read_stream(response: requests.Response, max_bytes: int = DEFAULT_MAX_BYTES) -> str:
+def _read_stream(response: requests.Response, max_bytes: int = _DEFAULT_MAX_BYTES) -> str:
     start_time = time.time()
     content = StringIO()
 
-    for chunk in response.iter_content(REQUEST_CHUNK_SIZE):
-        if time.time() - start_time >= REQUEST_TIMEOUT:
-            raise RequestTimeout(f'Request timed out ({REQUEST_TIMEOUT} seconds).')
+    for chunk in response.iter_content(_REQUEST_CHUNK_SIZE):
+        if time.time() - start_time >= _REQUEST_TIMEOUT:
+            raise RequestTimeout(f'Request timed out ({_REQUEST_TIMEOUT} seconds).')
         if not chunk:  # filter out keep-alive new chunks
             continue
         content_length = content.write(chunk.decode('UTF-8', errors='ignore'))
         if '</title>' in content.getvalue():
             break
         if content_length > max_bytes:
-            raise ResponseBodyTooLarge(f'Couldn\'t find the page title within {size_fmt(content_length)}.')
+            raise ResponseBodyTooLarge(f'Couldn\'t find the page title within {_size_fmt(content_length)}.')
 
     return content.getvalue()
 
 
-def _parse_url(url: str, session=requests):
+def _parse_url(url: str, session):
     hostname = urlparse(url).hostname
     for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
         ip = ipaddress.ip_address(sockaddr[0])
         if not ip.is_global:
             raise InvalidIPAddress(f'{hostname} is not a publicly routable address.')
 
-    hostname = HOSTNAME_CLEANUP_REGEX.sub('', hostname)
+    hostname = _HOSTNAME_CLEANUP_REGEX.sub('', hostname)
     with session.get(url, stream=True) as response:
         if response.status_code != requests.codes.ok:
             response.raise_for_status()
@@ -117,8 +116,8 @@ def _parse_url(url: str, session=requests):
         if content_type:
             content_type, _ = cgi.parse_header(content_type)
             main_type = content_type.split('/')[0]
-            if main_type not in ALLOWED_CONTENT_TYPES:
-                raise ContentTypeNotAllowed(f'{main_type} not in {ALLOWED_CONTENT_TYPES}')
+            if main_type not in _ALLOWED_CONTENT_TYPES:
+                raise ContentTypeNotAllowed(f'{main_type} not in {_ALLOWED_CONTENT_TYPES}')
 
         title = None
         size = int(response.headers.get('Content-Length', 0))
@@ -126,25 +125,25 @@ def _parse_url(url: str, session=requests):
         if content_disposition:
             _, params = cgi.parse_header(content_disposition)
             title = params.get('filename')
-        elif content_type in HTML_MIMETYPES or content_type == 'text/plain':
+        elif content_type in _HTML_MIMETYPES or content_type == 'text/plain':
             content = _read_stream(response)
             try:
                 title = BeautifulSoup(content, 'html.parser').title.string
             except AttributeError:
-                if content and content_type not in HTML_MIMETYPES:
+                if content and content_type not in _HTML_MIMETYPES:
                     title = re.sub(r'\s+', ' ', ' '.join(content.split('\n')))
 
         if title:
             title = html.unescape(title).strip()
-            if len(title) > MAX_TITLE_LENGTH:
-                title = ''.join(title[:MAX_TITLE_LENGTH - 3]) + '...'
+            if len(title) > _MAX_TITLE_LENGTH:
+                title = ''.join(title[:_MAX_TITLE_LENGTH - 3]) + '...'
     return hostname, title, content_type, size
 
 
 def _clean_url(url: str):
     if url:
         url = url.rstrip('\'.,"\1')
-        for left_brace, right_brace in BRACES:
+        for left_brace, right_brace in _BRACES:
             if left_brace not in url and url.endswith(right_brace):
                 url = url.rstrip(right_brace)
     return url
@@ -152,26 +151,18 @@ def _clean_url(url: str):
 
 @irc3.plugin
 class UrlInfo(object):
-
     requires = [
         'plugins.formatting',
         'plugins.botui'
     ]
 
+    ignore_nicks = []
+    ignore_hostnames = []
+
     def __init__(self, bot):
         self.bot = bot
         self.load_config()
-        socket.getaddrinfo = getaddrinfo_wrapper
-
-        self.ignore_nicks = []
-        self.ignore_hostnames = []
-
-        requests.packages.urllib3.disable_warnings()
-        self.session = Session()
-
-        request_headers = self.bot.request_headers.copy()
-        request_headers.update({'verify': 'false'})
-        self.session.headers.update(request_headers)
+        socket.getaddrinfo = _getaddrinfo_wrapper
 
     def load_config(self):
         try:
@@ -184,12 +175,13 @@ class UrlInfo(object):
         except KeyError:
             pass
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{0}).*'.format(URL_FINDER.pattern))
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{0}).*'.format(_URL_FINDER.pattern))
     def on_url(self, mask, target, data):
-        if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd) or data.startswith(f'{self.bot.nick}: '):
+        if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd) or data.startswith(
+                f'{self.bot.nick}: '):
             return
 
-        urls = [_clean_url(url) for url in set(URL_FINDER.findall(data))] or []
+        urls = [_clean_url(url) for url in set(_URL_FINDER.findall(data))] or []
         for url in urls:
             if urlparse(url).hostname in self.ignore_hostnames:
                 urls.remove(url)
@@ -204,7 +196,7 @@ class UrlInfo(object):
             messages = []
             self.bot.log.debug(f'Retrieving page titles for {urls}')
 
-            future_to_url = {executor.submit(_parse_url, url, self.session): url for url in urls}
+            future_to_url = {executor.submit(_parse_url, url, self.bot.requests): url for url in urls}
             for future in concurrent.futures.as_completed(future_to_url):
                 url = future_to_url[future]
                 hostname = urlparse(url).hostname
@@ -234,8 +226,8 @@ class UrlInfo(object):
                         formatted_title = self.bot.format(title, bold=True)
                         reply = f'[ {formatted_hostname} ] {formatted_title} ({mimetype})'
 
-                        if size and mimetype not in HTML_MIMETYPES:
-                            reply += f' ({size_fmt(size)})'
+                        if size and mimetype not in _HTML_MIMETYPES:
+                            reply += f' ({_size_fmt(size)})'
 
                         messages.append(reply)
 

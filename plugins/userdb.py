@@ -19,7 +19,6 @@ import threading
 from datetime import datetime
 
 import bottle
-from irc3.plugins.command import command
 
 try:
     import ujson as json
@@ -30,11 +29,11 @@ import irc3
 from pathlib import Path
 
 
-def strip_path():
+def _strip_path():
     bottle.request.environ['PATH_INFO'] = bottle.request.environ['PATH_INFO'].rstrip('/')
 
 
-def http_json_dump(data: dict):
+def _http_json_dump(data: dict):
     bottle.response.content_type = 'application/json'
 
     return json.dumps(dict(sorted(data.items(), reverse=True)))
@@ -42,12 +41,12 @@ def http_json_dump(data: dict):
 
 @irc3.plugin
 class UserDB(object):
+    data = {}
 
     def __init__(self, bot):
         self.bot = bot
         self.root = Path('data')
         self.file = self.root / 'userdb.json'
-        self.data = {}
         self.last_write = datetime.now()
 
         for sig in (signal.SIGINT, signal.SIGTERM):
@@ -84,8 +83,8 @@ class UserDB(object):
             if any(c.isupper() for c in user):
                 self.set_user_value(user, self.data.pop(user))
 
-        bottle.hook('before_request')(strip_path)
-        bottle.route('/')(lambda: http_json_dump(self.data))
+        bottle.hook('before_request')(_strip_path)
+        bottle.route('/')(lambda: _http_json_dump(self.data))
         bottle_thread = threading.Thread(
             target=bottle.run,
             kwargs={'quiet': True, 'host': host, 'port': port},
@@ -108,7 +107,7 @@ class UserDB(object):
         except KeyError:
             pass
 
-        self.sync()
+        self._sync()
 
     @irc3.extend
     def set_user_value(self, username: str, key, value=None):
@@ -122,9 +121,9 @@ class UserDB(object):
         except ValueError:
             self.del_user_value(username, key)
 
-        self.sync()
+        self._sync()
 
-    def sync(self, force=False):
+    def _sync(self, force=False):
         # Only write to disk once every 5 minutes so seen.py doesn't kill performance with constant writes.
         if force or abs((datetime.now() - self.last_write).seconds) >= 60 * 5:
             with self.file.open('w') as fd:
@@ -133,5 +132,5 @@ class UserDB(object):
             self.bot.log.debug('Synced database to disk.')
 
     def _shutdown_hook(self, signo, frame):
-        self.sync(force=True)
+        self._sync(force=True)
         sys.exit(0)

@@ -14,16 +14,16 @@
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
 import re
-
-import irc3
 import time
 from datetime import timedelta
+
+import irc3
 from irc3.plugins.command import command
 
-DB_KEY = 'last_seen'
+_DB_KEY = 'last_seen'
 
 
-def time_format(seconds: int):
+def _time_format(seconds: int):
     delta = str(timedelta(seconds=seconds))
 
     # Remove microseconds in string representation
@@ -33,7 +33,6 @@ def time_format(seconds: int):
 
 @irc3.plugin
 class Seen(object):
-
     requires = [
         'irc3.plugins.command',
         'plugins.userdb'
@@ -43,10 +42,10 @@ class Seen(object):
         self.bot = bot
 
     def get_last_seen(self, nick: str):
-        return self.bot.get_user_value(nick, DB_KEY)
+        return self.bot.get_user_value(nick, _DB_KEY)
 
     def set_last_seen(self, nick: str, timestamp: float):
-        self.bot.set_user_value(nick, DB_KEY, timestamp)
+        self.bot.set_user_value(nick, _DB_KEY, timestamp)
 
     @command(permission='view', aliases=['died'])
     def seen(self, mask, target, args):
@@ -63,12 +62,12 @@ class Seen(object):
         if nick == mask.nick.lower():
             return 'Are you seriously asking me that?'
 
-        if not self.bot.get_user_value(nick, DB_KEY):
+        if not self.bot.get_user_value(nick, _DB_KEY):
             return f'I haven\'t seen any activity from {nick} yet.'
 
         last_seen = self.get_last_seen(nick)
         time_now = time.time()
-        timefmt = time_format(time_now - last_seen)
+        timefmt = _time_format(time_now - last_seen)
 
         return f'{nick} was last seen {timefmt} ago.'
 

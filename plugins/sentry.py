@@ -13,15 +13,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import subprocess
-
 import irc3
 import sentry_sdk
 from irc3.plugins.command import command
 from requests import RequestException
 
 
-def before_send(event, hint):
+def _before_send(event, hint):
     if 'exc_info' in hint:
         exc_type, exc_value, tb = hint['exc_info']
         if isinstance(exc_value, (RequestException, TimeoutError)):
@@ -32,7 +30,6 @@ def before_send(event, hint):
 
 @irc3.plugin
 class Sentry(object):
-
     requires = [
         'irc3.plugins.command',
         'plugins.botui'
@@ -42,7 +39,7 @@ class Sentry(object):
         self.bot = bot
 
         try:
-            sentry_sdk.init(self.bot.config[__name__]['dsn'], before_send=before_send, release=self.bot.version)
+            sentry_sdk.init(self.bot.config[__name__]['dsn'], before_send=_before_send, release=self.bot.version)
         except KeyError:
             self.bot.log.warn('Missing Sentry DSN')
             return

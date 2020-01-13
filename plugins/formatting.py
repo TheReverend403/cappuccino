@@ -14,11 +14,11 @@
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
 import re
-
 from enum import Enum
+
 import irc3
 
-IRC_CODES_REGEX = re.compile(r'\x1f|\x02|\x1D|\x03(?:\d{1,2}(?:,\d{1,2})?)?', re.UNICODE)
+_IRC_CODES_REGEX = re.compile(r'\x1f|\x02|\x1D|\x03(?:\d{1,2}(?:,\d{1,2})?)?', re.UNICODE)
 
 
 class Color(Enum):
@@ -60,4 +60,4 @@ class Formatting(object):
 
     @irc3.extend
     def strip_formatting(self, string: str) -> str:
-        return IRC_CODES_REGEX.sub('', string)
+        return _IRC_CODES_REGEX.sub('', string)

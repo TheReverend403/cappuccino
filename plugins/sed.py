@@ -13,13 +13,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import subprocess
 import collections
-import irc3
 import re
+import subprocess
 
-SED_PRIVMSG = r'\s*s[/|\\!\.,\\].+'
-SED_CHECKER = re.compile('^' + SED_PRIVMSG)
+import irc3
+
+_SED_PRIVMSG = r'\s*s[/|\\!\.,\\].+'
+_SED_CHECKER = re.compile('^' + _SED_PRIVMSG)
 
 
 def _sed_wrapper(text: str, command: str) -> str:
@@ -39,7 +40,7 @@ def _sed_wrapper(text: str, command: str) -> str:
     return stream
 
 
-def edit(text: str, command: str) -> str:
+def _edit(text: str, command: str) -> str:
     output = _sed_wrapper(text, command)
     if not output or output == text:
         return text
@@ -52,7 +53,6 @@ class EditorException(Exception):
 
 @irc3.plugin
 class Sed(object):
-
     requires = [
         'plugins.formatting'
     ]
@@ -63,7 +63,7 @@ class Sed(object):
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def update_chat_history(self, target, event, mask, data):
-        if event != 'PRIVMSG' or SED_CHECKER.match(data) or data.startswith(self.bot.config.cmd):
+        if event != 'PRIVMSG' or _SED_CHECKER.match(data) or data.startswith(self.bot.config.cmd):
             return
 
         # Strip ACTION data and just use the message.
@@ -78,7 +78,7 @@ class Sed(object):
         queue.append(line)
         self.history_buffer.update({target: queue})
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<command>{0})'.format(SED_PRIVMSG))
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<command>{0})'.format(_SED_PRIVMSG))
     def sed(self, mask, target, command):
         if target not in self.history_buffer:
             return
@@ -86,7 +86,7 @@ class Sed(object):
         for target_user, message in reversed(self.history_buffer[target]):
             message = message.strip()
             try:
-                new_message = edit(message, command)
+                new_message = _edit(message, command)
             except EditorException as error:
                 self.bot.notice(mask.nick, str(error))
                 # Don't even check the rest if the sed command is invalid.

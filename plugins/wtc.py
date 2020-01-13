@@ -15,7 +15,7 @@
 
 import irc3
 from irc3.plugins.command import command
-from requests import RequestException, Session
+from requests import RequestException
 
 
 @irc3.plugin
@@ -28,8 +28,6 @@ class BotUI(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.session = Session()
-        self.session.headers.update(self.bot.request_headers)
 
     @command(permission='view', aliases=['whatthecommit'])
     def wtc(self, mask, target, args):
@@ -39,7 +37,7 @@ class BotUI(object):
         """
 
         try:
-            with self.session.get('https://whatthecommit.com/index.txt') as response:
+            with self.bot.requests.get('https://whatthecommit.com/index.txt') as response:
                 yield f'git commit -m "{response.text.strip()}"'
         except RequestException as ex:
             yield ex.strerror

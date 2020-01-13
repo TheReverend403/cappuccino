@@ -13,44 +13,35 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
+import random
 import re
 
 import irc3
-import random
-
 from irc3.plugins.command import command
 
-USER_AGENT = 'cappuccino (https://github.com/FoxDev/cappuccino)'
-DEFAULT_HEADERS = {
-    'User-Agent': USER_AGENT,
-    'Accept-Language': 'en-GB, en-US, en'
-}
-
-DECIDE_DELIMITERS = [' or ', ',', '|']
-
+_RANDOM_CHANCE = 0.2
+_DECIDE_DELIMITERS = [' or ', ',', '|']
 # Borrowed from https://github.com/GeneralUnRest/8ball-bot/blob/master/8ball.js
-EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.', 'Without a doubt.',
-                       'My sources say no.', 'As I see it, yes.', 'You may rely on it.', 'Concentrate and ask again.',
-                       'Outlook not so good.', 'It is decidedly so.', 'Better not tell you now.', 'Very doubtful.',
-                       'Yes - definitely.', 'It is certain.', 'Cannot predict now.', 'Most likely.', 'Ask again later.',
-                       'My reply is no.', 'Outlook good.', 'Don\'t count on it.']
+_EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.', 'Without a doubt.',
+                        'My sources say no.', 'As I see it, yes.', 'You may rely on it.', 'Concentrate and ask again.',
+                        'Outlook not so good.', 'It is decidedly so.', 'Better not tell you now.', 'Very doubtful.',
+                        'Yes - definitely.', 'It is certain.', 'Cannot predict now.', 'Most likely.',
+                        'Ask again later.',
+                        'My reply is no.', 'Outlook good.', 'Don\'t count on it.']
 
 
 @irc3.plugin
 class Fun(object):
-
     requires = [
         'plugins.formatting'
     ]
-
-    random_chance = 0.2
 
     def __init__(self, bot):
         self.bot = bot
 
     def reply(self, target: str, message: str):
         # Only reply a certain percentage of the time. AKA rate-limiting. Sort of.
-        if random.random() <= self.random_chance:
+        if random.random() <= _RANDOM_CHANCE:
             self.bot.privmsg(target, message)
 
     @command(permission='view', use_shlex=False)
@@ -61,15 +52,15 @@ class Fun(object):
         """
 
         options = ' '.join(args['<options>'])
-        for delimiter in DECIDE_DELIMITERS:
+        for delimiter in _DECIDE_DELIMITERS:
             options = options.replace(delimiter, '|')
         options = options.split('|')
         options = list(filter(None, set(option.replace(delimiter, '').strip()
-                                        for delimiter in DECIDE_DELIMITERS
+                                        for delimiter in _DECIDE_DELIMITERS
                                         for option in options
-                                        if option not in DECIDE_DELIMITERS)))
+                                        if option not in _DECIDE_DELIMITERS)))
 
-        [options.remove(delimiter.strip()) for delimiter in DECIDE_DELIMITERS if delimiter.strip() in options]
+        [options.remove(delimiter.strip()) for delimiter in _DECIDE_DELIMITERS if delimiter.strip() in options]
         self.bot.log.debug(f'Parsed options: {options}')
 
         if not options:
@@ -88,7 +79,7 @@ class Fun(object):
             %%8ball <query>...
         """
 
-        return f'{mask.nick}: {random.choice(EIGHTBALL_RESPONSES)}'
+        return f'{mask.nick}: {random.choice(_EIGHTBALL_RESPONSES)}'
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*\[+(?P<data>[A-Za-z0-9-_ \'"!]+)\]+$')
     def intensify(self, target, data):
