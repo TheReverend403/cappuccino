@@ -75,33 +75,41 @@ class UserDB(object):
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
-        query = select([self.ricedb.c.data]).where(func.lower(self.ricedb.c.nick) == username.lower())
-        result = self.db.execute(query).scalar()
+        user_data = self._get_user(username)
 
         try:
-            del result[key]
+            del user_data[key]
         except KeyError:
             pass
 
-        update = self.ricedb.update().where(func.lower(self.ricedb.c.nick) == username.lower()).values(data=result)
+        update = self.ricedb.update().where(func.lower(self.ricedb.c.nick) == username.lower()).values(data=user_data)
         self.db.execute(update)
 
     @irc3.extend
     def set_user_value(self, username: str, key, value=None):
-        query = select([self.ricedb.c.data]).where(func.lower(self.ricedb.c.nick) == username.lower())
-        result = self.db.execute(query).scalar()
-        data = {key: value} if value else key
+        input_data = {key: value} if value else key
+        user_data = self._get_user(username)
 
-        try:
-            result.update(data)
-        except KeyError:
-            result = data
-        except ValueError:
-            self.del_user_value(username, key)
+        if user_data is None:
+            self.db.execute(self.ricedb.insert().values(nick=username, data=input_data))
             return
 
-        update = self.ricedb.update().where(func.lower(self.ricedb.c.nick) == username.lower()).values(data=result)
+        try:
+            user_data.update(input_data)
+        except KeyError:
+            user_data = input_data
+        except ValueError:
+            try:
+                del user_data[key]
+            except KeyError:
+                pass
+
+        update = self.ricedb.update().where(func.lower(self.ricedb.c.nick) == username.lower()).values(data=user_data)
         self.db.execute(update)
+
+    def _get_user(self, user):
+        query = select([self.ricedb.c.data]).where(func.lower(self.ricedb.c.nick) == user.lower())
+        return self.db.execute(query).scalar()
 
     def _migrate(self):
         if os.path.exists('data/userdb.json'):
