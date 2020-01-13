@@ -120,14 +120,13 @@ class Ai(object):
             formatting_codes_regex = re.compile(r'.*\x1f|\x02|\x1D|\x03.*', re.UNICODE)
 
             corpus_results = sqlite_db.execute('SELECT * FROM corpus')
-            channel_results = sqlite_db.execute('SELECT * FROM channels')
-
             corpus_insert = self.corpus.insert(). \
                 values([
                     {'line': row[0], 'channel': row[1]}
                     for row in corpus_results if not formatting_codes_regex.match(row[0])
                 ])
 
+            channel_results = sqlite_db.execute('SELECT * FROM channels')
             channels_insert = self.channels.insert(). \
                 values([
                     {'name': row[0], 'status': row[1]}
