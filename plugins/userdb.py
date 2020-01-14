@@ -104,7 +104,9 @@ class UserDB(object):
             except KeyError:
                 pass
 
-        update = self.ricedb.update().where(func.lower(self.ricedb.c.nick) == username.lower()).values(data=user_data)
+        update = self.ricedb.update().where(
+            func.lower(self.ricedb.c.nick) == username.lower()
+        ).values(data=user_data, nick=username)  # Also update nick to fix the mass lowercasing I did on the old DB.
         self.db.execute(update)
 
     def _get_user(self, user):
