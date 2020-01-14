@@ -135,7 +135,7 @@ class UserDB(object):
 
     def _json_dump(self):
         bottle.response.content_type = 'application/json'
-        result = self.db.execute(self.ricedb.select().order_by(desc(self.ricedb.c.nick)))
+        result = self.db.execute(self.ricedb.select().order_by(desc(func.lower(self.ricedb.c.nick))))
         data = {row[0]: row[1] for row in result}
 
         return json.dumps(dict(data.items()))
