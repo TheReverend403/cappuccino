@@ -74,7 +74,7 @@ class LastFM(object):
                 return f'No such last.fm user ({lastfm_username}). ' \
                        f'Please set a valid user with {base_command} --set <username>'
 
-            formatted_name = irc_username.lower()
+            formatted_name = irc_username
             if irc_username.lower() != lastfm_username.lower():
                 formatted_name += f' ({lastfm_username})'
 
