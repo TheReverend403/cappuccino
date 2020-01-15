@@ -87,7 +87,8 @@ class Seen(object):
             return f'Deleted trigger \'{trigger}\'.' if self._delete_trigger(target, trigger) else 'No such trigger.'
 
         if args['list']:
-            trigger_list = [row[0] for row in self.db.execute(self.triggers.select())]
+            rows = self.db.execute(self.triggers.select().where(func.lower(self.triggers.c.channel) == target.lower()))
+            trigger_list = [row[0] for row in rows]
             if trigger_list:
                 trigger_list = ', '.join(trigger_list)
                 return f'Available triggers for {target}: {trigger_list}'
@@ -99,11 +100,11 @@ class Seen(object):
         if mask.nick == self.bot.nick or event == 'NOTICE':
             return
 
-        triggers = re.search(r'\?([A-Za-z]+)', data)
-        if not triggers:
+        triggers_re = re.findall(r'\?([A-Za-z]+)', data)
+        if not triggers_re:
             return
 
-        triggers = set(triggers.groups()[:3])
+        triggers = set(triggers_re[:3])
         responses = []
         for trigger in triggers:
             response = self._get_trigger(target, trigger)
