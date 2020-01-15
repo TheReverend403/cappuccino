@@ -99,7 +99,7 @@ class Seen(object):
         if mask.nick == self.bot.nick or event == 'NOTICE':
             return
 
-        triggers = re.search(r':([A-Za-z]+)', data)
+        triggers = re.search(r'\?([A-Za-z]+)', data)
         if not triggers:
             return
 
