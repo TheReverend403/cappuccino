@@ -17,7 +17,7 @@ import re
 
 import irc3
 from irc3.plugins.command import command
-from sqlalchemy import Column, MetaData, String, Table, func
+from sqlalchemy import Column, MetaData, String, Table, func, select
 
 
 @irc3.plugin
@@ -40,7 +40,7 @@ class Seen(object):
         self.metadata.create_all(self.db)
 
     def _get_trigger(self, channel: str, trigger: str):
-        stmnt = self.triggers.select(). \
+        stmnt = select([self.triggers.c.response]). \
             where(func.lower(self.triggers.c.trigger) == trigger.lower()). \
             where(func.lower(self.triggers.c.channel) == channel.lower())
 
