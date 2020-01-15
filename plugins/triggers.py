@@ -25,6 +25,7 @@ class Seen(object):
     requires = [
         'irc3.plugins.command',
         'plugins.botui',
+        'plugins.formatting',
         'plugins.database'
     ]
 
@@ -108,7 +109,7 @@ class Seen(object):
         responses = []
         for trigger in triggers:
             response = self._get_trigger(target, trigger)
-            trigger = self.bot.format(trigger.lower(), color=self.bot.color.PURPLE, reset=True)
+            trigger = self.bot.format(trigger.lower(), color=self.bot.color.ORANGE, reset=True)
             if response is not None:
                 responses.append(f'[{trigger.lower()}] {response}')
 
