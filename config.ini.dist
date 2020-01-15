@@ -30,6 +30,7 @@ includes =
     plugins.urlinfo
     plugins.execshell
     plugins.wtc
+    plugins.triggers
 
 # the bot will join #null
 # ${hash} is replaced by the # char
