@@ -111,7 +111,7 @@ class Seen(object):
             response = self._get_trigger(target, trigger)
             trigger = self.bot.format(trigger.lower(), color=self.bot.color.ORANGE, reset=True)
             if response is not None:
-                responses.append(f'[{trigger.lower()}] {response}')
+                responses.append(f'[{trigger}] {response}')
 
         for response in responses:
             self.bot.privmsg(target, response)
