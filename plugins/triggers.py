@@ -101,11 +101,11 @@ class Seen(object):
         if mask.nick == self.bot.nick or event == 'NOTICE':
             return
 
-        triggers_re = re.findall(r'\?([A-Za-z]+)', data)
-        if not triggers_re:
+        captured_triggers = re.findall(r'\?([A-Za-z]+)', data)
+        if not captured_triggers:
             return
 
-        triggers = set(triggers_re[:3])
+        triggers = set(captured_triggers[:3])
         responses = []
         for trigger in triggers:
             response = self._get_trigger(target, trigger)
