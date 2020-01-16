@@ -28,6 +28,8 @@ import irc3
 import requests
 from bs4 import BeautifulSoup
 
+from util.formatting import Color, style, unstyle
+
 _URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
 _BRACES = [('{', '}'), ('<', '>'), ('[', ']'), ('(', ')')]
 _DEFAULT_MAX_BYTES = 655360  # 64K
@@ -137,7 +139,7 @@ def _parse_url(url: str, session):
             title = html.unescape(title).strip()
             if len(title) > _MAX_TITLE_LENGTH:
                 title = ''.join(title[:_MAX_TITLE_LENGTH - 3]) + '...'
-    return hostname, title, content_type, size
+    return hostname, unstyle(title), content_type, size
 
 
 def _clean_url(url: str):
@@ -152,28 +154,15 @@ def _clean_url(url: str):
 @irc3.plugin
 class UrlInfo(object):
     requires = [
-        'plugins.formatting',
         'plugins.botui'
     ]
 
-    ignore_nicks = []
-    ignore_hostnames = []
-
     def __init__(self, bot):
         self.bot = bot
-        self.load_config()
+        self.config = self.bot.config.get(__name__, {})
+        self.ignore_nicks = self.config.get('ignore_nicks', '').split()
+        self.ignore_hostnames = self.config.get('ignore_nicks', '').split()
         socket.getaddrinfo = _getaddrinfo_wrapper
-
-    def load_config(self):
-        try:
-            self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
-        except KeyError:
-            pass
-
-        try:
-            self.ignore_hostnames = self.bot.config[__name__]['ignore_hostnames'].split()
-        except KeyError:
-            pass
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{0}).*'.format(_URL_FINDER.pattern))
     def on_url(self, mask, target, data):
@@ -208,22 +197,22 @@ class UrlInfo(object):
                 except ContentTypeNotAllowed as ex:
                     self.bot.log.debug(ex)
                 except (socket.gaierror, ValueError, requests.RequestException) as ex:
-                    formatted_hostname = self.bot.format(hostname, color=self.bot.color.RED)
-                    formatted_error = self.bot.format(ex, bold=True)
+                    formatted_hostname = style(hostname, color=Color.RED)
+                    formatted_error = style(ex, bold=True)
 
                     if type(ex) == requests.RequestException:
                         if ex.response is not None and ex.response.reason is not None:
-                            formatted_status_code = self.bot.format(ex.response.status_code, bold=True)
-                            status_code_name = self.bot.format(ex.response.reason, bold=True)
-                            messages.append(f'[ {formatted_hostname} ] {formatted_status_code} {status_code_name}.')
+                            formatted_status_code = style(ex.response.status_code, bold=True)
+                            formatted_reason = style(ex.response.reason, bold=True)
+                            messages.append(f'[ {formatted_hostname} ] {formatted_status_code} {formatted_reason}')
                         return
                     else:
-                        messages.append(f'[ {formatted_hostname} ] {formatted_error}.')
+                        messages.append(f'[ {formatted_hostname} ] {formatted_error}')
                 # no exception
                 else:
-                    formatted_hostname = self.bot.format(hostname, color=self.bot.color.GREEN)
+                    formatted_hostname = style(hostname, color=Color.GREEN)
                     if title is not None and mimetype is not None:
-                        formatted_title = self.bot.format(title, bold=True)
+                        formatted_title = style(title, bold=True)
                         reply = f'[ {formatted_hostname} ] {formatted_title} ({mimetype})'
 
                         if size and mimetype not in _HTML_MIMETYPES:
@@ -233,5 +222,5 @@ class UrlInfo(object):
 
             # Send all parsed URLs now that we have them all.
             if messages:
-                pipe_character = self.bot.format(' | ', color=self.bot.color.LIGHT_GRAY, reset=True)
+                pipe_character = style(' | ', color=Color.LIGHT_GRAY, reset=True)
                 self.bot.privmsg(target, pipe_character.join(messages))

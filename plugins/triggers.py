@@ -19,13 +19,15 @@ import irc3
 from irc3.plugins.command import command
 from sqlalchemy import Column, MetaData, String, Table, func, select
 
+from util.channel import is_chanop
+from util.formatting import Color, style
+
 
 @irc3.plugin
 class Seen(object):
     requires = [
         'irc3.plugins.command',
         'plugins.botui',
-        'plugins.formatting',
         'plugins.database'
     ]
 
@@ -51,7 +53,8 @@ class Seen(object):
         if self._get_trigger(channel, trigger):
             stmnt = self.triggers.update(). \
                 where(func.lower(self.triggers.c.trigger) == trigger.lower()). \
-                where(func.lower(self.triggers.c.channel) == channel.lower()).values(response=text)
+                where(func.lower(self.triggers.c.channel) == channel.lower()). \
+                values(response=text)
 
             self.db.execute(stmnt)
             return
@@ -73,10 +76,10 @@ class Seen(object):
             %%trigger (set <trigger> <response>... | del <trigger> | list)
         """
 
-        if not target.startswith('#'):
+        if not target.is_channel:
             return 'This command can only be used in channels.'
 
-        if (args['set'] or args['del']) and not self.bot.is_chanop(target, mask.nick):
+        if (args['set'] or args['del']) and not is_chanop(self.bot, target, mask.nick):
             return 'Only channel operators may modify channel triggers.'
 
         trigger = args['<trigger>']
@@ -109,7 +112,7 @@ class Seen(object):
         responses = []
         for trigger in triggers:
             response = self._get_trigger(target, trigger)
-            trigger = self.bot.format(trigger.lower(), color=self.bot.color.ORANGE, reset=True)
+            trigger = style(trigger.lower(), color=Color.ORANGE, reset=True)
             if response is not None:
                 responses.append(f'[{trigger}] {response}')
 

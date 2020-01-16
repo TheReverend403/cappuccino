@@ -38,15 +38,16 @@ class Sentry(object):
 
     def __init__(self, bot):
         self.bot = bot
+        self.config = self.bot.config.get(__name__, {})
 
-        try:
-            sentry_sdk.init(self.bot.config[__name__]['dsn'],
+        dsn = self.config.get('dsn', None)
+        if not dsn:
+            self.bot.log.warn('Missing Sentry DSN')
+        else:
+            sentry_sdk.init(dsn,
                             before_send=_before_send,
                             release=self.bot.version,
                             integrations=[SqlalchemyIntegration()])
-        except KeyError:
-            self.bot.log.warn('Missing Sentry DSN')
-            return
 
     @command(name='testsentry', permission='admin', show_in_help_list=False)
     def testsentry(self, mask, target, args):

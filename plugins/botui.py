@@ -15,20 +15,11 @@
 
 import platform
 import subprocess
-from enum import Enum
 
 import irc3
 import requests
 from irc3.plugins.command import command
 from requests import Session
-
-
-class NickPrefix(Enum):
-    VOICE = '+'
-    HALF_OP = '%'
-    OP = '@'
-    SUPER_OP = '&'
-    OWNER = '~'
 
 
 @irc3.plugin
@@ -40,7 +31,6 @@ class BotUI(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.bot.nickprefix = NickPrefix
         self.bot.version = subprocess.check_output(['git', 'describe']).decode('UTF-8').strip()
         requests.packages.urllib3.disable_warnings()
         self.bot.requests = Session()
@@ -51,21 +41,6 @@ class BotUI(object):
             'allow_redirects': 'true',
             'verify': 'false'
         })
-
-    @irc3.extend
-    def is_chanop(self, channel: str, nick: str) -> bool:
-        for mode in NickPrefix:
-            # Voiced users aren't channel operators.
-            if mode is NickPrefix.VOICE:
-                continue
-
-            try:
-                if nick in self.bot.channels[channel].modes[mode.value]:
-                    return True
-            except (KeyError, AttributeError):
-                continue
-
-        return False
 
     @command(permission='view')
     def bots(self, mask, target, args):

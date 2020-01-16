@@ -13,30 +13,3 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import irc3
-from irc3.plugins.command import command
-from requests import RequestException
-
-
-@irc3.plugin
-class BotUI(object):
-    requires = [
-        'irc3.plugins.command',
-        'plugins.botui'
-    ]
-
-    def __init__(self, bot):
-        self.bot = bot
-
-    @command(permission='view', aliases=['whatthecommit'])
-    def wtc(self, mask, target, args):
-        """Grab a random commit message.
-
-            %%wtc
-        """
-
-        try:
-            with self.bot.requests.get('https://whatthecommit.com/index.txt') as response:
-                yield f'git commit -m "{response.text.strip()}"'
-        except RequestException as ex:
-            yield ex.strerror

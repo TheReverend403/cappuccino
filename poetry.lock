@@ -71,6 +71,17 @@ web = ["aiohttp"]
 
 [[package]]
 category = "main"
+description = "A simple Python module for applying and stripping formatting from IRC messages."
+name = "ircmessage"
+optional = false
+python-versions = "*"
+version = "0.1.1"
+
+[package.dependencies]
+six = ">=1.10.0,<1.11"
+
+[[package]]
+category = "main"
 description = "A simple, extensible Markov chain generator. Uses include generating random semi-plausible sentences based on an existing text."
 name = "markovify"
 optional = true
@@ -142,6 +153,14 @@ rq = ["0.6"]
 sanic = ["sanic (>=0.8)"]
 sqlalchemy = ["sqlalchemy (>=1.2)"]
 tornado = ["tornado (>=5)"]
+
+[[package]]
+category = "main"
+description = "Python 2 and 3 compatibility utilities"
+name = "six"
+optional = false
+python-versions = "*"
+version = "1.10.0"
 
 [[package]]
 category = "main"
@@ -223,7 +242,7 @@ lastfm = ["pylast"]
 sentry = ["sentry-sdk"]
 
 [metadata]
-content-hash = "adfc6fc3d69b894001f7d368a2da2080be66a3cc406cd39776e24ad97559d2b2"
+content-hash = "47438face59e40d537766cbb1c18d754c85dcef1145cb12d7f51560e8d1997ef"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -255,6 +274,9 @@ irc3 = [
     {file = "irc3-1.1.4-py3-none-any.whl", hash = "sha256:ad6e703ba86831c24656c3b56560b8a4661ecf1462e773e0ce9ced1760ad9760"},
     {file = "irc3-1.1.4.tar.gz", hash = "sha256:17da0ac1ecdbc4f097913cc4205749dd232435b0476f5396efcf65c29867f996"},
 ]
+ircmessage = [
+    {file = "ircmessage-0.1.1.tar.gz", hash = "sha256:e5b6d7979f7fc2a21b1e9b7605a1c43bb7522dc3cf855013a7cfdcee42bcf09f"},
+]
 markovify = [
     {file = "markovify-0.8.0.tar.gz", hash = "sha256:c533a2e1aba8148bb98031b7159e8bf1a276c61db53d2e882ecb74fa5603a4f4"},
 ]
@@ -284,6 +306,10 @@ requests = [
 sentry-sdk = [
     {file = "sentry-sdk-0.14.0.tar.gz", hash = "sha256:8e2d38dc58dc992280487e553ec3d97a424e4d179f4fad802ef3b08f64ccf4d8"},
     {file = "sentry_sdk-0.14.0-py2.py3-none-any.whl", hash = "sha256:9b59e155229ea7d46a52b5c025d8c3c6d591e9dd9bb5f5f47310b2bb430038a8"},
+]
+six = [
+    {file = "six-1.10.0-py2.py3-none-any.whl", hash = "sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1"},
+    {file = "six-1.10.0.tar.gz", hash = "sha256:105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a"},
 ]
 soupsieve = [
     {file = "soupsieve-1.9.5-py2.py3-none-any.whl", hash = "sha256:bdb0d917b03a1369ce964056fc195cfdff8819c40de04695a80bc813c3cfa1f5"},

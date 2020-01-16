@@ -19,6 +19,8 @@ import re
 import irc3
 from irc3.plugins.command import command
 
+from util.formatting import style
+
 _RANDOM_CHANCE = 0.2
 _DECIDE_DELIMITERS = [' or ', ',', '|']
 # Borrowed from https://github.com/GeneralUnRest/8ball-bot/blob/master/8ball.js
@@ -32,9 +34,6 @@ _EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.',
 
 @irc3.plugin
 class Fun(object):
-    requires = [
-        'plugins.formatting'
-    ]
 
     def __init__(self, bot):
         self.bot = bot
@@ -88,11 +87,11 @@ class Fun(object):
             data += ' INTENSIFIES'
 
         if data and len(data) <= 32:
-            self.bot.privmsg(target, self.bot.format(f'[{data}]', bold=True))
+            self.bot.privmsg(target, style(f'[{data}]', bold=True))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*wew$')
     def wew(self, target):
-        self.reply(target, self.bot.format('w e w l a d', bold=True))
+        self.reply(target, style('w e w l a d', bold=True))
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*ayy+$')
     def ayy(self, target):
@@ -100,15 +99,15 @@ class Fun(object):
 
     @irc3.event(r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*same$')
     def same(self, target):
-        self.reply(target, self.bot.format('same', bold=True))
+        self.reply(target, style('same', bold=True))
 
     @irc3.event(r'.*PRIVMSG (?P<target>\S+) :(?i)\s*benis$')
     def benis(self, target):
-        self.reply(target, self.bot.format('3===D', bold=True))
+        self.reply(target, style('3===D', bold=True))
 
     @irc3.event(r'.*PRIVMSG (?P<target>\S+) :(?i).*loli.*')
     def loli(self, target):
-        self.reply(target, self.bot.format('https://pedo.help'))
+        self.reply(target, 'https://pedo.help')
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def not_the_only_one(self, target, event, mask, data):

@@ -17,6 +17,8 @@ import irc3
 import pylast
 from irc3.plugins.command import command
 
+from util.formatting import style
+
 _DB_KEY = 'lastfm'
 _MAX_TRACK_ARTIST_LEN = 32
 _MAX_TRACK_TITLE_LEN = 75
@@ -26,17 +28,19 @@ _MAX_TRACK_TITLE_LEN = 75
 class LastFM(object):
     requires = [
         'irc3.plugins.command',
-        'plugins.formatting',
         'plugins.userdb'
     ]
 
     def __init__(self, bot):
         self.bot = bot
-        try:
-            self.lastfm = pylast.LastFMNetwork(api_key=self.bot.config[__name__]['api_key'])
-        except KeyError:
-            self.bot.log.warn('Missing last.fm API key')
+        self.config = self.bot.config.get(__name__, {})
+
+        api_key = self.config.get('api_key', None)
+        if not api_key:
+            self.bot.log.error('Missing last.fm API key')
             return
+
+        self.lastfm = pylast.LastFMNetwork(api_key=api_key)
 
     @command(name='np', permission='view', aliases=['lastfm'])
     def now_playing(self, mask, target, args):
@@ -90,12 +94,12 @@ class LastFM(object):
             if len(title) > _MAX_TRACK_TITLE_LEN:
                 title = ''.join(title[:_MAX_TRACK_TITLE_LEN]) + '...'
 
-            artist = self.bot.format(artist, bold=True)
-            title = self.bot.format(title, bold=True)
+            artist = style(artist, bold=True)
+            title = style(title, bold=True)
             track_info = f'{title} by {artist}'
 
         except (pylast.NetworkError, pylast.MalformedResponseError, pylast.WSError) as err:
-            error = self.bot.format(err, bold=True)
+            error = style(err, bold=True)
             return f'{mask.nick}: A last.fm error occurred: {error}'
 
         return f'{formatted_name} is now playing {track_info}'

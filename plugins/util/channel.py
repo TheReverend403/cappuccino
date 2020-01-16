@@ -13,30 +13,27 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import irc3
-from irc3.plugins.command import command
-from requests import RequestException
+from enum import Enum
 
 
-@irc3.plugin
-class BotUI(object):
-    requires = [
-        'irc3.plugins.command',
-        'plugins.botui'
-    ]
+class NickPrefix(Enum):
+    VOICE = '+'
+    HALF_OP = '%'
+    OP = '@'
+    SUPER_OP = '&'
+    OWNER = '~'
 
-    def __init__(self, bot):
-        self.bot = bot
 
-    @command(permission='view', aliases=['whatthecommit'])
-    def wtc(self, mask, target, args):
-        """Grab a random commit message.
-
-            %%wtc
-        """
+def is_chanop(botcontext, channel: str, nick: str) -> bool:
+    for mode in NickPrefix:
+        # Voiced users aren't channel operators.
+        if mode is NickPrefix.VOICE:
+            continue
 
         try:
-            with self.bot.requests.get('https://whatthecommit.com/index.txt') as response:
-                yield f'git commit -m "{response.text.strip()}"'
-        except RequestException as ex:
-            yield ex.strerror
+            if nick in botcontext.channels[channel].modes[mode.value]:
+                return True
+        except (KeyError, AttributeError):
+            continue
+
+    return False

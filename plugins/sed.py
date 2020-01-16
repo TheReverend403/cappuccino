@@ -19,6 +19,8 @@ import subprocess
 
 import irc3
 
+from util.formatting import Color, style
+
 _SED_PRIVMSG = r'\s*s[/|\\!\.,\\].+'
 _SED_CHECKER = re.compile('^' + _SED_PRIVMSG)
 
@@ -53,9 +55,6 @@ class EditorException(Exception):
 
 @irc3.plugin
 class Sed(object):
-    requires = [
-        'plugins.formatting'
-    ]
 
     def __init__(self, bot):
         self.bot = bot
@@ -100,10 +99,10 @@ class Sed(object):
             max_len = len(message) + max_extra_chars
             error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
             if len(new_message) > len(error_msg) and len(new_message) > max_len or len(new_message) > 256:
-                self.bot.notice(mask.nick, self.bot.format(error_msg, color=self.bot.color.RED))
+                self.bot.notice(mask.nick, style(error_msg, color=Color.RED))
                 return
 
-            emphasised_meant = self.bot.format('meant', bold=True)
+            emphasised_meant = style('meant', bold=True)
             if mask.nick == target_user:
                 if target.is_channel:
                     prefix = f'{mask.nick} {emphasised_meant} to say:'

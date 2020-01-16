@@ -20,8 +20,12 @@ import re
 import irc3
 import markovify
 from irc3.plugins.command import command
+from irc3.utils import IrcString
 from sqlalchemy import Boolean, Column, MetaData, String, Table, create_engine, func, select
 from sqlalchemy.exc import IntegrityError
+
+from util.channel import is_chanop
+from util.formatting import unstyle
 
 _CMD_PATTERN = re.compile(r'^\s*([.!~`$])+')
 _SED_CHECKER = re.compile(r'^\s*s[/|\\!.,].+')
@@ -42,33 +46,26 @@ def _should_ignore_message(line):
 @irc3.plugin
 class Ai(object):
     requires = [
-        'plugins.database',
-        'plugins.formatting'
+        'plugins.database'
     ]
 
     metadata = MetaData()
     corpus = Table('ai_corpus', metadata, Column('line', String, primary_key=True), Column('channel', String))
     channels = Table('ai_channels', metadata, Column('name', String, primary_key=True), Column('status', Boolean))
 
-    ignore_nicks = []
-    max_loaded_lines = 25000
-
     def __init__(self, bot):
         self.bot = bot
         self.db = self.bot.database
-
-        try:
-            self.ignore_nicks = self.bot.config[__name__]['ignore_nicks'].split()
-            self.max_loaded_lines = self.bot.config[__name__]['max_loaded_lines']
-        except KeyError:
-            pass
+        self.config = self.bot.config.get(__name__, {})
+        self.ignore_nicks = self.config.get('ignore_nicks', '').split()
+        self.max_loaded_lines = self.config.get('max_loaded_lines', 25000)
 
         self.metadata.create_all(self.db)
         self._migrate()
 
     def _add_line(self, line: str, channel: str):
         try:
-            insert_stmt = self.corpus.insert().values(line=self.bot.strip_formatting(line), channel=channel)
+            insert_stmt = self.corpus.insert().values(line=unstyle(line), channel=channel)
             self.db.execute(insert_stmt)
         except IntegrityError:
             pass
@@ -92,7 +89,7 @@ class Ai(object):
         return self.db.execute(select_stmt).scalar()
 
     def _is_active(self, channel: str) -> bool:
-        if not channel.startswith('#'):
+        if not IrcString(channel).is_channel:
             return False
 
         select_stmt = select([self.channels.c.status]).where(self.channels.c.name == channel)
@@ -117,20 +114,19 @@ class Ai(object):
         if not str(self.db.url).startswith('sqlite://') and os.path.exists('data/ai.sqlite'):
             self.bot.log.info('Found ai.sqlite, migrating data.')
             sqlite_db = create_engine('sqlite:///data/ai.sqlite')
-            formatting_codes_regex = re.compile(r'.*\x1f|\x02|\x1D|\x03.*', re.UNICODE)
 
             corpus_results = sqlite_db.execute('SELECT * FROM corpus')
             corpus_insert = self.corpus.insert(). \
                 values([
-                    {'line': row[0], 'channel': row[1]}
-                    for row in corpus_results if not formatting_codes_regex.match(row[0])
+                    {'line': unstyle(row[0]), 'channel': row[1]}
+                    for row in corpus_results
                 ])
 
             channel_results = sqlite_db.execute('SELECT * FROM channels')
             channels_insert = self.channels.insert(). \
                 values([
                     {'name': row[0], 'status': row[1]}
-                    for row in channel_results if row[0].startswith('#')
+                    for row in channel_results if IrcString(row[0]).is_channel
                 ])
 
             try:
@@ -162,7 +158,7 @@ class Ai(object):
             return f'Chatbot is currently {ai_status} for {target}. ' \
                    f'Channel/global line count: {channel_line_count}/{line_count} ({channel_percentage}%).'
 
-        if not self.bot.is_chanop(target, mask.nick):
+        if not is_chanop(self.bot, target, mask.nick):
             prefixes = [prefix.value for prefix in self.bot.nickprefix if prefix is not self.bot.nickprefix.VOICE]
             op_prefixes = ', '.join(prefixes)
 
@@ -173,10 +169,9 @@ class Ai(object):
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def handle_line(self, target, event, mask, data):
-        if not target.is_channel:
+        if not target.is_channel or not mask.is_user:
             return
 
-        channel = target
         if mask.nick in self.ignore_nicks or mask.nick == self.bot.nick:
             return
 
@@ -187,10 +182,10 @@ class Ai(object):
         # Only respond to messages mentioning the bot in an active channel
         if self.bot.nick.lower() not in data.lower():
             # Only add lines that aren't mentioning the bot
-            self._add_line(data, channel)
+            self._add_line(data, target)
             return
 
-        if not self._is_active(channel):
+        if not self._is_active(target):
             return
 
         corpus = self._get_lines()
@@ -201,7 +196,7 @@ class Ai(object):
         text_model = markovify.NewlineText('\n'.join(corpus))
         generated_reply = text_model.make_short_sentence(100)
         if not generated_reply:
-            self.bot.privmsg(channel, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))
+            self.bot.privmsg(target, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))
             return
 
-        self.bot.privmsg(channel, generated_reply.strip())
+        self.bot.privmsg(target, generated_reply.strip())

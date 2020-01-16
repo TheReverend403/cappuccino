@@ -48,24 +48,19 @@ class UserDB(object):
         self.db = self.bot.database
         self.metadata.create_all(self.db)
         self._migrate()
+        self.config = self.bot.config.get(__name__, {})
 
-        try:
-            self.config = self.bot.config[__name__]
-            if not self.config.get('enable_http_server'):
-                return
-            host, port = self.config['http_host'], int(self.config['http_port'])
-        except KeyError:
-            host, port = '127.0.0.1', 8080
-
-        bottle.hook('before_request')(_strip_path)
-        bottle.route('/')(lambda: self._json_dump())
-        bottle_thread = threading.Thread(
-            target=bottle.run,
-            kwargs={'quiet': True, 'host': host, 'port': port},
-            name='{0} HTTP server'.format(__name__),
-            daemon=True
-        )
-        bottle_thread.start()
+        if self.config.get('enable_http_server', False):
+            host, port = self.config.get('http_host', '127.0.0.1'), int(self.config.get('http_port', 8080))
+            bottle.hook('before_request')(_strip_path)
+            bottle.route('/')(lambda: self._json_dump())
+            bottle_thread = threading.Thread(
+                target=bottle.run,
+                kwargs={'quiet': True, 'host': host, 'port': port},
+                name='{0} HTTP server'.format(__name__),
+                daemon=True
+            )
+            bottle_thread.start()
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
@@ -78,7 +73,7 @@ class UserDB(object):
         user_data = self._get_user(username)
 
         try:
-            del user_data[key]
+            user_data.pop(key)
         except KeyError:
             pass
 
@@ -99,10 +94,7 @@ class UserDB(object):
         except KeyError:
             user_data = input_data
         except ValueError:
-            try:
-                del user_data[key]
-            except KeyError:
-                pass
+            user_data.pop(key, None)
 
         update = self.ricedb.update().where(
             func.lower(self.ricedb.c.nick) == username.lower()

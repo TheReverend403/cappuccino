@@ -19,6 +19,8 @@ import re
 import irc3
 from irc3.plugins.command import command
 
+from util.formatting import Color, style
+
 MAX_USER_VALUES = 6
 
 
@@ -37,7 +39,6 @@ def _from_user_index(index: int):
 class Rice(object):
     requires = [
         'irc3.plugins.command',
-        'plugins.formatting',
         'plugins.userdb'
     ]
 
@@ -132,7 +133,7 @@ class Rice(object):
             args['<user>'], args['<id>'] = None, args['<user>']
 
         user = args['<user>'] or mask.nick
-        formatted_user = self.bot.format(user, color=self.bot.color.GREEN)
+        formatted_user = style(user, color=Color.GREEN)
 
         if args['<id>'] is not None:
             try:
@@ -147,8 +148,8 @@ class Rice(object):
         if values:
             indexed_values = []
             for index, item in enumerate(values):
-                index = self.bot.format(_to_user_index(index), bold=True)
-                item = self.bot.format(item, reset=True)
+                index = style(_to_user_index(index), bold=True)
+                item = style(item, reset=True)
                 indexed_values.append(f'({index}) {item}')
 
             formatted_values = ' | '.join(indexed_values)
