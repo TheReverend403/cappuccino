@@ -112,7 +112,7 @@ class Seen(object):
         responses = []
         for trigger in triggers:
             response = self._get_trigger(target, trigger)
-            trigger = style(trigger.lower(), color=Color.ORANGE, reset=True)
+            trigger = style(trigger.lower(), fg=Color.ORANGE, reset=True)
             if response is not None:
                 responses.append(f'[{trigger}] {response}')
 

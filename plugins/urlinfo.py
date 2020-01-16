@@ -197,7 +197,7 @@ class UrlInfo(object):
                 except ContentTypeNotAllowed as ex:
                     self.bot.log.debug(ex)
                 except (socket.gaierror, ValueError, requests.RequestException) as ex:
-                    formatted_hostname = style(hostname, color=Color.RED)
+                    formatted_hostname = style(hostname, fg=Color.RED)
                     formatted_error = style(ex, bold=True)
 
                     if type(ex) == requests.RequestException:
@@ -210,7 +210,7 @@ class UrlInfo(object):
                         messages.append(f'[ {formatted_hostname} ] {formatted_error}')
                 # no exception
                 else:
-                    formatted_hostname = style(hostname, color=Color.GREEN)
+                    formatted_hostname = style(hostname, fg=Color.GREEN)
                     if title is not None and mimetype is not None:
                         formatted_title = style(title, bold=True)
                         reply = f'[ {formatted_hostname} ] {formatted_title} ({mimetype})'
@@ -222,5 +222,5 @@ class UrlInfo(object):
 
             # Send all parsed URLs now that we have them all.
             if messages:
-                pipe_character = style(' | ', color=Color.LIGHT_GRAY, reset=True)
+                pipe_character = style(' | ', fg=Color.LIGHT_GRAY, reset=True)
                 self.bot.privmsg(target, pipe_character.join(messages))

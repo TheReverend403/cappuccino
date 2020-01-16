@@ -133,7 +133,7 @@ class Rice(object):
             args['<user>'], args['<id>'] = None, args['<user>']
 
         user = args['<user>'] or mask.nick
-        formatted_user = style(user, color=Color.GREEN)
+        formatted_user = style(user, fg=Color.GREEN)
 
         if args['<id>'] is not None:
             try:

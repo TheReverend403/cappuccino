@@ -38,10 +38,14 @@ class Color(Enum):
     LIGHT_GRAY = ircmessage.colors.light_grey
 
 
-def style(text, color: Color = None, bold: bool = False, reset: bool = True) -> str:
-    if color:
-        color = ircmessage.colors.idToName.get(color.value, None)
-    return ircmessage.style(str(text), fg=color, bold=bold, reset=reset)
+def style(text, fg: Color = None, bg: Color = None, bold=False, italics=False, underline=False, reset=True) -> str:
+    if fg:
+        fg = ircmessage.colors.idToName.get(fg.value, None)
+
+    if bg:
+        bg = ircmessage.colors.idToName.get(bg.value, None)
+
+    return ircmessage.style(str(text), fg=fg, bg=bg, italics=italics, underline=underline, bold=bold, reset=reset)
 
 
 def unstyle(text: str) -> str:
