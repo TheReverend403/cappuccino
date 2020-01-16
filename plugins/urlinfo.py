@@ -161,7 +161,7 @@ class UrlInfo(object):
         self.bot = bot
         self.config = self.bot.config.get(__name__, {})
         self.ignore_nicks = self.config.get('ignore_nicks', '').split()
-        self.ignore_hostnames = self.config.get('ignore_nicks', '').split()
+        self.ignore_hostnames = self.config.get('ignore_hostnames', '').split()
         socket.getaddrinfo = _getaddrinfo_wrapper
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{0}).*'.format(_URL_FINDER.pattern))
