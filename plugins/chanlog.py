@@ -36,7 +36,6 @@ class Chanlog(object):
     def __init__(self, bot):
         self.bot = bot
         self.db = Database(self)
-        print(self.bot)
 
     def _add_event(self, user, event, data, channel: IrcString = None, target=None):
         if not channel.is_channel:
@@ -48,7 +47,6 @@ class Chanlog(object):
 
     @irc3.event(r'PRIVMSG (?P<target>[^#]+) :(?P<data>.*)', iotype='out')
     def on_privmsg_out(self, event, target, data):
-        print('privmsg out')
         self._add_event(self.bot.nick, 'PRIVMSG', data, channel=target)
 
     @irc3.event(rfc.PRIVMSG)
