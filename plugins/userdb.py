@@ -19,6 +19,8 @@ import bottle
 from sqlalchemy import Column, JSON, MetaData, String, Table, desc, func, select
 from sqlalchemy.exc import IntegrityError
 
+from util.database import Database
+
 try:
     import ujson as json
 except ImportError:
@@ -34,21 +36,16 @@ def _strip_path():
 @irc3.plugin
 class UserDB(object):
 
-    requires = [
-        'plugins.database'
-    ]
-
-    metadata = MetaData()
-    ricedb = Table('ricedb', metadata,
+    db_meta = MetaData()
+    ricedb = Table('ricedb', db_meta,
                    Column('nick', String, primary_key=True),
                    Column('data', JSON))
 
     def __init__(self, bot):
         self.bot = bot
-        self.db = self.bot.database
-        self.metadata.create_all(self.db)
-        self._migrate()
         self.config = self.bot.config.get(__name__, {})
+        self.db = Database(self)
+        self._migrate()
 
         if self.config.get('enable_http_server', False):
             host, port = self.config.get('http_host', '127.0.0.1'), int(self.config.get('http_port', 8080))

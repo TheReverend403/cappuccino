@@ -67,9 +67,9 @@ api_key =
 ignore_nicks = Nick1 Nick2
 ignore_hostnames = example.com
 
-[plugins.database]
+[database]
 # https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
-database = sqlite:///data/ai.sqlite
+uri = sqlite:///data/ai.sqlite
 
 [irc3.plugins.command]
 # set command char

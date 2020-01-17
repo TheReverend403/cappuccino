@@ -20,6 +20,7 @@ from irc3.plugins.command import command
 from sqlalchemy import Column, MetaData, String, Table, func, select
 
 from util.channel import is_chanop
+from util.database import Database
 from util.formatting import Color, style
 
 
@@ -27,8 +28,7 @@ from util.formatting import Color, style
 class Seen(object):
     requires = [
         'irc3.plugins.command',
-        'plugins.botui',
-        'plugins.database'
+        'plugins.botui'
     ]
 
     metadata = MetaData()
@@ -39,8 +39,7 @@ class Seen(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.db = self.bot.database
-        self.metadata.create_all(self.db)
+        self.db = Database(self)
 
     def _get_trigger(self, channel: str, trigger: str):
         stmnt = select([self.triggers.c.response]). \

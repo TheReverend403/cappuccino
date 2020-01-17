@@ -25,6 +25,7 @@ from sqlalchemy import Boolean, Column, MetaData, String, Table, create_engine, 
 from sqlalchemy.exc import IntegrityError
 
 from util.channel import is_chanop
+from util.database import Database
 from util.formatting import unstyle
 
 _CMD_PATTERN = re.compile(r'^\s*([.!~`$])+')
@@ -45,22 +46,17 @@ def _should_ignore_message(line):
 
 @irc3.plugin
 class Ai(object):
-    requires = [
-        'plugins.database'
-    ]
 
-    metadata = MetaData()
-    corpus = Table('ai_corpus', metadata, Column('line', String, primary_key=True), Column('channel', String))
-    channels = Table('ai_channels', metadata, Column('name', String, primary_key=True), Column('status', Boolean))
+    db_meta = MetaData()
+    corpus = Table('ai_corpus', db_meta, Column('line', String, primary_key=True), Column('channel', String))
+    channels = Table('ai_channels', db_meta, Column('name', String, primary_key=True), Column('status', Boolean))
 
     def __init__(self, bot):
         self.bot = bot
-        self.db = self.bot.database
         self.config = self.bot.config.get(__name__, {})
         self.ignore_nicks = self.config.get('ignore_nicks', '').split()
         self.max_loaded_lines = self.config.get('max_loaded_lines', 25000)
-
-        self.metadata.create_all(self.db)
+        self.db = Database(self)
         self._migrate()
 
     def _add_line(self, line: str, channel: str):
