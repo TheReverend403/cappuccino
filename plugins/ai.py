@@ -13,7 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import os
 import random
 import re
 
@@ -21,7 +20,7 @@ import irc3
 import markovify
 from irc3.plugins.command import command
 from irc3.utils import IrcString
-from sqlalchemy import Boolean, Column, MetaData, String, Table, create_engine, func, select
+from sqlalchemy import Boolean, Column, MetaData, String, Table, func, select
 from sqlalchemy.exc import IntegrityError
 
 from util.channel import is_chanop
@@ -57,7 +56,6 @@ class Ai(object):
         self.ignore_nicks = self.config.get('ignore_nicks', '').split()
         self.max_loaded_lines = self.config.get('max_loaded_lines', 25000)
         self.db = Database(self)
-        self._migrate()
 
     def _add_line(self, line: str, channel: str):
         try:
@@ -105,34 +103,6 @@ class Ai(object):
             update_stmt = self.channels.update().where(self.channels.c.name == channel).values(status=1)
 
         self.db.execute(update_stmt)
-
-    def _migrate(self):
-        if not str(self.db.url).startswith('sqlite://') and os.path.exists('data/ai.sqlite'):
-            self.bot.log.info('Found ai.sqlite, migrating data.')
-            sqlite_db = create_engine('sqlite:///data/ai.sqlite')
-
-            corpus_results = sqlite_db.execute('SELECT * FROM corpus')
-            corpus_insert = self.corpus.insert(). \
-                values([
-                    {'line': unstyle(row[0]), 'channel': row[1]}
-                    for row in corpus_results
-                ])
-
-            channel_results = sqlite_db.execute('SELECT * FROM channels')
-            channels_insert = self.channels.insert(). \
-                values([
-                    {'name': row[0], 'status': row[1]}
-                    for row in channel_results if IrcString(row[0]).is_channel
-                ])
-
-            try:
-                self.db.execute(channels_insert)
-                self.db.execute(corpus_insert)
-            except IntegrityError:
-                pass
-
-            self.bot.log.info('Migration complete, renaming old sqlite database.')
-            os.rename('data/ai.sqlite', 'data/ai.sqlite.bak')
 
     @command()
     def ai(self, mask, target, args):

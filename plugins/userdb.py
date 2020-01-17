@@ -12,12 +12,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
-import os
 import threading
 
 import bottle
 from sqlalchemy import Column, JSON, MetaData, String, Table, desc, func, select
-from sqlalchemy.exc import IntegrityError
 
 from util.database import Database
 
@@ -45,7 +43,6 @@ class UserDB(object):
         self.bot = bot
         self.config = self.bot.config.get(__name__, {})
         self.db = Database(self)
-        self._migrate()
 
         if self.config.get('enable_http_server', False):
             host, port = self.config.get('http_host', '127.0.0.1'), int(self.config.get('http_port', 8080))
@@ -101,26 +98,6 @@ class UserDB(object):
     def _get_user(self, user):
         query = select([self.ricedb.c.data]).where(func.lower(self.ricedb.c.nick) == user.lower())
         return self.db.execute(query).scalar()
-
-    def _migrate(self):
-        if os.path.exists('data/userdb.json'):
-            self.bot.log.info('Found userdb.json, migrating data.')
-            with open('data/userdb.json', 'r') as fd:
-                data = json.load(fd)
-
-                rice_insert = self.ricedb.insert(). \
-                    values([
-                        {'nick': user, 'data': data[user]}
-                        for user in data.keys()
-                    ])
-
-                try:
-                    self.db.execute(rice_insert)
-                except IntegrityError:
-                    pass
-
-                self.bot.log.info('Migration complete, renaming old file.')
-                os.rename('data/userdb.json', 'data/userdb.json.bak')
 
     def _json_dump(self):
         bottle.response.content_type = 'application/json'
