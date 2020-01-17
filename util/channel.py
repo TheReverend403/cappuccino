@@ -16,7 +16,7 @@
 from enum import Enum
 
 
-class NickPrefix(Enum):
+class ChannelMode(Enum):
     VOICE = '+'
     HALF_OP = '%'
     OP = '@'
@@ -25,9 +25,9 @@ class NickPrefix(Enum):
 
 
 def is_chanop(botcontext, channel: str, nick: str) -> bool:
-    for mode in NickPrefix:
+    for mode in ChannelMode:
         # Voiced users aren't channel operators.
-        if mode is NickPrefix.VOICE:
+        if mode is ChannelMode.VOICE:
             continue
 
         try:

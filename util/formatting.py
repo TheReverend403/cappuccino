@@ -13,12 +13,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-from enum import Enum
-
 import ircmessage
 
 
-class Color(Enum):
+class Color:
     WHITE = ircmessage.colors.white
     BLACK = ircmessage.colors.black
     BLUE = ircmessage.colors.blue
@@ -39,12 +37,6 @@ class Color(Enum):
 
 
 def style(text, fg: Color = None, bg: Color = None, bold=False, italics=False, underline=False, reset=True) -> str:
-    if fg:
-        fg = ircmessage.colors.idToName.get(fg.value, None)
-
-    if bg:
-        bg = ircmessage.colors.idToName.get(bg.value, None)
-
     return ircmessage.style(str(text), fg=fg, bg=bg, italics=italics, underline=underline, bold=bold, reset=reset)
 
 
