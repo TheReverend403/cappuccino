@@ -42,7 +42,7 @@ class Chanlog(object):
             channel = None
 
         self.db.execute(self.chanlog.insert().values(
-            user=user, channel=channel, event=event, target=target, data=data
+            user=user.nick, channel=channel, event=event, target=target, data=data
         ))
 
     @irc3.event(r'^PRIVMSG (?P<target>\S+) :(?P<data>.*)$', iotype='out')
