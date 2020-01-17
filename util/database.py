@@ -16,20 +16,21 @@
 from sqlalchemy import create_engine
 
 
+class _Singleton:
+    def __init__(self, engine):
+        self.engine = engine
+
+
 class Database(object):
     instance = None
 
     def __init__(self, plugin):
         plugin.bot.log.info(f'Initialising database for {plugin.__module__}')
         if not Database.instance:
-            Database.instance = Database.__Singleton(create_engine(plugin.bot.config.get('database', {}).get('uri')))
+            Database.instance = _Singleton(create_engine(plugin.bot.config.get('database', {}).get('uri')))
 
         if hasattr(plugin, 'db_meta'):
             plugin.db_meta.create_all(self.instance.engine)
-
-    class __Singleton:
-        def __init__(self, engine):
-            self.engine = engine
 
     def __getattr__(self, name):
         return getattr(self.instance.engine, name)
