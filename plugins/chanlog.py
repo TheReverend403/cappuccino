@@ -38,7 +38,7 @@ class Chanlog(object):
         self.db = Database(self)
 
     def _add_event(self, user: IrcString, event, data, channel: IrcString = None, target=None):
-        if not channel.is_channel:
+        if channel and not channel.is_channel:
             channel = None
 
         if user.is_nick:
