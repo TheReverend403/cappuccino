@@ -41,6 +41,9 @@ class Chanlog(object):
         if not channel.is_channel:
             channel = None
 
+        if IrcString(user).is_user:
+            user = user.nick
+
         self.db.execute(self.chanlog.insert().values(
             user=user.nick, channel=channel, event=event, target=target, data=data
         ))
