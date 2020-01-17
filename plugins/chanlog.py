@@ -62,27 +62,22 @@ class Chanlog(object):
         self._add_event(mask, event, data, channel=target)
 
     @irc3.event(rfc.JOIN_PART_QUIT)
-    @irc3.event(rfc.JOIN_PART_QUIT, iotype='out')
     def on_join_part_quit(self, mask, event, channel, data):
         self._add_event(mask, event, data, channel=channel)
 
     @irc3.event(rfc.KICK)
-    @irc3.event(rfc.KICK, iotype='out')
     def on_kick(self, mask, event, channel, target, data):
         self._add_event(mask, event, data, channel, target)
 
     @irc3.event(rfc.NEW_NICK)
-    @irc3.event(rfc.NEW_NICK, iotype='out')
-    def on_new_nick(self, nick, newnick):
-        self._add_event(nick, 'NICK', newnick)
+    def on_new_nick(self, nick, new_nick):
+        self._add_event(nick, 'NICK', new_nick)
 
     @irc3.event(rfc.TOPIC)
-    @irc3.event(rfc.TOPIC, iotype='out')
     def on_topic(self, mask, channel, data):
         self._add_event(mask, 'TOPIC', data, channel)
 
     @irc3.event(rfc.MODE)
-    @irc3.event(rfc.MODE, iotype='out')
     def on_mode(self, mask, event, target, modes, data):
         if not target.is_channel:
             return
