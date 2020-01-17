@@ -37,15 +37,15 @@ class Chanlog(object):
         self.bot = bot
         self.db = Database(self)
 
-    def _add_event(self, user, event, data, channel: IrcString = None, target=None):
+    def _add_event(self, user: IrcString, event, data, channel: IrcString = None, target=None):
         if not channel.is_channel:
             channel = None
 
-        if IrcString(user).is_user:
+        if user.is_nick:
             user = user.nick
 
         self.db.execute(self.chanlog.insert().values(
-            user=user.nick, channel=channel, event=event, target=target, data=data
+            user=user, channel=channel, event=event, target=target, data=data
         ))
 
     @irc3.event(r'^PRIVMSG (?P<target>\S+) :(?P<data>.*)$', iotype='out')
