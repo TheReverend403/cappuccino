@@ -64,7 +64,7 @@ class Chanlog(object):
     @irc3.event(rfc.JOIN_PART_QUIT)
     def on_join_part_quit(self, mask, event, channel, data):
         # Keep it clean.
-        if data:
+        if data and event == 'QUIT':
             data = data.replace('Quit: ', '')
 
         self._add_event(mask, event, data, channel=channel)
