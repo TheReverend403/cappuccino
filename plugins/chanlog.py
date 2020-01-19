@@ -77,7 +77,7 @@ class Chanlog(object):
 
     @irc3.event(rfc.JOIN_PART_QUIT, iotype='out')
     def on_join_part_quit_out(self, *args, **kwargs):
-        yield self.on_join_part_quit(args, **kwargs)
+        yield self.on_join_part_quit(*args, **kwargs)
 
     @irc3.event(rfc.KICK)
     def on_kick(self, mask=None, event=None, channel=None, target=None, data=None):
