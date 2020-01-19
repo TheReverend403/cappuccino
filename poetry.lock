@@ -59,7 +59,7 @@ description = "plugable irc client library based on asyncio with DCC and SASL su
 name = "irc3"
 optional = false
 python-versions = "*"
-version = "1.1.4"
+version = "1.1.5"
 
 [package.dependencies]
 docopt = "*"
@@ -271,8 +271,8 @@ idna = [
     {file = "idna-2.8.tar.gz", hash = "sha256:c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407"},
 ]
 irc3 = [
-    {file = "irc3-1.1.4-py3-none-any.whl", hash = "sha256:ad6e703ba86831c24656c3b56560b8a4661ecf1462e773e0ce9ced1760ad9760"},
-    {file = "irc3-1.1.4.tar.gz", hash = "sha256:17da0ac1ecdbc4f097913cc4205749dd232435b0476f5396efcf65c29867f996"},
+    {file = "irc3-1.1.5-py3-none-any.whl", hash = "sha256:ea3278df59ba02d016a6b7b606c440d9f8a2224422687b12be0222deccfb63c2"},
+    {file = "irc3-1.1.5.tar.gz", hash = "sha256:1a98cc8e31c856673a125ec1cf1e5703c3011f37cd0da946c9f0e12a8afc9c03"},
 ]
 ircmessage = [
     {file = "ircmessage-0.1.1.tar.gz", hash = "sha256:e5b6d7979f7fc2a21b1e9b7605a1c43bb7522dc3cf855013a7cfdcee42bcf09f"},

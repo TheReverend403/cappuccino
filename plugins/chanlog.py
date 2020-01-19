@@ -23,7 +23,6 @@ from util.database import Database
 
 @irc3.plugin
 class Chanlog(object):
-
     db_meta = MetaData()
     chanlog = Table('chanlog', db_meta,
                     Column('user', String),
@@ -36,53 +35,94 @@ class Chanlog(object):
     def __init__(self, bot):
         self.bot = bot
         self.db = Database(self)
+        self.default_nick = self.bot.nick
 
-    def _add_event(self, user: IrcString, event, data, channel: IrcString = None, target=None):
+    def _add_event(self, event: str, data: str = None,
+                   user: IrcString = None, channel: IrcString = None, target: str = None):
+
         if channel and not channel.is_channel:
             channel = None
 
-        if user.is_nick:
+        # Don't store server actions
+        if user and user.is_nick:
             user = user.nick
+        else:
+            return
 
         self.db.execute(self.chanlog.insert().values(
             user=user, channel=channel, event=event, target=target, data=data
         ))
 
-    @irc3.event(r'^PRIVMSG (?P<target>\S+) :(?P<data>.*)$', iotype='out')
-    def on_privmsg_out(self, target, data):
-        if not target.is_channel:
-            return
-        self._add_event(self.bot.nick, 'PRIVMSG', data, channel=target)
-
     @irc3.event(rfc.PRIVMSG)
-    def on_privmsg(self, mask, event, target, data):
+    @irc3.event(rfc.PRIVMSG, iotype='out')
+    def on_privmsg(self, mask=None, event=None, target=None, data=None):
         if event == 'NOTICE' or data.startswith('\x01VERSION') or not target.is_channel:
             return
 
-        self._add_event(mask, event, data, channel=target)
+        if not mask:
+            mask = self.bot.nick
+
+        self._add_event(event, user=mask, data=data, channel=target)
 
     @irc3.event(rfc.JOIN_PART_QUIT)
-    def on_join_part_quit(self, mask, event, channel, data):
+    def on_join_part_quit(self, mask=None, event=None, channel=None, data=None):
         # Keep it clean.
         if data and event == 'QUIT':
             data = data.replace('Quit: ', '')
 
-        self._add_event(mask, event, data, channel=channel)
+        if not mask:
+            mask = self.bot.nick
+
+        self._add_event(event, user=mask, data=data, channel=channel)
+
+    @irc3.event(rfc.JOIN_PART_QUIT, iotype='out')
+    def on_join_part_quit_out(self, *args, **kwargs):
+        yield self.on_join_part_quit(args, **kwargs)
 
     @irc3.event(rfc.KICK)
-    def on_kick(self, mask, event, channel, target, data):
-        self._add_event(mask, event, data, channel, target)
+    def on_kick(self, mask=None, event=None, channel=None, target=None, data=None):
+        if not mask:
+            mask = self.bot.nick
+
+        self._add_event(event, data=data, user=mask, channel=channel, target=target)
+
+    @irc3.event(rfc.KICK, iotype='out')
+    def on_kick_out(self, *args, **kwargs):
+        yield self.on_kick(*args, **kwargs)
 
     @irc3.event(rfc.NEW_NICK)
-    def on_new_nick(self, nick, new_nick):
-        self._add_event(nick, 'NICK', new_nick)
+    def on_new_nick(self, nick=None, new_nick=None):
+        if not nick:
+            nick = self.bot.nick
+
+        self._add_event('NICK', user=nick, data=new_nick)
+
+    @irc3.event(rfc.NEW_NICK, iotype='out')
+    def on_new_nick_out(self, *args, **kwargs):
+        yield self.on_new_nick(*args, **kwargs)
 
     @irc3.event(rfc.TOPIC)
-    def on_topic(self, mask, channel, data):
-        self._add_event(mask, 'TOPIC', data, channel)
+    @irc3.event(rfc.TOPIC, iotype='out')
+    def on_topic(self, mask=None, channel=None, data=None):
+        if not mask:
+            mask = self.bot.nick
+
+        self._add_event('TOPIC', user=mask, data=data, channel=channel)
+
+    @irc3.event(rfc.TOPIC, iotype='out')
+    def on_topic_out(self, *args, **kwargs):
+        yield self.on_topic(*args, **kwargs)
 
     @irc3.event(rfc.MODE)
-    def on_mode(self, mask, event, target, modes, data):
+    def on_mode(self, mask=None, event=None, target=None, modes=None, data=None):
         if not target.is_channel:
             return
-        self._add_event(mask, event, modes, channel=target, target=data)
+
+        if not mask:
+            mask = self.bot.nick
+
+        self._add_event(event, data=modes, user=mask, channel=target, target=data)
+
+    @irc3.event(rfc.MODE, iotype='out')
+    def on_mode_out(self, *args, **kwargs):
+        yield self.on_mode(*args, **kwargs)
