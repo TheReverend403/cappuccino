@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-from sqlalchemy import create_engine
+from sqlalchemy import MetaData, create_engine
 
 
 class _Singleton:
@@ -23,15 +23,14 @@ class _Singleton:
 
 class Database(object):
     instance = None
+    meta = None
 
     def __init__(self, plugin):
         plugin.bot.log.info(f'Initialising database for {plugin.__module__}')
         if not Database.instance:
             Database.instance = _Singleton(create_engine(plugin.bot.config.get('database', {}).get('uri')))
-
-        if hasattr(plugin, 'db_meta'):
-            plugin.db_meta.create_all(self.instance.engine)
+            Database.meta = MetaData(bind=Database.instance.engine, reflect=True)
 
     def __getattr__(self, name):
-        return getattr(self.instance.engine, name)
+        return getattr(self.instance.engine, name) or getattr(self.instance, name)
 

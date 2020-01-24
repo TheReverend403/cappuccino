@@ -16,25 +16,17 @@
 import irc3
 from irc3 import rfc
 from irc3.utils import IrcString
-from sqlalchemy import Column, DateTime, MetaData, String, Table, func
 
 from util.database import Database
 
 
 @irc3.plugin
 class Chanlog(object):
-    db_meta = MetaData()
-    chanlog = Table('chanlog', db_meta,
-                    Column('user', String),
-                    Column('channel', String),
-                    Column('event', String),
-                    Column('target', String),
-                    Column('data', String),
-                    Column('time', DateTime, server_default=func.now()))
 
     def __init__(self, bot):
         self.bot = bot
         self.db = Database(self)
+        self.chanlog = self.db.meta.tables['chanlog']
         self.default_nick = self.bot.nick
 
     def _add_event(self, event: str, data: str = None,

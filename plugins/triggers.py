@@ -17,7 +17,7 @@ import re
 
 import irc3
 from irc3.plugins.command import command
-from sqlalchemy import Column, MetaData, String, Table, func, select
+from sqlalchemy import func, select
 
 from util.channel import is_chanop
 from util.database import Database
@@ -31,15 +31,10 @@ class Seen(object):
         'plugins.botui'
     ]
 
-    metadata = MetaData()
-    triggers = Table('triggers', metadata,
-                     Column('trigger', String, nullable=False),
-                     Column('channel', String, nullable=False),
-                     Column('response', String, nullable=False))
-
     def __init__(self, bot):
         self.bot = bot
         self.db = Database(self)
+        self.triggers = self.db.meta.tables['triggers']
 
     def _get_trigger(self, channel: str, trigger: str):
         stmnt = select([self.triggers.c.response]). \
