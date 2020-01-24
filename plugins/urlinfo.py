@@ -136,10 +136,10 @@ def _parse_url(url: str, session):
                     title = re.sub(r'\s+', ' ', ' '.join(content.split('\n')))
 
         if title:
-            title = html.unescape(title).strip()
+            title = unstyle(html.unescape(title).strip())
             if len(title) > _MAX_TITLE_LENGTH:
                 title = ''.join(title[:_MAX_TITLE_LENGTH - 3]) + '...'
-    return hostname, unstyle(title), content_type, size
+    return hostname, title, content_type, size
 
 
 def _clean_url(url: str):
