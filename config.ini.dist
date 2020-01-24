@@ -69,7 +69,8 @@ ignore_hostnames = example.com
 
 [database]
 # https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
-uri = sqlite:///data/ai.sqlite
+# Only postgresql is officially supported, you're on your own for anything else.
+uri =
 
 [irc3.plugins.command]
 # set command char
