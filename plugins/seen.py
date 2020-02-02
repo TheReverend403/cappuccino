@@ -14,8 +14,7 @@
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
 import re
-import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import irc3
 from irc3.plugins.command import command
@@ -23,8 +22,8 @@ from irc3.plugins.command import command
 _DB_KEY = 'last_seen'
 
 
-def _time_format(seconds: int):
-    delta = str(timedelta(seconds=seconds))
+def _time_format(seconds: timedelta):
+    delta = str(seconds)
 
     # Remove microseconds in string representation
     delta = re.sub(r'\.[0-9]+', '', delta)
@@ -44,7 +43,7 @@ class Seen(object):
     def get_last_seen(self, nick: str):
         return self.bot.get_user_value(nick, _DB_KEY)
 
-    def set_last_seen(self, nick: str, timestamp: float):
+    def set_last_seen(self, nick: str, timestamp: datetime):
         self.bot.set_user_value(nick, _DB_KEY, timestamp)
 
     @command(permission='view', aliases=['died'])
@@ -66,8 +65,9 @@ class Seen(object):
             return f'I haven\'t seen any activity from {nick} yet.'
 
         last_seen = self.get_last_seen(nick)
-        time_now = time.time()
-        timefmt = _time_format(time_now - last_seen)
+        time_now = datetime.utcnow()
+        duration = time_now - last_seen
+        timefmt = _time_format(duration)
 
         return f'{nick} was last seen {timefmt} ago.'
 
@@ -76,4 +76,4 @@ class Seen(object):
         if mask.nick == self.bot.nick or event == 'NOTICE':
             return
 
-        self.set_last_seen(mask.nick, time.time())
+        self.set_last_seen(mask.nick, datetime.utcnow())

@@ -54,50 +54,50 @@ class UserDB(object):
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
-        query = select([self.ricedb.c.data[key]]).where(func.lower(self.ricedb.c.nick) == username.lower())
+        query = select([self.ricedb.c[key]]).where(func.lower(self.ricedb.c.nick) == username.lower())
         result = self.db.execute(query).scalar()
         return result
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
-        user_data = self._get_user(username)
+        update = self.ricedb.update().where(
+            func.lower(self.ricedb.c.nick) == username.lower()
+        ).values(**{key: None})
 
-        try:
-            user_data.pop(key)
-        except KeyError:
-            pass
-
-        update = self.ricedb.update().where(func.lower(self.ricedb.c.nick) == username.lower()).values(data=user_data)
         self.db.execute(update)
 
     @irc3.extend
     def set_user_value(self, username: str, key, value=None):
-        input_data = {key: value} if value else key
-        user_data = self._get_user(username)
+        user_exists = self.db.execute(select([self.ricedb.c.nick]).where(
+            func.lower(self.ricedb.c.nick) == username.lower()
+        )).scalar() or None
 
-        if user_data is None:
-            self.db.execute(self.ricedb.insert().values(nick=username, data=input_data))
+        if user_exists is None:
+            self.db.execute(self.ricedb.insert().values(nick=username, **{key: value}))
             return
-
-        try:
-            user_data.update(input_data)
-        except KeyError:
-            user_data = input_data
-        except ValueError:
-            user_data.pop(key, None)
 
         update = self.ricedb.update().where(
             func.lower(self.ricedb.c.nick) == username.lower()
-        ).values(data=user_data, nick=username)  # Also update nick to fix the mass lowercasing I did on the old DB.
+        ).values(nick=username, **{key: value})  # Also update nick to fix the mass lowercasing I did on the old DB.
         self.db.execute(update)
-
-    def _get_user(self, user):
-        query = select([self.ricedb.c.data]).where(func.lower(self.ricedb.c.nick) == user.lower())
-        return self.db.execute(query).scalar()
 
     def _json_dump(self):
         bottle.response.content_type = 'application/json'
-        result = self.db.execute(self.ricedb.select().order_by(desc(func.lower(self.ricedb.c.nick))))
-        data = {row[0]: row[1] for row in result}
 
-        return json.dumps(dict(data.items()))
+        data = {}
+        all_users = self.db.execute(self.ricedb.select().order_by(desc(func.lower(self.ricedb.c.nick))))
+        for row in all_users:
+            user = {}
+            nick = None
+            for key, value in row.items():
+                if key == 'nick':
+                    nick = value
+                    continue
+
+                if key == 'last_seen':
+                    if value is not None:
+                        value = value.timestamp()
+
+                user[key] = value
+            data.update(**{nick: user})
+        return json.dumps(data)
