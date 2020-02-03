@@ -45,12 +45,12 @@ class Seen(object):
             %%seen <nick>
         """
 
-        nick = args['<nick>'].lower()
+        nick = args['<nick>']
 
-        if nick == self.bot.nick.lower():
+        if nick.lower() == self.bot.nick.lower():
             return 'I\'m right here, idiot. -_-'
 
-        if nick == mask.nick.lower():
+        if nick.lower() == mask.nick.lower():
             return 'Are you seriously asking me that?'
 
         if not self.bot.get_user_value(nick, _DB_KEY):
