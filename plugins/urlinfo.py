@@ -27,6 +27,7 @@ from urllib.parse import urlparse
 import irc3
 import requests
 from bs4 import BeautifulSoup
+from humanize import naturalsize
 
 from util.formatting import Color, style, unstyle
 
@@ -75,15 +76,6 @@ def _getaddrinfo_wrapper(host, port, family=0, type=0, proto=0, flags=0):
     return original_getaddrinfo(host, port, family, type, proto, flags)
 
 
-def _size_fmt(num: int, suffix: str = 'B') -> str:
-    # https://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
-    for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
-        if abs(num) < 1024.0:
-            return "%3.1f%s%s" % (num, unit, suffix)
-        num /= 1024.0
-    return "%.1f%s%s" % (num, 'Yi', suffix)
-
-
 def _read_stream(response: requests.Response, max_bytes: int = _DEFAULT_MAX_BYTES) -> str:
     start_time = time.time()
     content = StringIO()
@@ -97,7 +89,8 @@ def _read_stream(response: requests.Response, max_bytes: int = _DEFAULT_MAX_BYTE
         if '</title>' in content.getvalue():
             break
         if content_length > max_bytes:
-            raise ResponseBodyTooLarge(f'Couldn\'t find the page title within {_size_fmt(content_length)}.')
+            size = naturalsize(content_length, gnu=True)
+            raise ResponseBodyTooLarge(f'Couldn\'t find the page title within {size}.')
 
     return content.getvalue()
 
@@ -197,27 +190,24 @@ class UrlInfo(object):
                 except ContentTypeNotAllowed as ex:
                     self.bot.log.debug(ex)
                 except (socket.gaierror, ValueError, requests.RequestException) as ex:
-                    formatted_hostname = style(hostname, fg=Color.RED)
-                    formatted_error = style(ex, bold=True)
+                    hostname = style(hostname, fg=Color.RED)
+                    error = style(ex, bold=True)
 
                     if type(ex) == requests.RequestException:
                         if ex.response is not None and ex.response.reason is not None:
-                            formatted_status_code = style(ex.response.status_code, bold=True)
-                            formatted_reason = style(ex.response.reason, bold=True)
-                            messages.append(f'[ {formatted_hostname} ] {formatted_status_code} {formatted_reason}')
+                            status_code = style(ex.response.status_code, bold=True)
+                            error = style(ex.response.reason, bold=True)
+                            messages.append(f'[ {hostname} ] {status_code} {error}')
                         return
                     else:
-                        messages.append(f'[ {formatted_hostname} ] {formatted_error}')
+                        messages.append(f'[ {hostname} ] {error}')
                 # no exception
                 else:
-                    formatted_hostname = style(hostname, fg=Color.GREEN)
+                    hostname = style(hostname, fg=Color.GREEN)
                     if title is not None and mimetype is not None:
-                        formatted_title = style(title, bold=True)
-                        reply = f'[ {formatted_hostname} ] {formatted_title} ({mimetype})'
-
-                        if size and mimetype not in _HTML_MIMETYPES:
-                            reply += f' ({_size_fmt(size)})'
-
+                        title = style(title, bold=True)
+                        size = f' - {naturalsize(size, gnu=True)}' if size else ''
+                        reply = f'[ {hostname} ] {title} ({mimetype}{size})'
                         messages.append(reply)
 
             # Send all parsed URLs now that we have them all.
