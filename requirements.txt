@@ -23,8 +23,7 @@ idna==2.8 \
 irc3==1.1.5 \
     --hash=sha256:ea3278df59ba02d016a6b7b606c440d9f8a2224422687b12be0222deccfb63c2 \
     --hash=sha256:1a98cc8e31c856673a125ec1cf1e5703c3011f37cd0da946c9f0e12a8afc9c03
-ircmessage==0.1.1 \
-    --hash=sha256:e5b6d7979f7fc2a21b1e9b7605a1c43bb7522dc3cf855013a7cfdcee42bcf09f
+-e git+https://github.com/FoxDev/IRC-Message@c4bd265ae9ac3bf25b5127b8128103766c62f502#egg=ircmessage
 mako==1.1.1 \
     --hash=sha256:2984a6733e1d472796ceef37ad48c26f4a984bb18119bb2dbc37a44d8f6e75a4
 markupsafe==1.1.1 \
@@ -68,9 +67,9 @@ python-editor==1.0.4 \
 requests==2.22.0 \
     --hash=sha256:9cf5292fcd0f598c671cfc1e0d7d1a7f13bb8085e9a590f48c010551dc6c4b31 \
     --hash=sha256:11e007a8a2aa0323f5a921e9e6a2d7e4e67d9877e85773fba9ba6419025cbeb4
-six==1.10.0 \
-    --hash=sha256:0ff78c403d9bccf5a425a6d31a12aa6b47f1c21ca4dc2573a7e2f32a97335eb1 \
-    --hash=sha256:105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a
+six==1.14.0 \
+    --hash=sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c \
+    --hash=sha256:236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a
 soupsieve==1.9.5 \
     --hash=sha256:bdb0d917b03a1369ce964056fc195cfdff8819c40de04695a80bc813c3cfa1f5 \
     --hash=sha256:e2c1c5dee4a1c36bcb790e0fabd5492d874b8ebd4617622c4f6a731701060dda
