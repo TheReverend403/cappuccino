@@ -36,7 +36,7 @@ class BotUI(object):
         """
 
         try:
-            with self.bot.requests.get('https://whatthecommit.com/index.txt') as response:
+            with self.bot.requests.get('http://whatthecommit.com/index.txt') as response:
                 yield f'git commit -m "{response.text.strip()}"'
         except RequestException as ex:
             yield ex.strerror
