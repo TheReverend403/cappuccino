@@ -16,11 +16,6 @@
 from sqlalchemy import MetaData, create_engine
 
 
-class _Singleton:
-    def __init__(self, engine):
-        self.engine = engine
-
-
 class Database(object):
     instance = None
     meta = None
@@ -28,9 +23,12 @@ class Database(object):
     def __init__(self, plugin):
         plugin.bot.log.info(f'Initialising database for {plugin.__module__}')
         if not Database.instance:
-            Database.instance = _Singleton(create_engine(plugin.bot.config.get('database', {}).get('uri')))
+            Database.instance = self.__Singleton(create_engine(plugin.bot.config.get('database', {}).get('uri')))
             Database.meta = MetaData(bind=Database.instance.engine, reflect=True)
 
     def __getattr__(self, name):
         return getattr(self.instance.engine, name) or getattr(self.instance, name)
 
+    class __Singleton:
+        def __init__(self, engine):
+            self.engine = engine
