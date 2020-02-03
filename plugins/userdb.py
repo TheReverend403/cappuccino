@@ -85,18 +85,17 @@ class UserDB(object):
     def _json_dump(self):
         bottle.response.content_type = 'application/json'
 
-        data = {}
+        data = []
         all_users = self.db.execute(self.ricedb.select().order_by(nullslast(desc(self.ricedb.c.last_seen))))
         for row in all_users:
             user = {}
-            nick = row[0]
             for column, value in row.items():
-                if column == 'nick' or value is None:
+                if value is None:
                     continue
 
                 if column == 'last_seen':
                     value = value.timestamp()
 
                 user[column] = value
-            data.update(**{nick: user})
+            data.append(user)
         return json.dumps(data)
