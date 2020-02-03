@@ -19,9 +19,9 @@ import re
 import irc3
 from irc3.plugins.command import command
 
-from util.formatting import style
+from util.formatting import Color, style
 
-_RANDOM_CHANCE = 0.2
+_RANDOM_CHANCE = 0.3
 _DECIDE_DELIMITERS = [' or ', ',', '|']
 # Borrowed from https://github.com/GeneralUnRest/8ball-bot/blob/master/8ball.js
 _EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.', 'Without a doubt.',
@@ -105,9 +105,12 @@ class Fun(object):
     def benis(self, target):
         self.reply(target, style('3===D', bold=True))
 
-    @irc3.event(r'.*PRIVMSG (?P<target>\S+) :(?i).*loli.*')
-    def loli(self, target):
-        self.reply(target, 'https://pedo.help')
+    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*loli.*')
+    def loli(self, target, mask):
+        link = style('https://pedo.help', fg=Color.BLUE)
+        reply = style('[NONCE DETECTED] ', fg=Color.RED)
+        reply += f'{mask.nick}, please click for your own good: {link}'
+        self.reply(target, reply)
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def not_the_only_one(self, target, event, mask, data):
