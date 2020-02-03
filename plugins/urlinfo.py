@@ -222,5 +222,5 @@ class UrlInfo(object):
 
             # Send all parsed URLs now that we have them all.
             if messages:
-                pipe_character = style(' | ', fg=Color.LIGHT_GRAY, reset=True)
+                pipe_character = style(' | ', fg=Color.LIGHT_GRAY)
                 self.bot.privmsg(target, pipe_character.join(messages))
