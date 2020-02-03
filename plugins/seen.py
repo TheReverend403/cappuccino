@@ -13,21 +13,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import re
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import irc3
+from humanize import naturaltime
 from irc3.plugins.command import command
 
 _DB_KEY = 'last_seen'
-
-
-def _time_format(seconds: timedelta):
-    delta = str(seconds)
-
-    # Remove microseconds in string representation
-    delta = re.sub(r'\.[0-9]+', '', delta)
-    return delta
 
 
 @irc3.plugin
@@ -66,10 +58,11 @@ class Seen(object):
 
         last_seen = self.get_last_seen(nick)
         time_now = datetime.utcnow()
-        duration = time_now - last_seen
-        timefmt = _time_format(duration)
+        duration = naturaltime(time_now - last_seen)
+        tz = last_seen.strftime('%Z') or 'UTC'
+        full_date = last_seen.strftime(f'%b %d %Y %H:%M {tz}')
 
-        return f'{nick} was last seen {timefmt} ago.'
+        return f'{nick} was last seen {duration}. ({full_date})'
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def on_privmsg(self, target, event, mask, data):
