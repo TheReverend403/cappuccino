@@ -15,7 +15,7 @@
 import threading
 
 import bottle
-from sqlalchemy import desc, func, select
+from sqlalchemy import desc, func, nullslast, select
 
 from util.database import Database
 
@@ -85,7 +85,7 @@ class UserDB(object):
         bottle.response.content_type = 'application/json'
 
         data = {}
-        all_users = self.db.execute(self.ricedb.select().order_by(desc(func.lower(self.ricedb.c.nick))))
+        all_users = self.db.execute(self.ricedb.select().order_by(nullslast(desc(func.lower(self.ricedb.c.last_seen)))))
         for row in all_users:
             user = {}
             nick = None
