@@ -306,7 +306,7 @@ lastfm = ["pylast"]
 sentry = ["sentry-sdk"]
 
 [metadata]
-content-hash = "cb51a0c6d1bef6aacf17a15578b50fcd934e732dc67a819498676033ea3302bb"
+content-hash = "6598de3f30fae94098a40edd85d80452cadfcaab9faf83ccd996342da63227c4"
 python-versions = "^3.6"
 
 [metadata.files]
