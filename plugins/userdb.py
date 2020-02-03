@@ -92,16 +92,14 @@ class UserDB(object):
         all_users = self.db.execute(self.ricedb.select().order_by(nullslast(desc(self.ricedb.c.last_seen))))
         for row in all_users:
             user = {}
-            nick = None
-            for key, value in row.items():
-                if key == 'nick':
-                    nick = value
+            nick = row[0]
+            for column, value in row.items():
+                if column == 'nick' or value is None:
                     continue
 
-                if key == 'last_seen':
-                    if value is not None:
-                        value = value.timestamp()
+                if column == 'last_seen':
+                    value = value.timestamp()
 
-                user[key] = value
+                user[column] = value
             data.update(**{nick: user})
         return json.dumps(data)
