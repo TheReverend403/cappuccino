@@ -12,6 +12,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
+
 import threading
 
 import bottle
@@ -68,10 +69,6 @@ class UserDB(object):
 
     @irc3.extend
     def set_user_value(self, username: str, key, value=None):
-        # Fuck off Rizon
-        if username == 'py-ctcp':
-            return
-
         user_exists = self.db.execute(select([self.ricedb.c.nick]).where(
             func.lower(self.ricedb.c.nick) == username.lower()
         )).scalar() or None

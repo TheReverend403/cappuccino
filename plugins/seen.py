@@ -66,7 +66,7 @@ class Seen(object):
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def on_privmsg(self, target, event, mask, data):
-        if mask.nick == self.bot.nick or event == 'NOTICE':
+        if event == 'NOTICE' or data.startswith('\x01VERSION') or not target.is_channel or mask.nick == self.bot.nick:
             return
 
         self.set_last_seen(mask.nick, datetime.utcnow())
