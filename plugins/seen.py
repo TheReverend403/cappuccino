@@ -59,8 +59,7 @@ class Seen(object):
         last_seen = self.get_last_seen(nick)
         time_now = datetime.utcnow()
         duration = naturaltime(time_now - last_seen)
-        tz = last_seen.strftime('%Z') or 'UTC'
-        full_date = last_seen.strftime(f'%b %d %Y %H:%M {tz}')
+        full_date = last_seen.strftime(f'%b %d %Y %H:%M UTC')
 
         return f'{nick} was last seen {duration}. ({full_date})'
 
