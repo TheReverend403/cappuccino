@@ -86,7 +86,7 @@ class UserDB(object):
         bottle.response.content_type = 'application/json'
 
         data = []
-        all_users = self.db.execute(select(self.ricedb).order_by(nullslast(desc(self.ricedb.c.last_seen))))
+        all_users = self.db.execute(select([self.ricedb]).order_by(nullslast(desc(self.ricedb.c.last_seen))))
         for row in all_users:
             user = {}
             for column, value in row.items():
