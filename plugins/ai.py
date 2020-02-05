@@ -20,7 +20,7 @@ import irc3
 import markovify
 from irc3.plugins.command import command
 from irc3.utils import IrcString
-from sqlalchemy import func, select
+from sqlalchemy import func, insert, select, update
 from sqlalchemy.exc import IntegrityError
 
 from util.channel import is_chanop
@@ -51,14 +51,13 @@ class Ai(object):
         self.config = self.bot.config.get(__name__, {})
         self.ignore_nicks = self.config.get('ignore_nicks', '').split()
         self.max_loaded_lines = self.config.get('max_loaded_lines', 25000)
-
         self.db = Database(self)
         self.corpus = self.db.meta.tables['ai_corpus']
         self.channels = self.db.meta.tables['ai_channels']
 
     def _add_line(self, line: str, channel: str):
         try:
-            insert_stmt = self.corpus.insert().values(line=unstyle(line), channel=channel)
+            insert_stmt = insert(self.corpus).values(line=unstyle(line), channel=channel)
             self.db.execute(insert_stmt)
         except IntegrityError:
             pass
@@ -66,7 +65,7 @@ class Ai(object):
     def _get_lines(self, channel: str = None) -> list:
         select_stmt = select([self.corpus.c.line])
         if channel:
-            select_stmt = select_stmt.where(self.corpus.c.channel == channel) \
+            select_stmt = select_stmt.where(func.lower(self.corpus.c.channel) == channel.lower()) \
                 .order_by(func.random()).limit(self.max_loaded_lines)
         else:
             select_stmt = select_stmt.order_by(func.random()).limit(self.max_loaded_lines)
@@ -77,7 +76,7 @@ class Ai(object):
     def _line_count(self, channel: str = None) -> int:
         select_stmt = select([func.count(self.corpus.c.line)])
         if channel:
-            select_stmt = select_stmt.where(self.corpus.c.channel == channel)
+            select_stmt = select_stmt.where(func.lower(self.corpus.c.channel) == channel.lower())
 
         return self.db.execute(select_stmt).scalar()
 
@@ -85,21 +84,21 @@ class Ai(object):
         if not IrcString(channel).is_channel:
             return False
 
-        select_stmt = select([self.channels.c.status]).where(self.channels.c.name == channel)
+        select_stmt = select([self.channels.c.status]).where(func.lower(self.corpus.c.channel) == channel.lower())
         result = self.db.execute(select_stmt).scalar()
 
         if result is None:
-            insert_stmt = self.channels.insert().values(name=channel, status=0)
+            insert_stmt = insert(self.channels).values(name=channel, status=0)
             self.db.execute(insert_stmt)
             return False
 
         return result
 
     def _toggle(self, channel: str):
-        if self._is_active(channel):
-            update_stmt = self.channels.update().where(self.channels.c.name == channel).values(status=0)
-        else:
-            update_stmt = self.channels.update().where(self.channels.c.name == channel).values(status=1)
+        new_status = int(not self._is_active(channel))
+        update_stmt = update(self.channels).where(
+            func.lower(self.corpus.c.channel) == channel.lower()
+        ).values(status=new_status)
 
         self.db.execute(update_stmt)
 

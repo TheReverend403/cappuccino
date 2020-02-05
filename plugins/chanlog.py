@@ -16,6 +16,7 @@
 import irc3
 from irc3 import rfc
 from irc3.utils import IrcString
+from sqlalchemy import insert
 
 from util.database import Database
 
@@ -41,9 +42,7 @@ class Chanlog(object):
         else:
             return
 
-        self.db.execute(self.chanlog.insert().values(
-            user=user, channel=channel, event=event, target=target, data=data
-        ))
+        self.db.execute(insert(self.chanlog).values(user=user, channel=channel, event=event, target=target, data=data))
 
     @irc3.event(rfc.PRIVMSG)
     @irc3.event(rfc.PRIVMSG, iotype='out')

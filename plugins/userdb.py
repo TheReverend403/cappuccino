@@ -16,7 +16,7 @@
 import threading
 
 import bottle
-from sqlalchemy import desc, func, nullslast, select
+from sqlalchemy import desc, func, insert, nullslast, select, update
 
 from util.database import Database
 
@@ -55,17 +55,17 @@ class UserDB(object):
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
-        query = select([self.ricedb.c[key]]).where(func.lower(self.ricedb.c.nick) == username.lower())
-        result = self.db.execute(query).scalar()
+        select_query = select([self.ricedb.c[key]]).where(func.lower(self.ricedb.c.nick) == username.lower())
+        result = self.db.execute(select_query).scalar()
         return result
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
-        update = self.ricedb.update().where(
+        update_query = update(self.ricedb).where(
             func.lower(self.ricedb.c.nick) == username.lower()
         ).values(**{key: None})
 
-        self.db.execute(update)
+        self.db.execute(update_query)
 
     @irc3.extend
     def set_user_value(self, username: str, key, value=None):
@@ -74,19 +74,19 @@ class UserDB(object):
         )).scalar() or None
 
         if user_exists is None:
-            self.db.execute(self.ricedb.insert().values(nick=username, **{key: value}))
+            self.db.execute(insert(self.ricedb).values(nick=username, **{key: value}))
             return
 
-        update = self.ricedb.update().where(
+        update_query = update(self.ricedb).where(
             func.lower(self.ricedb.c.nick) == username.lower()
         ).values(nick=username, **{key: value})  # Also update nick to fix the mass lowercasing I did on the old DB.
-        self.db.execute(update)
+        self.db.execute(update_query)
 
     def _json_dump(self):
         bottle.response.content_type = 'application/json'
 
         data = []
-        all_users = self.db.execute(self.ricedb.select().order_by(nullslast(desc(self.ricedb.c.last_seen))))
+        all_users = self.db.execute(select(self.ricedb).order_by(nullslast(desc(self.ricedb.c.last_seen))))
         for row in all_users:
             user = {}
             for column, value in row.items():

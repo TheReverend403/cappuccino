@@ -17,7 +17,7 @@ import re
 
 import irc3
 from irc3.plugins.command import command
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, insert, select, update
 
 from util.channel import is_chanop
 from util.database import Database
@@ -37,31 +37,31 @@ class Seen(object):
         self.triggers = self.db.meta.tables['triggers']
 
     def _get_trigger(self, channel: str, trigger: str):
-        stmnt = select([self.triggers.c.response]). \
+        select_query = select([self.triggers.c.response]). \
             where(func.lower(self.triggers.c.trigger) == trigger.lower()). \
             where(func.lower(self.triggers.c.channel) == channel.lower())
 
-        return self.db.execute(stmnt).scalar()
+        return self.db.execute(select_query).scalar()
 
     def _set_trigger(self, channel: str, trigger: str, text: str):
         if self._get_trigger(channel, trigger):
-            stmnt = self.triggers.update(). \
+            update_stmnt = update(self.triggers). \
                 where(func.lower(self.triggers.c.trigger) == trigger.lower()). \
                 where(func.lower(self.triggers.c.channel) == channel.lower()). \
                 values(response=text)
 
-            self.db.execute(stmnt)
+            self.db.execute(update_stmnt)
             return
 
-        self.db.execute(self.triggers.insert().values(channel=channel, trigger=trigger, response=text))
+        self.db.execute(insert(self.triggers).values(channel=channel, trigger=trigger, response=text))
 
     def _delete_trigger(self, channel: str, trigger: str) -> bool:
-        stmnt = self.triggers.delete(). \
+        delete_stmt = delete(self.triggers). \
             where(func.lower(self.triggers.c.trigger) == trigger.lower()). \
             where(func.lower(self.triggers.c.channel) == channel.lower()). \
             returning(self.triggers.c.trigger)
 
-        return self.db.execute(stmnt).scalar() is not None
+        return self.db.execute(delete_stmt).scalar() is not None
 
     @command(permission='view')
     def trigger(self, mask, target, args):
@@ -85,8 +85,9 @@ class Seen(object):
             return f'Deleted trigger \'{trigger}\'.' if self._delete_trigger(target, trigger) else 'No such trigger.'
 
         if args['list']:
-            rows = self.db.execute(self.triggers.select().where(func.lower(self.triggers.c.channel) == target.lower()))
-            trigger_list = [row[0] for row in rows]
+            list_query = select([self.triggers.c.trigger]).where(func.lower(self.triggers.c.channel) == target.lower())
+
+            trigger_list = [row[0] for row in self.db.execute(list_query)]
             if trigger_list:
                 trigger_list = ', '.join(trigger_list)
                 return f'Available triggers for {target}: {trigger_list}'
