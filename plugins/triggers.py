@@ -86,8 +86,8 @@ class Seen(object):
 
         if args['list']:
             list_query = select([self.triggers.c.trigger]).where(func.lower(self.triggers.c.channel) == target.lower())
-
             trigger_list = [row[0] for row in self.db.execute(list_query)]
+
             if trigger_list:
                 trigger_list = ', '.join(trigger_list)
                 return f'Available triggers for {target}: {trigger_list}'
