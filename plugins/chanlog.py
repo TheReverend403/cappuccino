@@ -75,6 +75,9 @@ class Chanlog(object):
         if not mask:
             mask = self.bot.nick
 
+        if data == mask:
+            data = None
+
         self._add_event(event, data=data, user=mask, channel=channel, target=target)
 
     @irc3.event(rfc.KICK, iotype='out')
