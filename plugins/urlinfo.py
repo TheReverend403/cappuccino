@@ -33,13 +33,13 @@ from util.formatting import Color, style, unstyle
 
 _URL_FINDER = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
 _BRACES = [('{', '}'), ('<', '>'), ('[', ']'), ('(', ')')]
-_DEFAULT_MAX_BYTES = 655360  # 64K
+_DEFAULT_MAX_BYTES = 10485760  # 10M
 _MAX_TITLE_LENGTH = 128
 _REQUEST_TIMEOUT = 5
 _HOSTNAME_CLEANUP_REGEX = re.compile(r'^www\.', re.IGNORECASE | re.UNICODE)
 _FORCE_IPV4_HOSTNAMES = ['www.youtube.com', 'youtube.com', 'youtu.be']
 _HTML_MIMETYPES = ['text/html', 'application/xhtml+xml']
-_REQUEST_CHUNK_SIZE = 256  # Bytes
+_REQUEST_CHUNK_SIZE = 1024  # Bytes
 _ALLOWED_CONTENT_TYPES = ['text', 'video', 'application']
 
 
@@ -86,8 +86,6 @@ def _read_stream(response: requests.Response, max_bytes: int = _DEFAULT_MAX_BYTE
         if not chunk:  # filter out keep-alive new chunks
             continue
         content_length = content.write(chunk.decode('UTF-8', errors='ignore'))
-        if '</title>' in content.getvalue():
-            break
         if content_length > max_bytes:
             size = naturalsize(content_length, gnu=True)
             raise ResponseBodyTooLarge(f'Couldn\'t find the page title within {size}.')
@@ -95,7 +93,7 @@ def _read_stream(response: requests.Response, max_bytes: int = _DEFAULT_MAX_BYTE
     return content.getvalue()
 
 
-def _parse_url(url: str, session):
+def _process_url(url: str, session):
     hostname = urlparse(url).hostname
     for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
         ip = ipaddress.ip_address(sockaddr[0])
@@ -122,6 +120,9 @@ def _parse_url(url: str, session):
             title = params.get('filename')
         elif content_type in _HTML_MIMETYPES or content_type == 'text/plain':
             content = _read_stream(response)
+            if content and not size:
+                size = len(content.encode('UTF-8'))
+
             try:
                 title = BeautifulSoup(content, 'html.parser').title.string
             except AttributeError:
@@ -178,7 +179,7 @@ class UrlInfo(object):
             messages = []
             self.bot.log.debug(f'Retrieving page titles for {urls}')
 
-            future_to_url = {executor.submit(_parse_url, url, self.bot.requests): url for url in urls}
+            future_to_url = {executor.submit(_process_url, url, self.bot.requests): url for url in urls}
             for future in concurrent.futures.as_completed(future_to_url):
                 url = future_to_url[future]
                 hostname = urlparse(url).hostname
