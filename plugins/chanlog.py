@@ -73,9 +73,9 @@ class Chanlog(object):
     @irc3.event(rfc.KICK)
     def on_kick(self, mask=None, event=None, channel=None, target=None, data=None):
         if not mask:
-            mask = self.bot.nick
+            mask = IrcString(self.bot.nick)
 
-        if data == mask:
+        if data == mask.nick:
             data = None
 
         self._add_event(event, data=data, user=mask, channel=channel, target=target)
