@@ -1,5 +1,5 @@
-alembic==1.4.0 \
-    --hash=sha256:2df2519a5b002f881517693b95626905a39c5faf4b5a1f94de4f1441095d1d26
+alembic==1.4.1 \
+    --hash=sha256:791a5686953c4b366d3228c5377196db2f534475bb38d26f70eb69668efd9028
 beautifulsoup4==4.8.2 \
     --hash=sha256:e1505eeed31b0f4ce2dbb3bc8eb256c04cc2b3b72af7d551a4ab6efd5cbe5dae \
     --hash=sha256:9fbb4d6e48ecd30bcacc5b63b94088192dcda178513b2ae3c394229f8911b887 \
@@ -25,8 +25,9 @@ irc3==1.1.5 \
     --hash=sha256:ea3278df59ba02d016a6b7b606c440d9f8a2224422687b12be0222deccfb63c2 \
     --hash=sha256:1a98cc8e31c856673a125ec1cf1e5703c3011f37cd0da946c9f0e12a8afc9c03
 -e git+https://github.com/FujiMakoto/IRC-Message@832b705d192ebe9091acb552076a776efa80877c#egg=ircmessage
-mako==1.1.1 \
-    --hash=sha256:2984a6733e1d472796ceef37ad48c26f4a984bb18119bb2dbc37a44d8f6e75a4
+mako==1.1.2 \
+    --hash=sha256:8e8b53c71c7e59f3de716b6832c4e401d903af574f6962edbbbf6ecc2a5fe6c9 \
+    --hash=sha256:3139c5d64aa5d175dbafb95027057128b5fbd05a40c53999f3905ceb53366d9d
 markovify==0.8.0 \
     --hash=sha256:c533a2e1aba8148bb98031b7159e8bf1a276c61db53d2e882ecb74fa5603a4f4
 markupsafe==1.1.1 \
@@ -87,15 +88,15 @@ python-editor==1.0.4 \
 requests==2.23.0 \
     --hash=sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee \
     --hash=sha256:b3f43d496c6daba4493e7c431722aeb7dbc6288f52a6e04e7b6023b0247817e6
-sentry-sdk==0.14.1 \
-    --hash=sha256:e023da07cfbead3868e1e2ba994160517885a32dfd994fc455b118e37989479b \
-    --hash=sha256:b06dd27391fd11fb32f84fe054e6a64736c469514a718a99fb5ce1dff95d6b28
+sentry-sdk==0.14.2 \
+    --hash=sha256:480eee754e60bcae983787a9a13bc8f155a111aef199afaa4f289d6a76aa622a \
+    --hash=sha256:a920387dc3ee252a66679d0afecd34479fb6fc52c2bc20763793ed69e5b0dcc0
 six==1.14.0 \
     --hash=sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c \
     --hash=sha256:236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a
-soupsieve==1.9.5 \
-    --hash=sha256:bdb0d917b03a1369ce964056fc195cfdff8819c40de04695a80bc813c3cfa1f5 \
-    --hash=sha256:e2c1c5dee4a1c36bcb790e0fabd5492d874b8ebd4617622c4f6a731701060dda
+soupsieve==2.0 \
+    --hash=sha256:fcd71e08c0aee99aca1b73f45478549ee7e7fc006d51b37bec9e9def7dc22b69 \
+    --hash=sha256:e914534802d7ffd233242b785229d5ba0766a7f487385e3f714446a07bf540ae
 sqlalchemy==1.3.13 \
     --hash=sha256:64a7b71846db6423807e96820993fa12a03b89127d278290ca25c0b11ed7b4fb
 ujson==1.35 \
