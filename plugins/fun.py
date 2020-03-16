@@ -21,7 +21,7 @@ from irc3.plugins.command import command
 
 from util.formatting import Color, style
 
-_RANDOM_CHANCE = 0.3
+_RANDOM_CHANCE = 0.33
 _DECIDE_DELIMITERS = [' or ', ',', '|']
 # Borrowed from https://github.com/GeneralUnRest/8ball-bot/blob/master/8ball.js
 _EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.', 'Without a doubt.',
@@ -129,3 +129,7 @@ class Fun(object):
     def antitrap(self, target):
         self.bot.log.info('Parting {0}'.format(target))
         self.bot.part(target)
+
+    @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b')
+    def gravity(self, mask, target):
+        self.reply(target, f'{mask.nick}: A direction away from the center of gravity of a celestial object.')
