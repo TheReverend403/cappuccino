@@ -19,6 +19,7 @@ import bottle
 from sqlalchemy import desc, func, insert, nullslast, select, update
 
 from util.database import Database
+from util.formatting import unstyle
 
 try:
     import ujson as json
@@ -95,6 +96,11 @@ class UserDB(object):
 
                 if column == 'last_seen':
                     value = value.timestamp()
+
+                try:
+                    value = [unstyle(val) for val in value] if type(value) is list else unstyle(value)
+                except (TypeError, AttributeError):
+                    pass
 
                 user[column] = value
             data.append(user)
