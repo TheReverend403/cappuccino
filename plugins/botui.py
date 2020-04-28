@@ -129,4 +129,4 @@ class BotUI(object):
 
             %%ping
         """
-        self.bot.privmsg(target, 'Pong!')
+        self.bot.privmsg(target, f'{mask.nick}: Pong!')
