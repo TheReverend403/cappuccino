@@ -105,6 +105,10 @@ class Fun(object):
     def benis(self, target):
         self.reply(target, style('3===D', bold=True))
 
+    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*homo.*')
+    def homo(self, target, mask):
+        self.reply(target, f'hahahaha {mask.nick} said homo xDDD')
+
     @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*loli.*')
     def loli(self, target, mask):
         link = style('https://pedo.help', fg=Color.BLUE)
