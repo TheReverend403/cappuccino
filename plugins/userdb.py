@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import threading
+import sys
 
 import bottle
 from sqlalchemy import desc, func, insert, nullslast, select, update
@@ -43,16 +43,14 @@ class UserDB(object):
         self.ricedb = self.db.meta.tables['ricedb']
 
         if self.config.get('enable_http_server', False):
-            host, port = self.config.get('http_host', '127.0.0.1'), int(self.config.get('http_port', 8080))
+            host = self.config.get('http_host', '127.0.0.1')
+            port = int(self.config.get('http_port', 8080))
+            workers = int(self.config.get('http_workers', 1))
+
+            sys.argv = sys.argv[:1]  # Needed to prevent gunicorn receiving irc3's args.
             bottle.hook('before_request')(_strip_path)
-            bottle.route('/')(lambda: self._json_dump())
-            bottle_thread = threading.Thread(
-                target=bottle.run,
-                kwargs={'quiet': True, 'host': host, 'port': port},
-                name='{0} HTTP server'.format(__name__),
-                daemon=True
-            )
-            bottle_thread.start()
+            bottle.route('/')(self._json_dump)
+            bottle.run(quiet=True, host=host, port=port, server='gunicorn', worker_class='gevent', workers=workers)
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
