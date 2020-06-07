@@ -43,9 +43,10 @@ class UserDB(object):
         self.ricedb = self.db.meta.tables['ricedb']
 
         if self.config.get('enable_http_server', False):
-            host, port = self.config.get('http_host', '127.0.0.1'), int(self.config.get('http_port', 8080))
+            host = self.config.get('http_host', '127.0.0.1')
+            port = int(self.config.get('http_port', 8080))
             bottle.hook('before_request')(_strip_path)
-            bottle.route('/')(lambda: self._json_dump())
+            bottle.route('/')(self._json_dump)
             bottle_thread = threading.Thread(
                 target=bottle.run,
                 kwargs={'quiet': True, 'host': host, 'port': port},
