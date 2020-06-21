@@ -109,6 +109,9 @@ class Ai(object):
             %%ai [--status]
         """
 
+        if not target.is_channel:
+            return 'This command cannot be used in PM.'
+
         if args['--status']:
             line_count = self._line_count()
             channel_line_count = self._line_count(target)
