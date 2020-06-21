@@ -18,6 +18,7 @@ import re
 
 import irc3
 from irc3.plugins.command import command
+from requests import RequestException
 
 from util.formatting import Color, style
 
@@ -137,3 +138,30 @@ class Fun(object):
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b')
     def gravity(self, mask, target):
         self.reply(target, f'{mask.nick}: A direction away from the center of gravity of a celestial object.')
+
+    @command(permission='view', aliases=['whatthecommit'])
+    def wtc(self, mask, target, args):
+        """Grab a random commit message.
+
+            %%wtc
+        """
+
+        try:
+            with self.bot.requests.get('http://whatthecommit.com/index.txt') as response:
+                yield f'git commit -m "{response.text.strip()}"'
+        except RequestException as ex:
+            yield ex.strerror
+
+    @command(permission='view')
+    def catfact(self, mask, target, args):
+        """Grab a random cat fact.
+
+            %%catfact
+        """
+
+        try:
+            with self.bot.requests.get('https://catfact.ninja/fact?max_length=200') as response:
+                if 'fact' in (response_data := response.json()):
+                    yield f"{response_data['fact']}"
+        except RequestException as ex:
+            yield ex.strerror
