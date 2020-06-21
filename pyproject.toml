@@ -6,13 +6,13 @@ authors = ["Lee Watson <rev@revthefox.co.uk>"]
 license = "GPL-3.0"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.8"
 irc3 = "^1.1.0"
 markovify = { version = "^0.8.0", optional = true}
 pylast = { version = "^3.2.0", optional = true }
-ujson = "^2.0.0"
+ujson = "^3.0.0"
 requests = "^2.23.0"
-sentry-sdk = { version = "^0.14.0", optional = true }
+sentry-sdk = { version = "^0.15.0", optional = true }
 urllib3 = "^1.25.0"
 beautifulsoup4 = "^4.8.0"
 bottle = "^0.12.0"
