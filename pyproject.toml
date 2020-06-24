@@ -15,8 +15,8 @@ requests = "^2.23.0"
 sentry-sdk = { version = "^0.15.0", optional = true }
 urllib3 = "^1.25.0"
 beautifulsoup4 = "^4.8.0"
-bottle = "^0.12.0"
-sqlalchemy = { version = "^1.3.12", optional = true, extras = ["postgresql"]}
+bottle = { version = "^0.12.0", optional = true }
+sqlalchemy = { version = "^1.3.12", extras = ["postgresql"]}
 ircmessage = { git = "https://github.com/FujiMakoto/IRC-Message", branch = "master" }
 alembic = "^1.4.0"
 humanize = "^2.0.0"
@@ -26,7 +26,8 @@ humanize = "^2.0.0"
 [tool.poetry.extras]
 sentry = ["sentry-sdk"]
 lastfm = ["pylast"]
-ai = ["markovify", "sqlalchemy"]
+ai = ["markovify"]
+web = ["bottle"]
 
 [build-system]
 requires = ["poetry>=0.12"]
