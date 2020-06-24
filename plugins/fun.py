@@ -12,7 +12,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
-
+import json
 import random
 import re
 
@@ -38,6 +38,7 @@ class Fun(object):
 
     def __init__(self, bot):
         self.bot = bot
+        self.fact_cache = None
 
     def reply(self, target: str, message: str):
         # Only reply a certain percentage of the time. AKA rate-limiting. Sort of.
@@ -159,9 +160,14 @@ class Fun(object):
             %%catfact
         """
 
-        try:
-            with self.bot.requests.get('https://catfact.ninja/fact?max_length=200') as response:
-                if 'fact' in (response_data := response.json()):
-                    yield response_data['fact'].replace('\\', '')
-        except RequestException as ex:
-            yield ex.strerror
+        if not self.fact_cache:
+            try:
+                with self.bot.requests.get('https://cat-fact.herokuapp.com/facts') as response:
+                    self.fact_cache = [json.loads(json.dumps(fact['text'])) for fact in filter(
+                        lambda f: f['type'] == 'cat' and 10 < len(f['text']) < 200,
+                        response.json()['all']
+                    )]
+            except RequestException as ex:
+                return ex.strerror
+
+        yield random.choice(self.fact_cache)
