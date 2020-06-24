@@ -162,6 +162,6 @@ class Fun(object):
         try:
             with self.bot.requests.get('https://catfact.ninja/fact?max_length=200') as response:
                 if 'fact' in (response_data := response.json()):
-                    yield response_data['fact']
+                    yield response_data['fact'].replace('\\', '')
         except RequestException as ex:
             yield ex.strerror
