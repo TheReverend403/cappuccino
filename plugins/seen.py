@@ -61,6 +61,9 @@ class Seen(object):
         duration = naturaltime(time_now - last_seen)
         full_date = last_seen.strftime(f'%b %d %Y %H:%M UTC')
 
+        if nick == 'kori':
+            return f'{nick} was right there {duration}. ({full_date})'
+
         return f'{nick} was last seen {duration}. ({full_date})'
 
     @irc3.event(irc3.rfc.PRIVMSG)
