@@ -142,6 +142,7 @@ class Rice(object):
             except (ValueError, IndexError, TypeError):
                 return 'Invalid ID.'
 
+            value = style(value, reset=True)
             return f'{value} [{formatted_user}]'
 
         values = self.bot.get_user_value(user, mode)
