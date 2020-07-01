@@ -125,8 +125,9 @@ def _process_url(url: str, session):
 
             try:
                 soup = BeautifulSoup(content, 'html.parser')
-                title = soup.find('meta', property='og:title')
-                title = title['content'] if title else soup.title.string
+                title = soup.find('meta', property='og:title', content=True).get('content')
+                if not title:
+                    title = soup.title.string
             except AttributeError:
                 if content and content_type not in _HTML_MIMETYPES:
                     title = re.sub(r'\s+', ' ', ' '.join(content.split('\n')))
