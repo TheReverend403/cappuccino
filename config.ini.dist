@@ -67,6 +67,7 @@ api_key =
 ignore_nicks = Nick1 Nick2
 ignore_hostnames = example.com
 ipv4_hostnames = youtube.com
+fake_useragent_hostnames = twitter.com t.co
 
 [database]
 # https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls

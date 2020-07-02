@@ -79,6 +79,7 @@ class UrlInfo(object):
         self.ignore_nicks = self.config.get('ignore_nicks', '').split()
         self.ignore_hostnames = self.config.get('ignore_hostnames', '').split()
         self.ipv4_hostnames = self.config.get('ipv4_hostnames', '').split()
+        self.fake_useragent_hostnames = self.config.get('fake_useragent_hostnames', '').split()
         self._original_getaddrinfo = socket.getaddrinfo
         socket.getaddrinfo = self._getaddrinfo_wrapper
 
@@ -175,7 +176,17 @@ class UrlInfo(object):
                 raise InvalidIPAddress(f'{hostname} is not a publicly routable address.')
 
         hostname = self._hostname_cleanup_regex.sub('', hostname)
+
+        # Pretend to be Google for certain sites.
+        real_user_agent = self.bot.requests.headers.get('User-Agent')
+        if any(host.endswith(hostname) for host in self.fake_useragent_hostnames):
+            fake_user_agent = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+            self.bot.requests.headers.update({'User-Agent': fake_user_agent})
+
         with self.bot.requests.get(url, stream=True) as response:
+            # Reset to the real useragent after the request.
+            self.bot.requests.headers.update({'User-Agent': real_user_agent})
+
             if response.status_code != requests.codes.ok:
                 response.raise_for_status()
 
