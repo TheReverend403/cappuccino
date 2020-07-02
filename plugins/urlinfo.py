@@ -133,7 +133,7 @@ def _process_url(url: str, session):
                 # How to check if it's a repo? Simple.
                 # The description on GitHub ends with the repo name, AKA the og:title.
                 if hostname.endswith('github.com') and title in description:
-                    title = soup.title.string
+                    title = soup.title.string.replace('GitHub - ', '', 1)
 
                 if site_name and len(site_name) < 10 and ' ' not in site_name:
                     hostname = site_name
