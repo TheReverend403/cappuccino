@@ -123,29 +123,33 @@ def _process_url(url: str, session):
             if content and not size:
                 size = len(content.encode('UTF-8'))
 
-            try:
-                soup = bs4.BeautifulSoup(content, 'html5lib')
-                title = soup.find('meta', property='og:title', content=True).get('content') or soup.title.string
-                description = soup.find('meta', property='og:description', content=True).get('content')
-                site_name = soup.find('meta', property='og:site_name', content=True).get('content')
+            soup = bs4.BeautifulSoup(content, 'html5lib')
+            if title_tag := soup.find('meta', property='og:title', content=True):
+                title = title_tag.get('content') or soup.title.string
 
-                if site_name and len(site_name) < (site_name_max_size := 15):
-                    if len(site_name) > site_name_max_size:
-                        site_name = ''.join(title[:site_name_max_size - 3]) + '...'
+            site_name = None
+            if site_name_tag := soup.find('meta', property='og:site_name', content=True):
+                site_name = site_name_tag.get('content')
 
-                    hostname = site_name
+            if site_name and len(site_name) < (site_name_max_size := 15):
+                if len(site_name) > site_name_max_size:
+                    site_name = ''.join(title[:site_name_max_size - 3]) + '...'
+                hostname = site_name
 
-                    # GitHub's repo <title> is better than the og:title
-                    # How to check if it's a repo? Simple.
-                    # The description on GitHub ends with the repo name, AKA the og:title.
-                    if site_name == 'GitHub' and title in description:
-                        title = soup.title.string.replace('GitHub - ', '', 1)
+            if description_tag := soup.find('meta', property='og:description', content=True):
+                description = description_tag.get('content')
 
-                    if site_name == 'Twitter' and description:
-                        title = f'{title}: {description}'
-            except AttributeError:
-                if content and content_type not in _HTML_MIMETYPES:
-                    title = re.sub(r'\s+', ' ', ' '.join(content.split('\n')))
+                # GitHub's repo <title> is better than the og:title
+                # How to check if it's a repo? Simple.
+                # The description on GitHub ends with the repo name, AKA the og:title.
+                if site_name == 'GitHub' and title in description:
+                    title = soup.title.string.replace('GitHub - ', '', 1)
+
+                if site_name == 'Twitter' and description:
+                    title = f'{title}: {description}'
+
+            if not title and (content and content_type not in _HTML_MIMETYPES):
+                title = re.sub(r'\s+', ' ', ' '.join(content.split('\n')))
 
         if title:
             title = unstyle(html.unescape(title).strip())
@@ -224,10 +228,10 @@ class UrlInfo(object):
                 # no exception
                 else:
                     hostname = style(hostname, fg=Color.GREEN)
-                    if title is not None and mimetype is not None:
+                    if title is not None:
                         title = style(title, bold=True)
                         reply = f'[ {hostname} ] {title}'
-                        if size and mimetype != 'text/html':
+                        if (size and mimetype) and mimetype != 'text/html':
                             size = naturalsize(size, gnu=True)
                             reply = f'{reply} ({mimetype} - {size})'
                         messages.append(reply)
