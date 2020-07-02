@@ -20,6 +20,7 @@ sqlalchemy = { version = "^1.3.12", extras = ["postgresql"]}
 ircmessage = { git = "https://github.com/FujiMakoto/IRC-Message", branch = "master" }
 alembic = "^1.4.0"
 humanize = "^2.0.0"
+extraction = "^0.3"
 
 [tool.poetry.dev-dependencies]
 

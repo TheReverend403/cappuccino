@@ -24,9 +24,9 @@ import time
 from io import StringIO
 from urllib.parse import urlparse
 
+import extraction
 import irc3
 import requests
-from bs4 import BeautifulSoup
 from humanize import naturalsize
 
 from util.formatting import Color, style, unstyle
@@ -124,10 +124,15 @@ def _process_url(url: str, session):
                 size = len(content.encode('UTF-8'))
 
             try:
-                soup = BeautifulSoup(content, 'html.parser')
-                title = soup.find('meta', property='og:title', content=True).get('content')
-                if not title:
-                    title = soup.title.string
+                extracted = extraction.Extractor().extract(content, source_url=url)
+                title = extracted.title
+
+                # GitHub's repo description is better than the og:title.
+                # How to check if it's a repo? Simple.
+                # The description on GitHub ends with the repo name, AKA the og:title.
+                # TODO: Make a custom extractor for this.
+                if hostname.endswith('github.com') and (description := extracted.description).endswith(title):
+                    title = description
             except AttributeError:
                 if content and content_type not in _HTML_MIMETYPES:
                     title = re.sub(r'\s+', ' ', ' '.join(content.split('\n')))
