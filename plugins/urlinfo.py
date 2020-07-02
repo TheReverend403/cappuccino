@@ -129,13 +129,13 @@ def _process_url(url: str, session):
                 description = soup.find('meta', property='og:description', content=True).get('content')
                 site_name = soup.find('meta', property='og:site_name', content=True).get('content')
 
-                # GitHub's repo description is better than the og:title.
+                # GitHub's repo <title> is better than the og:title.
                 # How to check if it's a repo? Simple.
                 # The description on GitHub ends with the repo name, AKA the og:title.
                 if hostname.endswith('github.com') and title in description:
                     title = soup.title.string.replace('GitHub - ', '', 1)
 
-                if site_name and len(site_name) < 10 and ' ' not in site_name:
+                if site_name and len(site_name) < 10:
                     hostname = site_name
 
             except AttributeError:
