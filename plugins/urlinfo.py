@@ -215,8 +215,10 @@ class UrlInfo(object):
                     hostname = style(hostname, fg=Color.GREEN)
                     if title is not None and mimetype is not None:
                         title = style(title, bold=True)
-                        size = f' - {naturalsize(size, gnu=True)}' if size else ''
-                        reply = f'[ {hostname} ] {title} ({mimetype}{size})'
+                        reply = f'[ {hostname} ] {title}'
+                        if size and mimetype != 'text/html':
+                            size = naturalsize(size, gnu=True)
+                            reply = f'{reply} ({mimetype} - {size})'
                         messages.append(reply)
 
             # Send all parsed URLs now that we have them all.
