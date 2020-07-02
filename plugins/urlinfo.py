@@ -64,7 +64,7 @@ class UrlInfo(object):
         'plugins.botui'
     ]
 
-    _max_bytes = 10 * 1024 * 1024  # 10M
+    _max_bytes = 10 * 1000 * 1000  # 10M
     _url_regex = re.compile(r'(?:https?://\S+)', re.IGNORECASE | re.UNICODE)
     _hostname_cleanup_regex = re.compile(r'^www\.', re.IGNORECASE | re.UNICODE)
     _max_title_length = 128
@@ -94,8 +94,7 @@ class UrlInfo(object):
 
     @irc3.event(rf':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{_url_regex.pattern}).*')
     def on_url(self, mask, target, data):
-        if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd) or data.startswith(
-                f'{self.bot.nick}: '):
+        if mask.nick in self.ignore_nicks or data.startswith(self.bot.config.cmd) or data.startswith(f'{self.bot.nick}: '):
             return
 
         urls = [_clean_url(url) for url in set(self._url_regex.findall(data))] or []
@@ -143,8 +142,8 @@ class UrlInfo(object):
                         title = style(title, bold=True)
                         reply = f'[ {hostname} ] {title}'
                         if (size and mimetype) and mimetype != 'text/html':
-                            size = naturalsize(size, gnu=True)
-                            reply = f'{reply} ({mimetype} - {size})'
+                            size = naturalsize(size)
+                            reply = f'{reply} ({size} - {mimetype})'
                         messages.append(reply)
 
             # Send all parsed URLs now that we have them all.
@@ -163,7 +162,7 @@ class UrlInfo(object):
                 continue
             content_length = content.write(chunk.decode('UTF-8', errors='ignore'))
             if content_length > self._max_bytes:
-                size = naturalsize(content_length, gnu=True)
+                size = naturalsize(content_length)
                 raise ResponseBodyTooLarge(f'Couldn\'t find the page title within {size}.')
 
         return content.getvalue()
