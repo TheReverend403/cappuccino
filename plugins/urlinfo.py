@@ -139,8 +139,7 @@ def _process_url(url: str, session):
                         title = soup.title.string.replace('GitHub - ', '', 1)
 
                     if site_name == 'Twitter' and description:
-                        title = f'{soup.title.string}: {description}'
-
+                        title = f'{title}: {description}'
             except AttributeError:
                 if content and content_type not in _HTML_MIMETYPES:
                     title = re.sub(r'\s+', ' ', ' '.join(content.split('\n')))
