@@ -61,18 +61,6 @@ version = "0.6.2"
 
 [[package]]
 category = "main"
-description = "Extract basic info from HTML webpages."
-name = "extraction"
-optional = false
-python-versions = "*"
-version = "0.3"
-
-[package.dependencies]
-beautifulsoup4 = "*"
-html5lib = "*"
-
-[[package]]
-category = "main"
 description = "HTML parser based on the WHATWG HTML specification"
 name = "html5lib"
 optional = false
@@ -136,6 +124,7 @@ version = "0.1.1"
 reference = "832b705d192ebe9091acb552076a776efa80877c"
 type = "git"
 url = "https://github.com/FujiMakoto/IRC-Message"
+
 [[package]]
 category = "main"
 description = "A super-fast templating language that borrows the  best ideas from the existing templating languages."
@@ -349,7 +338,7 @@ sentry = ["sentry-sdk"]
 web = ["bottle"]
 
 [metadata]
-content-hash = "cfa212c3bb9e6231c7f101a203e727d44fe99cf3343de595276ab1387e5266f2"
+content-hash = "cf2b4b870815f1c55a10b7a1a2158568454f756bd569b6b8b9107b968df829b6"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -375,10 +364,6 @@ chardet = [
 ]
 docopt = [
     {file = "docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"},
-]
-extraction = [
-    {file = "extraction-0.3-py3-none-any.whl", hash = "sha256:c39f204d1394055cd68cef1f61cfc9b231af0dc13aeb5d2d6bd85e48b69f8d1b"},
-    {file = "extraction-0.3.tar.gz", hash = "sha256:8449cb3454380689fee892c2190a6f5a3acce7d64608bff504891eb54a332858"},
 ]
 html5lib = [
     {file = "html5lib-1.1-py2.py3-none-any.whl", hash = "sha256:0d78f8fde1c230e99fe37986a60526d7049ed4bf8a9fadbad5f00e22e58e041d"},
