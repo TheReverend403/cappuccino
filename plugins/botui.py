@@ -35,7 +35,7 @@ class BotUI(object):
         requests.packages.urllib3.disable_warnings()
         self.bot.requests = Session()
         self.bot.requests.headers.update({
-            'User-Agent': 'cappuccino (https://github.com/FoxDev/cappuccino)',
+            'User-Agent': 'cappuccino (https://github.com/FoxDev/cappuccino) | Not Googlebot/2.1',
             'Accept-Language': 'en-GB,en-US,en;q=0.5',
             'timeout': '5',
             'allow_redirects': 'true',
