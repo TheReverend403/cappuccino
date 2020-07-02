@@ -212,7 +212,10 @@ class UrlInfo(object):
                 if title_tag := soup.find('meta', property='og:title', content=True):
                     title = title_tag.get('content')
                 else:
-                    title = soup.title.string
+                    try:
+                        title = soup.title.string
+                    except AttributeError:
+                        pass
 
                 site_name = None
                 if site_name_tag := soup.find('meta', property='og:site_name', content=True):
