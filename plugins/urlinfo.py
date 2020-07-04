@@ -92,7 +92,9 @@ class UrlInfo(object):
         go straight to the Python socket library and wrap it's getaddrinfo function transparently to return only
         IPv4 addresses for certain hosts.
         """
-        family = socket.AF_INET if any(host.endswith(hostname) for hostname in self.ipv4_hostnames) else family
+        if family == socket.AF_INET6:
+            family = socket.AF_INET if any(host.endswith(hostname) for hostname in self.ipv4_hostnames) else family
+
         return self._original_getaddrinfo(host, port, family, type, proto, flags)
 
     @irc3.event(rf':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{_url_regex.pattern}).*')
