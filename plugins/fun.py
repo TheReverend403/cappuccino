@@ -12,7 +12,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
-import json
+
+try:
+    import ujson as json
+except ImportError:
+    import json
+
 import random
 import re
 
