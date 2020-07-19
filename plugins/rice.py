@@ -86,23 +86,23 @@ class Rice(object):
                 self.bot.del_user_value(mask.nick, mode)
                 return f'Removed all of your {mode}.'
 
-            deleted = []
+            deleted_list = []
             # Delete values in descending order to prevent re-ordering of the list while deleting.
             for index in sorted(indexes, reverse=True):
                 try:
                     index = _from_user_index(index)
-                    deleted.append(values[index])
+                    deleted_list.append(values[index])
                     del values[index]
                 except IndexError:
                     pass
                 except ValueError:
                     return 'Invalid ID(s)'
 
-            if not deleted:
+            if not deleted_list:
                 return f'No {mode} were removed. Maybe you supplied the wrong IDs?'
 
             self.bot.set_user_value(mask.nick, mode, values)
-            deleted_list = ', '.join(deleted)
+            deleted_list = ', '.join([style(deleted, reset=True) for deleted in deleted_list])
             return f'Removed {deleted_list}.'
 
         if args['--replace'] or args['-r']:
@@ -122,6 +122,8 @@ class Rice(object):
                 values[index] = replacement
                 self.bot.set_user_value(mask.nick, mode, values)
 
+                old_value = style(old_value, reset=True)
+                replacement = style(replacement, reset=True)
                 return f'Replaced {old_value} with {replacement}'
             except IndexError:
                 return 'Invalid ID.'
