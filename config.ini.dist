@@ -17,20 +17,20 @@ ssl = true
 # sasl_username = cappuccino_test
 # sasl_password = yourpassword
 
-# uncomment this if you have a nickserv account
-# nickserv_password = yourpassword
-
 includes =
     irc3.plugins.ctcp
     plugins.nickserv
     plugins.botui
     plugins.rice
+    plugins.lastfm
     plugins.fun
     plugins.sed
-    plugins.urlinfo
+    plugins.ai
+    plugins.seen
     plugins.execshell
-    plugins.wtc
     plugins.triggers
+    plugins.chanlog
+    plugins.urlinfo
 
 # the bot will join #null
 # ${hash} is replaced by the # char
@@ -66,8 +66,6 @@ api_key =
 [plugins.urlinfo]
 ignore_nicks = Nick1 Nick2
 ignore_hostnames = example.com
-ipv4_hostnames = youtube.com
-
 fake_useragent_hostnames = twitter.com t.co
 
 [database]
