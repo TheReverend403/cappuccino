@@ -16,19 +16,17 @@
 import irc3
 import sentry_sdk
 from irc3.plugins.command import command
+from requests import RequestException
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
-
-
-IGNORED_EXCEPTIONS = ['RequestException', 'TimeoutError']
 
 
 def _before_send(event, hint):
     if 'exc_info' in hint:
-        exc_type, _, _ = hint['exc_info']
-        if exc_type.__name__ in IGNORED_EXCEPTIONS:
+        exc_type, exc_value, tb = hint['exc_info']
+        if isinstance(exc_value, (RequestException, TimeoutError)):
             return None
 
-    return None
+    return event
 
 
 @irc3.plugin
