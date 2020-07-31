@@ -51,6 +51,7 @@ class Ai(object):
         self.config = self.bot.config.get(__name__, {})
         self.ignore_nicks = self.config.get('ignore_nicks', '').split()
         self.max_loaded_lines = self.config.get('max_loaded_lines', 25000)
+        self.max_reply_length = self.config.get('max_reply_length', 100)
         self.db = Database(self)
         self.corpus = self.db.meta.tables['ai_corpus']
         self.channels = self.db.meta.tables['ai_channels']
@@ -161,7 +162,7 @@ class Ai(object):
             return
 
         text_model = markovify.NewlineText('\n'.join(corpus))
-        generated_reply = text_model.make_short_sentence(100)
+        generated_reply = text_model.make_short_sentence(self.max_reply_length)
         if not generated_reply:
             self.bot.privmsg(target, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))
             return
