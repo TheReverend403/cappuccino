@@ -40,6 +40,9 @@ _EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.',
 
 @irc3.plugin
 class Fun(object):
+    requires = [
+        'plugins.cache'
+    ]
 
     def __init__(self, bot):
         self.bot = bot
@@ -165,17 +168,11 @@ class Fun(object):
             %%catfact
         """
 
-        if not self.fact_cache:
-            limit = 1000
-            max_length = 200
+        @self.bot.cache(ttl=60*60)
+        def _get_cat_facts(limit=1000, max_length=200):
             url = f'https://catfact.ninja/facts?limit={limit}&max_length={max_length}'
+            with self.bot.requests.get(url) as response:
+                return [fact['fact'] for fact in response.json()['data']]
 
-            try:
-                with self.bot.requests.get(url) as response:
-                    self.fact_cache = [fact['fact'] for fact in response.json()['data']]
-            except RequestException as ex:
-                return ex.strerror
+        yield random.choice(_get_cat_facts())
 
-        fact = random.choice(self.fact_cache)
-        self.fact_cache.remove(fact)
-        yield fact

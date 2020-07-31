@@ -198,6 +198,25 @@ version = "1.0.4"
 
 [[package]]
 category = "main"
+description = "Basic Redis caching for functions"
+name = "python-redis-cache"
+optional = false
+python-versions = "*"
+version = "1.1.0"
+
+[[package]]
+category = "main"
+description = "Python client for Redis key-value store"
+name = "redis"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+version = "3.5.3"
+
+[package.extras]
+hiredis = ["hiredis (>=0.1.3)"]
+
+[[package]]
+category = "main"
 description = "Python HTTP for Humans."
 name = "requests"
 optional = false
@@ -339,7 +358,7 @@ sentry = ["sentry-sdk"]
 web = ["bottle"]
 
 [metadata]
-content-hash = "a1c8b371ea3e36c3b820b26a83ff502cb5e59e7af9a934aee89184ec90c5916a"
+content-hash = "7839bd6df88dabef1e2fa269869a9a6869c99a3e4200776b6b4352ac3ee17b63"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -449,6 +468,13 @@ python-editor = [
     {file = "python_editor-1.0.4-py2.7.egg", hash = "sha256:ea87e17f6ec459e780e4221f295411462e0d0810858e055fc514684350a2f522"},
     {file = "python_editor-1.0.4-py3-none-any.whl", hash = "sha256:1bf6e860a8ad52a14c3ee1252d5dc25b2030618ed80c022598f00176adc8367d"},
     {file = "python_editor-1.0.4-py3.5.egg", hash = "sha256:c3da2053dbab6b29c94e43c486ff67206eafbe7eb52dbec7390b5e2fb05aac77"},
+]
+python-redis-cache = [
+    {file = "python-redis-cache-1.1.0.tar.gz", hash = "sha256:09f686b9f2cde9414809ae987e14321e808e553fbbf297421de90c1253af7388"},
+]
+redis = [
+    {file = "redis-3.5.3-py2.py3-none-any.whl", hash = "sha256:432b788c4530cfe16d8d943a09d40ca6c16149727e4afe8c2c9d5580c59d9f24"},
+    {file = "redis-3.5.3.tar.gz", hash = "sha256:0e7e0cfca8660dea8b7d5cd8c4f6c5e29e11f31158c0b0ae91a397f00e5a05a2"},
 ]
 requests = [
     {file = "requests-2.24.0-py2.py3-none-any.whl", hash = "sha256:fe75cc94a9443b9246fc7049224f75604b113c36acb93f87b80ed42c44cbb898"},

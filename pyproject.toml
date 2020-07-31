@@ -21,6 +21,8 @@ ircmessage = { git = "https://github.com/FujiMakoto/IRC-Message", branch = "mast
 alembic = "^1.4.0"
 humanize = "^2.0.0"
 html5lib = "^1.1"
+redis = "^3.5.0"
+python-redis-cache = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
 
