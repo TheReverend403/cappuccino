@@ -42,7 +42,8 @@ class Chanlog(object):
         else:
             return
 
-        data = data.replace('\x00', '')
+        if data:
+            data = data.replace('\x00', '')
         self.db.execute(insert(self.chanlog).values(user=user, channel=channel, event=event, target=target, data=data))
 
     @irc3.event(rfc.PRIVMSG)
