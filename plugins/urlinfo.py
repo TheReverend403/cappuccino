@@ -78,24 +78,9 @@ class UrlInfo(object):
         self.config = self.bot.config.get(__name__, {})
         self.ignore_nicks = self.config.get('ignore_nicks', '').split()
         self.ignore_hostnames = self.config.get('ignore_hostnames', '').split()
-        self.ipv4_hostnames = self.config.get('ipv4_hostnames', '').split()
         self.real_user_agent = self.bot.requests.headers.get('User-Agent')
         self.fake_user_agent = self.config.get('fake_useragent', 'Googlebot/2.1 (+http://www.google.com/bot.html)')
         self.fake_useragent_hostnames = self.config.get('fake_useragent_hostnames', '').split()
-        self._original_getaddrinfo = socket.getaddrinfo
-        socket.getaddrinfo = self._getaddrinfo_wrapper
-
-    def _getaddrinfo_wrapper(self, host, port, family=0, type=0, proto=0, flags=0):
-        """
-        Some sites like YouTube like to block certain IPv6 ranges, so forcing IPv4 is necessary to get info on those URLs.
-        Because neither requests, urllib, or HTTPRequest provide a way to do that, it's necessary to bypass them and
-        go straight to the Python socket library and wrap it's getaddrinfo function transparently to return only
-        IPv4 addresses for certain hosts.
-        """
-        if family == socket.AF_INET6:
-            family = socket.AF_INET if any(host.endswith(hostname) for hostname in self.ipv4_hostnames) else family
-
-        return self._original_getaddrinfo(host, port, family, type, proto, flags)
 
     @irc3.event(rf':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{_url_regex.pattern}).*')
     def on_url(self, mask, target, data):
