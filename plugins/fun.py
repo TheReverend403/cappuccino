@@ -166,13 +166,16 @@ class Fun(object):
         """
 
         if not self.fact_cache:
+            limit = 1000
+            max_length = 200
+            url = f'https://catfact.ninja/facts?limit={limit}&max_length={max_length}'
+
             try:
-                with self.bot.requests.get('https://cat-fact.herokuapp.com/facts') as response:
-                    self.fact_cache = [json.loads(json.dumps(fact['text'])) for fact in filter(
-                        lambda f: f['type'] == 'cat' and 10 < len(f['text']) < 200,
-                        response.json()['all']
-                    )]
+                with self.bot.requests.get(url) as response:
+                    self.fact_cache = [json.loads(json.dumps(fact['fact'])) for fact in response.json()['data']]
             except RequestException as ex:
                 return ex.strerror
 
-        yield random.choice(self.fact_cache)
+        fact = random.choice(self.fact_cache)
+        self.fact_cache.remove(fact)
+        yield fact
