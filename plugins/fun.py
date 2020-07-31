@@ -168,7 +168,7 @@ class Fun(object):
             %%catfact
         """
 
-        @self.bot.cache(ttl=60*60)
+        @self.bot.cache(ttl=60*60*24*7)
         def _get_cat_facts(limit=1000, max_length=200):
             url = f'https://catfact.ninja/facts?limit={limit}&max_length={max_length}'
             with self.bot.requests.get(url) as response:
