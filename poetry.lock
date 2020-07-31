@@ -122,16 +122,12 @@ web = ["aiohttp"]
 
 [[package]]
 category = "main"
-description = "A simple Python module for applying and stripping formatting from IRC messages."
-name = "ircmessage"
+description = "Apply and strip formatting from IRC messages"
+name = "ircstyle"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 version = "0.1.1"
 
-[package.source]
-reference = "832b705d192ebe9091acb552076a776efa80877c"
-type = "git"
-url = "https://github.com/FujiMakoto/IRC-Message"
 [[package]]
 category = "main"
 description = "A super-fast templating language that borrows the  best ideas from the existing templating languages."
@@ -366,7 +362,7 @@ sentry = ["sentry-sdk"]
 web = ["bottle"]
 
 [metadata]
-content-hash = "8bcebb29a82566dcdddc5c4356f2cf2189e679c6f272da41916e717e7b235569"
+content-hash = "e6e33b935d4b684fad02953c111e44b9e07554fdf5032623ebed9a3741a8bac2"
 python-versions = ">=3.8, <3.9"
 
 [metadata.files]
@@ -457,7 +453,10 @@ irc3 = [
     {file = "irc3-1.1.6-py3-none-any.whl", hash = "sha256:fd549dd1b1b3eca5dea4f9e150e947e43c9db9168791e82fcafa61cfb0e78773"},
     {file = "irc3-1.1.6.tar.gz", hash = "sha256:7c6e43c939804355021d1c6c7c3be9c962df592bd1a3d39d3acdf7fcef62508d"},
 ]
-ircmessage = []
+ircstyle = [
+    {file = "ircstyle-0.1.1-py3-none-any.whl", hash = "sha256:0261adc7b4320d4fcb61d0ddb844c79a7e10698affae93bf28df9012c8ed8de4"},
+    {file = "ircstyle-0.1.1.tar.gz", hash = "sha256:8762a969b1cd01b219edff16c3b70365a6c312525c2b686fb6c326d536b38aab"},
+]
 mako = [
     {file = "Mako-1.1.3-py2.py3-none-any.whl", hash = "sha256:93729a258e4ff0747c876bd9e20df1b9758028946e976324ccd2d68245c7b6a9"},
     {file = "Mako-1.1.3.tar.gz", hash = "sha256:8195c8c1400ceb53496064314c6736719c6f25e7479cd24c77be3d9361cddc27"},

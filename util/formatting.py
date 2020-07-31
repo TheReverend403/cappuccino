@@ -13,32 +13,32 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import ircmessage
+import ircstyle
 
 
 class Color:
-    WHITE = ircmessage.colors.white
-    BLACK = ircmessage.colors.black
-    BLUE = ircmessage.colors.blue
-    GREEN = ircmessage.colors.green
-    RED = ircmessage.colors.red
-    BROWN = ircmessage.colors.brown
-    PURPLE = ircmessage.colors.purple
-    ORANGE = ircmessage.colors.orange
-    YELLOW = ircmessage.colors.yellow
-    LIGHT_GREEN = ircmessage.colors.light_green
-    TEAL = ircmessage.colors.teal
-    LIGHT_CYAN = ircmessage.colors.light_cyan
-    LIGHT_BLUE = ircmessage.colors.light_blue
-    PINK = ircmessage.colors.pink
-    GRAY = ircmessage.colors.grey
-    LIME = ircmessage.colors.lime
-    LIGHT_GRAY = ircmessage.colors.light_grey
+    WHITE = ircstyle.colors.white
+    BLACK = ircstyle.colors.black
+    BLUE = ircstyle.colors.blue
+    GREEN = ircstyle.colors.green
+    RED = ircstyle.colors.red
+    BROWN = ircstyle.colors.brown
+    PURPLE = ircstyle.colors.purple
+    ORANGE = ircstyle.colors.orange
+    YELLOW = ircstyle.colors.yellow
+    LIGHT_GREEN = ircstyle.colors.light_green
+    TEAL = ircstyle.colors.teal
+    LIGHT_CYAN = ircstyle.colors.light_cyan
+    LIGHT_BLUE = ircstyle.colors.light_blue
+    PINK = ircstyle.colors.pink
+    GRAY = ircstyle.colors.grey
+    LIME = ircstyle.colors.lime
+    LIGHT_GRAY = ircstyle.colors.light_grey
 
 
 def style(text, fg: Color = None, bg: Color = None, bold=False, italics=False, underline=False, reset=True) -> str:
-    return ircmessage.style(str(text), fg=fg, bg=bg, italics=italics, underline=underline, bold=bold, reset=reset)
+    return ircstyle.style(str(text), fg=fg, bg=bg, italics=italics, underline=underline, bold=bold, reset=reset)
 
 
 def unstyle(text: str) -> str:
-    return ircmessage.unstyle(text)
+    return ircstyle.unstyle(text)
