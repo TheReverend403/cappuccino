@@ -172,7 +172,7 @@ class Fun(object):
 
             try:
                 with self.bot.requests.get(url) as response:
-                    self.fact_cache = [json.loads(json.dumps(fact['fact'])) for fact in response.json()['data']]
+                    self.fact_cache = [fact['fact'] for fact in response.json()['data']]
             except RequestException as ex:
                 return ex.strerror
 
