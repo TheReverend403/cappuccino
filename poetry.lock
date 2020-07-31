@@ -132,7 +132,6 @@ version = "0.1.1"
 reference = "832b705d192ebe9091acb552076a776efa80877c"
 type = "git"
 url = "https://github.com/FujiMakoto/IRC-Message"
-
 [[package]]
 category = "main"
 description = "A super-fast templating language that borrows the  best ideas from the existing templating languages."
@@ -210,8 +209,8 @@ category = "main"
 description = "Basic Redis caching for functions"
 name = "python-redis-cache"
 optional = false
-python-versions = "*"
-version = "1.1.0"
+python-versions = ">=3.6,<3.9"
+version = "1.1.1"
 
 [[package]]
 category = "main"
@@ -367,8 +366,8 @@ sentry = ["sentry-sdk"]
 web = ["bottle"]
 
 [metadata]
-content-hash = "535d38c5a740943aea42e76f57a6a9dfe275eac5783f4488a96f6c50dafa1754"
-python-versions = "^3.8"
+content-hash = "8bcebb29a82566dcdddc5c4356f2cf2189e679c6f272da41916e717e7b235569"
+python-versions = ">=3.8, <3.9"
 
 [metadata.files]
 alembic = [
@@ -527,7 +526,8 @@ python-editor = [
     {file = "python_editor-1.0.4-py3.5.egg", hash = "sha256:c3da2053dbab6b29c94e43c486ff67206eafbe7eb52dbec7390b5e2fb05aac77"},
 ]
 python-redis-cache = [
-    {file = "python-redis-cache-1.1.0.tar.gz", hash = "sha256:09f686b9f2cde9414809ae987e14321e808e553fbbf297421de90c1253af7388"},
+    {file = "python-redis-cache-1.1.1.tar.gz", hash = "sha256:a685afdf4314cbf75ed8cb184684fe6c285cf0dc28bea3bf6029f1117a8f5b91"},
+    {file = "python_redis_cache-1.1.1-py3-none-any.whl", hash = "sha256:ef93daec78087af7c6f97eb967c99d457ed181e983d2a1e25179c87a659855e4"},
 ]
 redis = [
     {file = "redis-3.5.3-py2.py3-none-any.whl", hash = "sha256:432b788c4530cfe16d8d943a09d40ca6c16149727e4afe8c2c9d5580c59d9f24"},

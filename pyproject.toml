@@ -6,7 +6,7 @@ authors = ["Lee Watson <rev@revthefox.co.uk>"]
 license = "GPL-3.0"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8, <3.9"
 irc3 = "^1.1.0"
 markovify = { version = "^0.8.0", optional = true}
 pylast = { version = "^3.2.0", optional = true }
@@ -22,7 +22,7 @@ alembic = "^1.4.0"
 humanize = "^2.0.0"
 html5lib = "^1.1"
 redis = "^3.5.0"
-python-redis-cache = "^1.1.0"
+python-redis-cache = "^1.1.1"
 hiredis = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
