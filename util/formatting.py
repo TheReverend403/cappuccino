@@ -37,7 +37,7 @@ class Color:
 
 
 def style(text: str, fg: Color = None, bg: Color = None, bold=False, italics=False, underline=False, reset=True) -> str:
-    return ircstyle.style(text, fg=fg, bg=bg, italics=italics, underline=underline, bold=bold, reset=reset)
+    return ircstyle.style(str(text), fg=fg, bg=bg, italics=italics, underline=underline, bold=bold, reset=reset)
 
 
 def unstyle(text: str) -> str:
