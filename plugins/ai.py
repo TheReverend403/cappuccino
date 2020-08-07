@@ -56,6 +56,7 @@ class Ai(object):
         self.db = Database(self)
         self.corpus = self.db.meta.tables['ai_corpus']
         self.channels = self.db.meta.tables['ai_channels']
+        self.text_model = None
 
     def _add_line(self, line: str, channel: str):
         try:
@@ -166,13 +167,14 @@ class Ai(object):
             self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
             return
 
-        start = timer()
-        text_model = markovify.NewlineText('\n'.join(corpus))
-        end = timer()
-        self.bot.log.debug(f'Creating text model took {end - start} seconds.')
+        if not self.text_model:
+            start = timer()
+            self.text_model = markovify.NewlineText('\n'.join(corpus), retain_original=False)
+            end = timer()
+            self.bot.log.debug(f'Creating text model took {end - start} seconds.')
 
         start = timer()
-        generated_reply = text_model.make_short_sentence(self.max_reply_length)
+        generated_reply = self.text_model.make_short_sentence(self.max_reply_length)
         end = timer()
         self.bot.log.debug(f'Generating sentence took {end - start} seconds.')
 
