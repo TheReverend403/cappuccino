@@ -15,6 +15,7 @@
 
 import random
 import re
+from timeit import default_timer as timer
 
 import irc3
 import markovify
@@ -156,13 +157,25 @@ class Ai(object):
         if not self._is_active(target):
             return
 
+        start = timer()
         corpus = self._get_lines()
+        end = timer()
+        self.bot.log.debug(f'Fetching lines for corpus took {end - start} seconds.')
+
         if not corpus:
             self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
             return
 
+        start = timer()
         text_model = markovify.NewlineText('\n'.join(corpus))
+        end = timer()
+        self.bot.log.debug(f'Creating text model took {end - start} seconds.')
+
+        start = timer()
         generated_reply = text_model.make_short_sentence(self.max_reply_length)
+        end = timer()
+        self.bot.log.debug(f'Generating sentence took {end - start} seconds.')
+
         if not generated_reply:
             self.bot.privmsg(target, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))
             return
