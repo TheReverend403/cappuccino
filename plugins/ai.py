@@ -56,7 +56,24 @@ class Ai(object):
         self.db = Database(self)
         self.corpus = self.db.meta.tables['ai_corpus']
         self.channels = self.db.meta.tables['ai_channels']
-        self.text_model = None
+        self.text_model = self._get_text_model()
+
+    def _get_text_model(self):
+        start = timer()
+        corpus = self._get_lines()
+        end = timer()
+        self.bot.log.debug(f'Fetching lines for corpus took {(end - start) * 1000} milliseconds.')
+
+        if not corpus:
+            self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
+            return
+
+        start = timer()
+        model = markovify.NewlineText('\n'.join(corpus), retain_original=False).compile()
+        end = timer()
+        self.bot.log.debug(f'Creating text model took {(end - start) * 1000} milliseconds.')
+
+        return model
 
     def _add_line(self, line: str, channel: str):
         try:
@@ -157,21 +174,6 @@ class Ai(object):
 
         if not self._is_active(target):
             return
-
-        if not self.text_model:
-            start = timer()
-            corpus = self._get_lines()
-            end = timer()
-            self.bot.log.debug(f'Fetching lines for corpus took {(end - start) * 1000} milliseconds.')
-
-            if not corpus:
-                self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
-                return
-
-            start = timer()
-            self.text_model = markovify.NewlineText('\n'.join(corpus), retain_original=False)
-            end = timer()
-            self.bot.log.debug(f'Creating text model took {(end - start)*1000} milliseconds.')
 
         start = timer()
         generated_reply = self.text_model.make_short_sentence(self.max_reply_length)
