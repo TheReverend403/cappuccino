@@ -36,9 +36,9 @@ class Color:
     LIGHT_GRAY = ircstyle.colors.light_grey
 
 
-def style(text: str, fg: Color = None, bg: Color = None, bold=False, italics=False, underline=False, reset=True) -> str:
+def style(text, fg: Color = None, bg: Color = None, bold=False, italics=False, underline=False, reset=True) -> str:
     return ircstyle.style(str(text), fg=fg, bg=bg, italics=italics, underline=underline, bold=bold, reset=reset)
 
 
-def unstyle(text: str) -> str:
-    return ircstyle.unstyle(text)
+def unstyle(text) -> str:
+    return ircstyle.unstyle(str(text))
