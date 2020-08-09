@@ -17,6 +17,7 @@ import cgi
 import concurrent
 import html
 import ipaddress
+import logging
 import random
 import re
 import socket
@@ -29,7 +30,9 @@ import irc3
 import requests
 from humanize import naturalsize
 
-from util.formatting import Color, style, unstyle
+from cappuccino.util.formatting import Color, style, unstyle
+
+log = logging.getLogger(__name__)
 
 
 class ResponseBodyTooLarge(requests.RequestException):
@@ -61,7 +64,7 @@ def _clean_url(url: str):
 @irc3.plugin
 class UrlInfo(object):
     requires = [
-        'plugins.botui'
+        'cappuccino.botui'
     ]
 
     _max_bytes = 10 * 1000 * 1000  # 10M
@@ -100,7 +103,7 @@ class UrlInfo(object):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(urls)) as executor:
             messages = []
-            self.bot.log.debug(f'Retrieving page titles for {urls}')
+            log.debug(f'Retrieving page titles for {urls}')
 
             future_to_url = {executor.submit(self._process_url, url): url for url in urls}
             for future in concurrent.futures.as_completed(future_to_url):
@@ -112,7 +115,7 @@ class UrlInfo(object):
                 except InvalidIPAddress:
                     return
                 except ContentTypeNotAllowed as ex:
-                    self.bot.log.debug(ex)
+                    log.debug(ex)
                 except (socket.gaierror, ValueError, requests.RequestException) as ex:
                     hostname = style(hostname, fg=Color.RED)
                     error = style(ex, bold=True)

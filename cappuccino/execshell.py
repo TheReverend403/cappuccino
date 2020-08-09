@@ -36,7 +36,7 @@ def _exec_wrapper(cmd: dict, input_data: str = None) -> str:
 class ExecShell(object):
     requires = [
         'irc3.plugins.command',
-        'plugins.botui'
+        'cappuccino.botui'
     ]
 
     def __init__(self, bot):

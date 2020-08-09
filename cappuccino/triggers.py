@@ -19,16 +19,16 @@ import irc3
 from irc3.plugins.command import command
 from sqlalchemy import delete, func, insert, select, update
 
-from util.channel import is_chanop
-from util.database import Database
-from util.formatting import Color, style
+from cappuccino.util.channel import is_chanop
+from cappuccino.util.database import Database
+from cappuccino.util.formatting import Color, style
 
 
 @irc3.plugin
 class Seen(object):
     requires = [
         'irc3.plugins.command',
-        'plugins.botui'
+        'cappuccino.botui'
     ]
 
     def __init__(self, bot):

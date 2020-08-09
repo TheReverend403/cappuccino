@@ -13,6 +13,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
+from logging import getLogger
+
 try:
     import ujson as json
 except ImportError:
@@ -25,8 +27,9 @@ import irc3
 from irc3.plugins.command import command
 from requests import RequestException
 
-from util.formatting import Color, style
+from cappuccino.util.formatting import Color, style
 
+log = getLogger(__name__)
 _RANDOM_CHANCE = 0.33
 _DECIDE_DELIMITERS = [' or ', ',', '|']
 # Borrowed from https://github.com/GeneralUnRest/8ball-bot/blob/master/8ball.js
@@ -41,7 +44,7 @@ _EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.',
 @irc3.plugin
 class Fun(object):
     requires = [
-        'plugins.cache'
+        'cappuccino.cache'
     ]
 
     def __init__(self, bot):
@@ -70,7 +73,6 @@ class Fun(object):
                                         if option not in _DECIDE_DELIMITERS)))
 
         [options.remove(delimiter.strip()) for delimiter in _DECIDE_DELIMITERS if delimiter.strip() in options]
-        self.bot.log.debug(f'Parsed options: {options}')
 
         if not options:
             return f'{mask.nick}: I can\'t make a decision for you if you don\'t give me any choices >:V'
@@ -141,7 +143,7 @@ class Fun(object):
 
     @irc3.event(r':TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#(?i)DontJoinItsATrap) :.*PART THE CHANNEL.*')
     def antitrap(self, target):
-        self.bot.log.info('Parting {0}'.format(target))
+        log.info('Parting {0}'.format(target))
         self.bot.part(target)
 
     @irc3.event(r':(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b')
@@ -170,6 +172,7 @@ class Fun(object):
 
         @self.bot.cache(ttl=60*60*24*7)
         def _get_cat_facts(limit=1000, max_length=200):
+            log.debug('Fetching cat facts.')
             url = f'https://catfact.ninja/facts?limit={limit}&max_length={max_length}'
             with self.bot.requests.get(url) as response:
                 return [fact['fact'] for fact in response.json()['data']]

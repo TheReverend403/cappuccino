@@ -18,7 +18,7 @@ from irc3 import rfc
 from irc3.utils import IrcString
 from sqlalchemy import insert
 
-from util.database import Database
+from cappuccino.util.database import Database
 
 
 @irc3.plugin

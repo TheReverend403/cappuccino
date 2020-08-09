@@ -95,3 +95,4 @@ data/
 .idea/
 
 docker-compose.*.yml
+logging.yml

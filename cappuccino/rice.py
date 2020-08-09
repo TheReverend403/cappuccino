@@ -19,7 +19,7 @@ import re
 import irc3
 from irc3.plugins.command import command
 
-from util.formatting import Color, style
+from cappuccino.util.formatting import Color, style
 
 MAX_USER_VALUES = 6
 
@@ -39,7 +39,7 @@ def _from_user_index(index: int):
 class Rice(object):
     requires = [
         'irc3.plugins.command',
-        'plugins.userdb'
+        'cappuccino.userdb'
     ]
 
     def __init__(self, bot):

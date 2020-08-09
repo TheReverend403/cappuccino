@@ -18,8 +18,8 @@ import threading
 import bottle
 from sqlalchemy import desc, func, insert, nullslast, select, update
 
-from util.database import Database
-from util.formatting import unstyle
+from cappuccino.util.database import Database
+from cappuccino.util.formatting import unstyle
 
 try:
     import ujson as json

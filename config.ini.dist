@@ -18,19 +18,19 @@ ssl = true
 # sasl_password = yourpassword
 
 includes =
+    cappuccino.nickserv
+    cappuccino.botui
+    cappuccino.rice
+    cappuccino.lastfm
+    cappuccino.fun
+    cappuccino.sed
+    cappuccino.ai
+    cappuccino.seen
+    cappuccino.execshell
+    cappuccino.triggers
+    cappuccino.chanlog
+    cappuccino.urlinfo
     irc3.plugins.ctcp
-    plugins.nickserv
-    plugins.botui
-    plugins.rice
-    plugins.lastfm
-    plugins.fun
-    plugins.sed
-    plugins.ai
-    plugins.seen
-    plugins.execshell
-    plugins.triggers
-    plugins.chanlog
-    plugins.urlinfo
 
 # the bot will join #null
 # ${hash} is replaced by the # char
@@ -57,13 +57,13 @@ autojoins =
 [ctcp]
 version = cappuccino (https://github.com/FoxDev/cappuccino)
 
-[plugins.nickserv]
+[cappuccino.nickserv]
 password =
 
-[plugins.lastfm]
+[cappuccino.lastfm]
 api_key =
 
-[plugins.urlinfo]
+[cappuccino.urlinfo]
 ignore_nicks = Nick1 Nick2
 ignore_hostnames = example.com
 fake_useragent_hostnames = twitter.com t.co
@@ -73,29 +73,29 @@ fake_useragent_hostnames = twitter.com t.co
 # Only postgresql is officially supported, you're on your own for anything else.
 uri =
 
-[irc3.plugins.command]
+[irc3.cappuccino.command]
 # set command char
 cmd = .
 
 antiflood = true
 
 # set guard policy
-guard = irc3.plugins.command.mask_based_policy
+guard = irc3.cappuccino.command.mask_based_policy
 
-[irc3.plugins.command.masks]
+[irc3.cappuccino.command.masks]
 # this section is used by the guard to secure the bot's command
 # change your nickname and uncomment the line below
 # user!*@* = all_permissions
 * = view
 
 # https://sentry.io
-[plugins.sentry]
+[cappuccino.sentry]
 dsn =
 
-[plugins.userdb]
+[cappuccino.userdb]
 enable_http_server = false
 http_host = 127.0.0.1
 http_port = 8080
 
-[plugins.cache]
+[cappuccino.cache]
 redis_url = redis://localhost:6379/0

@@ -26,7 +26,7 @@ _DB_KEY = 'last_seen'
 class Seen(object):
     requires = [
         'irc3.plugins.command',
-        'plugins.userdb'
+        'cappuccino.userdb'
     ]
 
     def __init__(self, bot):

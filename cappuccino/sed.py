@@ -19,7 +19,7 @@ import subprocess
 
 import irc3
 
-from util.formatting import Color, style
+from cappuccino.util.formatting import Color, style
 
 _SED_PRIVMSG = r'\s*s[/|\\!\.,\\].+'
 _SED_CHECKER = re.compile('^' + _SED_PRIVMSG)

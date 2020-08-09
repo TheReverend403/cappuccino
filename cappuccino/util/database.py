@@ -13,7 +13,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
+
 from sqlalchemy import MetaData, create_engine
+
+log = logging.getLogger(__name__)
 
 
 class Database(object):
@@ -21,7 +25,7 @@ class Database(object):
     meta = None
 
     def __init__(self, plugin):
-        plugin.bot.log.info(f'Initialising database for {plugin.__module__}')
+        log.debug(f'Initialising database for {plugin.__module__}')
         if not Database.instance:
             Database.instance = self.__Singleton(create_engine(plugin.bot.config.get('database', {}).get('uri')))
             Database.meta = MetaData(bind=Database.instance.engine, reflect=True)

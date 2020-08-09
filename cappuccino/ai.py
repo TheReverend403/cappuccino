@@ -13,6 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
 import random
 import re
 from timeit import default_timer as timer
@@ -24,13 +25,15 @@ from irc3.utils import IrcString
 from sqlalchemy import func, insert, select, update
 from sqlalchemy.exc import IntegrityError
 
-from util.channel import is_chanop
-from util.database import Database
-from util.formatting import unstyle
+from cappuccino.util.channel import is_chanop
+from cappuccino.util.database import Database
+from cappuccino.util.formatting import unstyle
 
 _CMD_PATTERN = re.compile(r'^\s*([.!~`$])+')
 _SED_CHECKER = re.compile(r'^\s*s[/|\\!.,].+')
 _URL_CHECKER = re.compile(r'.*https?://.*', re.IGNORECASE | re.UNICODE)
+
+log = logging.getLogger(__name__)
 
 
 def _should_ignore_message(line):
@@ -59,19 +62,20 @@ class Ai(object):
         self.text_model = self._get_text_model()
 
     def _get_text_model(self):
+        log.info('Creating text model...')
         start = timer()
         corpus = self._get_lines()
         end = timer()
-        self.bot.log.debug(f'Fetching lines for corpus took {(end - start) * 1000} milliseconds.')
+        log.debug(f'Queried {len(corpus)} rows in {(end - start) * 1000} milliseconds.')
 
         if not corpus:
-            self.bot.log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
+            log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
             return
 
         start = timer()
         model = markovify.NewlineText('\n'.join(corpus), retain_original=False).compile()
         end = timer()
-        self.bot.log.debug(f'Creating text model took {(end - start) * 1000} milliseconds.')
+        log.info(f'Created text model in {(end - start) * 1000} milliseconds.')
 
         return model
 
@@ -178,7 +182,7 @@ class Ai(object):
         start = timer()
         generated_reply = self.text_model.make_short_sentence(self.max_reply_length)
         end = timer()
-        self.bot.log.debug(f'Generating sentence took {(end - start)*1000} milliseconds.')
+        log.debug(f'Generating sentence took {(end - start)*1000} milliseconds.')
 
         if not generated_reply:
             self.bot.privmsg(target, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))

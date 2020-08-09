@@ -13,11 +13,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
+
 import irc3
 import sentry_sdk
 from irc3.plugins.command import command
 from requests import RequestException
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+
+log = logging.getLogger(__name__)
 
 
 def _before_send(event, hint):
@@ -33,7 +37,7 @@ def _before_send(event, hint):
 class Sentry(object):
     requires = [
         'irc3.plugins.command',
-        'plugins.botui'
+        'cappuccino.botui'
     ]
 
     def __init__(self, bot):
@@ -42,7 +46,7 @@ class Sentry(object):
 
         dsn = self.config.get('dsn', None)
         if not dsn:
-            self.bot.log.warn('Missing Sentry DSN')
+            log.warning('Missing Sentry DSN')
         else:
             sentry_sdk.init(dsn,
                             before_send=_before_send,

@@ -13,11 +13,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
+
 import irc3
 import pylast
 from irc3.plugins.command import command
 
-from util.formatting import style
+from cappuccino.util.formatting import style
+
+log = logging.getLogger(__name__)
 
 _DB_KEY = 'lastfm'
 _MAX_TRACK_ARTIST_LEN = 32
@@ -28,7 +32,7 @@ _MAX_TRACK_TITLE_LEN = 75
 class LastFM(object):
     requires = [
         'irc3.plugins.command',
-        'plugins.userdb'
+        'cappuccino.userdb'
     ]
 
     def __init__(self, bot):
@@ -37,7 +41,7 @@ class LastFM(object):
 
         api_key = self.config.get('api_key', None)
         if not api_key:
-            self.bot.log.error('Missing last.fm API key')
+            log.error('Missing last.fm API key')
             return
 
         self.lastfm = pylast.LastFMNetwork(api_key=api_key)

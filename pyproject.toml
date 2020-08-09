@@ -24,6 +24,7 @@ redis = "^3.5.0"
 python-redis-cache = "^1.1.1"
 hiredis = "^1.1.0"
 ircstyle = "^0.1.1"
+pyyaml = "^5.3.1"
 
 [tool.poetry.dev-dependencies]
 
