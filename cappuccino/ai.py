@@ -47,10 +47,6 @@ def _should_ignore_message(line):
            line.startswith('\x01ACTION ')
 
 
-def to_ms(seconds: float) -> int:
-    return int(seconds * 1000)
-
-
 @irc3.plugin
 class Ai(object):
 
@@ -70,17 +66,16 @@ class Ai(object):
         start = timer()
         corpus = self._get_lines()
         end = timer()
+        log.debug(f'Queried {len(corpus)} rows in {(end - start) * 1000} milliseconds.')
 
         if not corpus:
             log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
             return
 
-        log.debug(f'Queried {len(corpus)} rows in {to_ms(end - start)} milliseconds.')
-
         start = timer()
-        model = markovify.NewlineText('\n'.join(corpus), retain_original=False, state_size=3).compile()
+        model = markovify.NewlineText('\n'.join(corpus), retain_original=False).compile()
         end = timer()
-        log.info(f'Created text model in {to_ms(end - start)} milliseconds.')
+        log.info(f'Created text model in {(end - start) * 1000} milliseconds.')
 
         return model
 
@@ -187,7 +182,7 @@ class Ai(object):
         start = timer()
         generated_reply = self.text_model.make_short_sentence(self.max_reply_length)
         end = timer()
-        log.debug(f'Generating sentence took {to_ms(end - start)} milliseconds.')
+        log.debug(f'Generating sentence took {(end - start)*1000} milliseconds.')
 
         if not generated_reply:
             self.bot.privmsg(target, random.choice(['What?', 'Hmm?', 'Yes?', 'What do you want?']))
