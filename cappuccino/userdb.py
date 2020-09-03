@@ -22,7 +22,7 @@ from cappuccino.util.database import Database
 from cappuccino.util.formatting import unstyle
 
 try:
-    import ujson as jso
+    import ujson as json
 except ImportError:
     import json
 
