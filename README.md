@@ -13,9 +13,13 @@
 A set of <a href="https://github.com/gawel/irc3">irc3</a> plugins providing various utilities primarily for <a href="https://qchat.rizon.net/?channels=rice">#rice@irc.rizon.net</a>. 
 </p>
 
-Requires Python 3.6 or above.
+## Installation
 
-# Installation
+Requirements:
+* PostgreSQL
+* Redis
+* Python 3.8+
+* [Poetry](https://python-poetry.org)
 
 First, install [Poetry](https://poetry.eustace.io/)
 
