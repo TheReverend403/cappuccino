@@ -1,11 +1,19 @@
-Cappuccino
-======
+<p align="center">
+  <img align="center" src="https://static.foxdev.co/img/catpuccino_alpha_128.png">
+</p>
 
-[![License](https://img.shields.io/github/license/FoxDev/cappuccino.svg)](https://www.gnu.org/licenses/gpl.txt)
-[![Requirements Status](https://requires.io/github/FoxDev/cappuccino/requirements.svg?branch=master)](https://requires.io/github/FoxDev/cappuccino/requirements/?branch=master)
-[![Keybase PGP](https://img.shields.io/keybase/pgp/TheReverend403.svg)](https://keybase.io/thereverend403)
+<h1 align="center">cappuccino</h1>
 
-A set of [irc3](https://github.com/gawel/irc3) plugins providing various utilities primarily for [#rice@irc.rizon.net](https://qchat.rizon.net/?channels=rice). 
+<p align="center">
+<a href="LICENSE"><img src="https://img.shields.io/github/license/FoxDev/cappuccino?style=flat-square" alt="GitHub"></a>
+<a href="https://requires.io/github/FoxDev/cappuccino/requirements"><img src="https://img.shields.io/requires/github/FoxDev/cappuccino?style=flat-square" alt="Requires.io"></a>
+</p>
+
+<p align="center">
+Nothing fancy, just an experimental Discord port of <a href="https://github.com/FoxDev/cappuccino">cappuccino</a> for fun.
+</p>
+
+A set of <a href="https://github.com/gawel/irc3">irc3</a> plugins providing various utilities primarily for <a href="https://qchat.rizon.net/?channels=rice">#rice@irc.rizon.net</a>. 
 
 Requires Python 3.6 or above.
 
