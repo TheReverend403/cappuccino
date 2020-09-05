@@ -21,8 +21,6 @@ Requirements:
 * Python 3.8+
 * [Poetry](https://python-poetry.org)
 
-First, install [Poetry](https://poetry.eustace.io/)
-
 ```sh
 poetry install # Optionally install plugin dependencies with: --extras 'sentry ai lastfm web'
 cp config.ini.dist config.ini
