@@ -66,11 +66,12 @@ class Ai(object):
         start = timer()
         corpus = self._get_lines()
         end = timer()
-        log.debug(f'Queried {len(corpus)} rows in {(end - start) * 1000} milliseconds.')
 
         if not corpus:
             log.warning('Not enough lines in corpus for markovify to generate a decent reply.')
             return
+
+        log.debug(f'Queried {len(corpus)} rows in {(end - start) * 1000} milliseconds.')
 
         start = timer()
         model = markovify.NewlineText('\n'.join(corpus), retain_original=False).compile()
