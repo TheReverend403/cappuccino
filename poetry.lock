@@ -29,7 +29,7 @@ lxml = ["lxml"]
 
 [[package]]
 name = "bottle"
-version = "0.12.18"
+version = "0.12.19"
 description = "Fast and simple WSGI-framework for small web-applications."
 category = "main"
 optional = true
@@ -37,7 +37,7 @@ python-versions = "*"
 
 [[package]]
 name = "certifi"
-version = "2020.6.20"
+version = "2020.11.8"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "main"
 optional = false
@@ -229,7 +229,7 @@ hiredis = ["hiredis (>=0.1.3)"]
 
 [[package]]
 name = "requests"
-version = "2.24.0"
+version = "2.25.0"
 description = "Python HTTP for Humans."
 category = "main"
 optional = false
@@ -239,15 +239,15 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 certifi = ">=2017.4.17"
 chardet = ">=3.0.2,<4"
 idna = ">=2.5,<3"
-urllib3 = ">=1.21.1,<1.25.0 || >1.25.0,<1.25.1 || >1.25.1,<1.26"
+urllib3 = ">=1.21.1,<1.27"
 
 [package.extras]
 security = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)"]
-socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7)", "win-inet-pton"]
+socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
 
 [[package]]
 name = "sentry-sdk"
-version = "0.19.1"
+version = "0.19.3"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = true
@@ -330,7 +330,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "urllib3"
-version = "1.25.11"
+version = "1.26.2"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 category = "main"
 optional = false
@@ -339,7 +339,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4"
 [package.extras]
 brotli = ["brotlipy (>=0.6.0)"]
 secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
-socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7,<2.0)"]
+socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "venusian"
@@ -371,7 +371,7 @@ web = ["bottle"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8, <3.9"
-content-hash = "015f2446f6955bd5c948ec0fd0ecfb3f737ce296d152f04118e21a502495639c"
+content-hash = "1f49dd8f254f5cf02d4b85e0b950c62c45cc7e9a9d409694a3da809a00887ce7"
 
 [metadata.files]
 alembic = [
@@ -384,12 +384,12 @@ beautifulsoup4 = [
     {file = "beautifulsoup4-4.9.3.tar.gz", hash = "sha256:84729e322ad1d5b4d25f805bfa05b902dd96450f43842c4e99067d5e1369eb25"},
 ]
 bottle = [
-    {file = "bottle-0.12.18-py3-none-any.whl", hash = "sha256:43157254e88f32c6be16f8d9eb1f1d1472396a4e174ebd2bf62544854ecf37e7"},
-    {file = "bottle-0.12.18.tar.gz", hash = "sha256:0819b74b145a7def225c0e83b16a4d5711fde751cd92bae467a69efce720f69e"},
+    {file = "bottle-0.12.19-py3-none-any.whl", hash = "sha256:f6b8a34fe9aa406f9813c02990db72ca69ce6a158b5b156d2c41f345016a723d"},
+    {file = "bottle-0.12.19.tar.gz", hash = "sha256:a9d73ffcbc6a1345ca2d7949638db46349f5b2b77dac65d6494d45c23628da2c"},
 ]
 certifi = [
-    {file = "certifi-2020.6.20-py2.py3-none-any.whl", hash = "sha256:8fc0819f1f30ba15bdb34cceffb9ef04d99f420f68eb75d901e9560b8749fc41"},
-    {file = "certifi-2020.6.20.tar.gz", hash = "sha256:5930595817496dd21bb8dc35dad090f1c2cd0adfaf21204bf6732ca5d8ee34d3"},
+    {file = "certifi-2020.11.8-py2.py3-none-any.whl", hash = "sha256:1f422849db327d534e3d0c5f02a263458c3955ec0aae4ff09b95f195c59f4edd"},
+    {file = "certifi-2020.11.8.tar.gz", hash = "sha256:f05def092c44fbf25834a51509ef6e631dc19765ab8a57b4e7ab85531f0a9cf4"},
 ]
 chardet = [
     {file = "chardet-3.0.4-py2.py3-none-any.whl", hash = "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"},
@@ -555,12 +555,12 @@ redis = [
     {file = "redis-3.5.3.tar.gz", hash = "sha256:0e7e0cfca8660dea8b7d5cd8c4f6c5e29e11f31158c0b0ae91a397f00e5a05a2"},
 ]
 requests = [
-    {file = "requests-2.24.0-py2.py3-none-any.whl", hash = "sha256:fe75cc94a9443b9246fc7049224f75604b113c36acb93f87b80ed42c44cbb898"},
-    {file = "requests-2.24.0.tar.gz", hash = "sha256:b3559a131db72c33ee969480840fff4bb6dd111de7dd27c8ee1f820f4f00231b"},
+    {file = "requests-2.25.0-py2.py3-none-any.whl", hash = "sha256:e786fa28d8c9154e6a4de5d46a1d921b8749f8b74e28bde23768e5e16eece998"},
+    {file = "requests-2.25.0.tar.gz", hash = "sha256:7f1a0b932f4a60a1a65caa4263921bb7d9ee911957e0ae4a23a6dd08185ad5f8"},
 ]
 sentry-sdk = [
-    {file = "sentry-sdk-0.19.1.tar.gz", hash = "sha256:5cf36eb6b1dc62d55f3c64289792cbaebc8ffa5a9da14474f49b46d20caa7fc8"},
-    {file = "sentry_sdk-0.19.1-py2.py3-none-any.whl", hash = "sha256:0eea248408d36e8e7037c7b73827bea20b13a4375bf1719c406cae6fcbc094e3"},
+    {file = "sentry-sdk-0.19.3.tar.gz", hash = "sha256:fd48f627945511c140546939b4d73815be4860cd1d2b9149577d7f6563e7bd60"},
+    {file = "sentry_sdk-0.19.3-py2.py3-none-any.whl", hash = "sha256:81d7a5d8ca0b13a16666e8280127b004565aa988bfeec6481e98a8601804b215"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
@@ -638,8 +638,8 @@ unidecode = [
     {file = "Unidecode-1.1.1.tar.gz", hash = "sha256:2b6aab710c2a1647e928e36d69c21e76b453cd455f4e2621000e54b2a9b8cce8"},
 ]
 urllib3 = [
-    {file = "urllib3-1.25.11-py2.py3-none-any.whl", hash = "sha256:f5321fbe4bf3fefa0efd0bfe7fb14e90909eb62a48ccda331726b4319897dd5e"},
-    {file = "urllib3-1.25.11.tar.gz", hash = "sha256:8d7eaa5a82a1cac232164990f04874c594c9453ec55eef02eab885aa02fc17a2"},
+    {file = "urllib3-1.26.2-py2.py3-none-any.whl", hash = "sha256:d8ff90d979214d7b4f8ce956e80f4028fc6860e4431f731ea4a8c08f23f99473"},
+    {file = "urllib3-1.26.2.tar.gz", hash = "sha256:19188f96923873c92ccb987120ec4acaa12f0461fa9ce5d3d0772bc965a39e08"},
 ]
 venusian = [
     {file = "venusian-3.0.0-py3-none-any.whl", hash = "sha256:06e7385786ad3a15c70740b2af8d30dfb063a946a851dcb4159f9e2a2302578f"},
