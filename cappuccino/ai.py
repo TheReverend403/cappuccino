@@ -20,6 +20,7 @@ from timeit import default_timer as timer
 
 import irc3
 import markovify
+from humanize import intcomma
 from irc3.plugins.command import command
 from irc3.utils import IrcString
 from sqlalchemy import func, insert, select, update
@@ -148,7 +149,7 @@ class Ai(object):
 
             ai_status = 'enabled' if self._is_active(target) else 'disabled'
             return f'Chatbot is currently {ai_status} for {target}. ' \
-                   f'Channel/global line count: {channel_line_count}/{line_count} ({channel_percentage}%).'
+                   f'Channel/global line count: {intcomma(channel_line_count)}/{intcomma(line_count)} ({channel_percentage}%).'
 
         if not is_chanop(self.bot, target, mask.nick):
             prefixes = [prefix.value for prefix in self.bot.nickprefix if prefix is not self.bot.nickprefix.VOICE]
