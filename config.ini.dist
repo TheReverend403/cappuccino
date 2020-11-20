@@ -82,7 +82,7 @@ antiflood = true
 # set guard policy
 guard = irc3.plugins.command.mask_based_policy
 
-[irc3.cappuccino.command.masks]
+[irc3.plugins.command.masks]
 # this section is used by the guard to secure the bot's command
 # change your nickname and uncomment the line below
 # user!*@* = all_permissions
