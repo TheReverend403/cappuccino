@@ -73,14 +73,14 @@ fake_useragent_hostnames = twitter.com t.co
 # Only postgresql is officially supported, you're on your own for anything else.
 uri =
 
-[irc3.cappuccino.command]
+[irc3.plugins.command]
 # set command char
 cmd = .
 
 antiflood = true
 
 # set guard policy
-guard = irc3.cappuccino.command.mask_based_policy
+guard = irc3.plugins.command.mask_based_policy
 
 [irc3.cappuccino.command.masks]
 # this section is used by the guard to secure the bot's command
