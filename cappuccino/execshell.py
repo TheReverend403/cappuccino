@@ -21,9 +21,8 @@ from irc3.plugins.command import command
 
 
 def _is_multiline_string(text: str):
-    return (
-        text.count("\n") > 1
-    )  # require minimum 2 newlines to account for the newline at the end of command output.
+    # require minimum 2 newlines to account for the newline at the end of output.
+    return text.count("\n") > 1
 
 
 def _exec_wrapper(cmd: dict, input_data: str = None) -> str:
@@ -65,7 +64,7 @@ class ExecShell(object):
             if not _is_multiline_string(output):
                 return f"{mask.nick}: {output}"
 
-            # Upload result of command to ix.io to avoid flooding channels with long output.
+            # Upload multiline output to ix.io to avoid flooding channels.
             result = self.bot.requests.post("http://ix.io", data={"f:1": output})
 
         except (

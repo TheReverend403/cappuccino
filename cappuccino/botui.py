@@ -49,7 +49,10 @@ class BotUI(object):
         %%bots
         """
         pyver = platform.python_version()
-        yield f"Reporting in! [cappuccino {self.bot.version}, Python {pyver}] https://github.com/FoxDev/cappuccino"
+        yield (
+            f"Reporting in! [cappuccino {self.bot.version}, Python {pyver}] "
+            f"https://github.com/FoxDev/cappuccino"
+        )
 
     @command(permission="admin", show_in_help_list=False)
     def join(self, mask, target, args):

@@ -56,7 +56,10 @@ class Rice(object):
         if args["--add"] or args["-a"]:
             values = self.bot.get_user_value(mask.nick, category) or []
             if len(values) + len(args["<values>"]) > MAX_USER_VALUES:
-                return f"You can only set {MAX_USER_VALUES} {category}! Consider deleting or replacing some."
+                return (
+                    f"You can only set {MAX_USER_VALUES} {category}! "
+                    f"Consider deleting or replacing some."
+                )
 
             for value in args["<values>"]:
                 values.append(value)
@@ -68,7 +71,10 @@ class Rice(object):
             values = args["<values>"]
 
             if len(values) > MAX_USER_VALUES:
-                return f"You can only set {MAX_USER_VALUES} {category}! Consider deleting or replacing some."
+                return (
+                    f"You can only set {MAX_USER_VALUES} {category}! "
+                    f"Consider deleting or replacing some."
+                )
 
             self.bot.set_user_value(mask.nick, category, values)
             return f"{category} updated."
@@ -84,7 +90,8 @@ class Rice(object):
                 return f"Removed all of your {category}."
 
             deleted_list = []
-            # Delete values in descending order to prevent re-ordering of the list while deleting.
+            # Delete values in descending order to prevent
+            # re-ordering of the list while deleting.
             for index in sorted(indexes, reverse=True):
                 try:
                     index = _from_user_index(index)

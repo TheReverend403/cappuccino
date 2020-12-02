@@ -170,9 +170,10 @@ class Ai(object):
                 )
 
             ai_status = "enabled" if self._is_active(target) else "disabled"
+            line_counts = f"{intcomma(channel_line_count)}/{intcomma(line_count)}"
             return (
                 f"Chatbot is currently {ai_status} for {target}. "
-                f"Channel/global line count: {intcomma(channel_line_count)}/{intcomma(line_count)} ({channel_percentage}%)."
+                f"Channel/global line count: {line_counts} ({channel_percentage}%)."
             )
 
         if not is_chanop(self.bot, target, mask.nick):

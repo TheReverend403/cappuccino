@@ -104,7 +104,10 @@ class Sed(object):
             # Prevent spam.
             max_extra_chars = 32
             max_len = len(message) + max_extra_chars
-            error_msg = "Replacement would be too long. I won't post it to prevent potential spam."
+            error_msg = (
+                "Replacement would be too long. "
+                "I won't post it to prevent potential spam."
+            )
             if (
                 len(new_message) > len(error_msg)
                 and len(new_message) > max_len

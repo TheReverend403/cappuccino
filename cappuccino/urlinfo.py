@@ -248,7 +248,7 @@ class UrlInfo(object):
 
                     # GitHub's repo <title> is better than the og:title
                     # How to check if it's a repo? Simple.
-                    # The description on GitHub ends with the repo name, AKA the og:title.
+                    # The description on GitHub ends with the repo name (og:title).
                     if site_name == "GitHub" and title in description:
                         title = soup.title.string.replace("GitHub - ", "", 1)
 
