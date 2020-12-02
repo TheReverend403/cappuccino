@@ -134,8 +134,10 @@ class Rice(object):
         if args['<user>'] is not None and args['<user>'].isdigit() and args['<id>'] is None:
             args['<user>'], args['<id>'] = None, args['<user>']
 
+        seperator = style(' \\ ', fg=Color.LIGHT_GRAY)
         user = args['<user>'] or mask.nick
-        formatted_user = style(user, fg=Color.GREEN)
+        user_tag = style(user, fg=Color.GREEN)
+        user_tag = f'{user_tag}{seperator}'
 
         if args['<id>'] is not None:
             try:
@@ -145,19 +147,20 @@ class Rice(object):
                 return 'Invalid ID.'
 
             value = style(value, reset=True)
-            return f'{value} [{formatted_user}]'
+            return f'{value} {user_tag}'
 
         values = self.bot.get_user_value(user, mode)
         if values:
             indexed_values = []
             for index, item in enumerate(values):
-                index = style(_to_user_index(index), bold=True)
+                index = _to_user_index(index)
+                id_prefix = style(f'#{index}', fg=Color.PURPLE)
                 item = style(item, reset=True)
-                indexed_values.append(f'({index}) {item}')
+                indexed_values.append(f'{id_prefix} {item}')
 
-            formatted_values = ' | '.join(indexed_values)
+            formatted_values = seperator.join(indexed_values)
 
-            return f'{formatted_values} [{formatted_user}]'
+            return f'{user_tag}{formatted_values}'
 
         return f'{user} has no {mode}.'
 
