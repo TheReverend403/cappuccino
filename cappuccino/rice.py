@@ -47,44 +47,44 @@ class Rice(object):
 
     def _generic_db(self, mask, target, args):
         # Get name of command _generic_db is being called from.
-        mode = inspect.stack()[1][3]
-        mode = mode if mode.endswith('s') else mode + 's'
+        category = inspect.stack()[1][3]
+        category = category if category.endswith('s') else category + 's'
 
         if args['<values>']:
             args['<values>'] = [arg.strip() for arg in args['<values>'] if arg.strip()]
 
             if len(args['<values>']) == 0:
-                return f'{mode} cannot be empty!'
+                return f'{category} cannot be empty!'
 
         if args['--add'] or args['-a']:
-            values = self.bot.get_user_value(mask.nick, mode) or []
+            values = self.bot.get_user_value(mask.nick, category) or []
             if len(values) + len(args['<values>']) > MAX_USER_VALUES:
-                return f'You can only set {MAX_USER_VALUES} {mode}! Consider deleting or replacing some.'
+                return f'You can only set {MAX_USER_VALUES} {category}! Consider deleting or replacing some.'
 
             for value in args['<values>']:
                 values.append(value)
 
-            self.bot.set_user_value(mask.nick, mode, values)
-            return f'{mode} updated.'
+            self.bot.set_user_value(mask.nick, category, values)
+            return f'{category} updated.'
 
         if args['--set'] or args['-s']:
             values = args['<values>']
 
             if len(values) > MAX_USER_VALUES:
-                return f'You can only set {MAX_USER_VALUES} {mode}! Consider deleting or replacing some.'
+                return f'You can only set {MAX_USER_VALUES} {category}! Consider deleting or replacing some.'
 
-            self.bot.set_user_value(mask.nick, mode, values)
-            return f'{mode} updated.'
+            self.bot.set_user_value(mask.nick, category, values)
+            return f'{category} updated.'
 
         if args['--delete'] or args['-d']:
-            values = self.bot.get_user_value(mask.nick, mode)
+            values = self.bot.get_user_value(mask.nick, category)
             if not values:
-                return f'You do not have any {mode} to remove.'
+                return f'You do not have any {category} to remove.'
 
             indexes = set(args['<ids>'])
             if '*' in indexes:
-                self.bot.del_user_value(mask.nick, mode)
-                return f'Removed all of your {mode}.'
+                self.bot.del_user_value(mask.nick, category)
+                return f'Removed all of your {category}.'
 
             deleted_list = []
             # Delete values in descending order to prevent re-ordering of the list while deleting.
@@ -99,9 +99,9 @@ class Rice(object):
                     return 'Invalid ID(s)'
 
             if not deleted_list:
-                return f'No {mode} were removed. Maybe you supplied the wrong IDs?'
+                return f'No {category} were removed. Maybe you supplied the wrong IDs?'
 
-            self.bot.set_user_value(mask.nick, mode, values)
+            self.bot.set_user_value(mask.nick, category, values)
             deleted_list = ', '.join([style(deleted, reset=True) for deleted in deleted_list])
             return f'Removed {deleted_list}.'
 
@@ -113,14 +113,14 @@ class Rice(object):
 
             replacement = args['<value>'].strip()
 
-            values = self.bot.get_user_value(mask.nick, mode)
+            values = self.bot.get_user_value(mask.nick, category)
             if not values:
-                return f'You do not have any {mode} to replace.'
+                return f'You do not have any {category} to replace.'
 
             try:
                 old_value = values[index]
                 values[index] = replacement
-                self.bot.set_user_value(mask.nick, mode, values)
+                self.bot.set_user_value(mask.nick, category, values)
 
                 old_value = style(old_value, reset=True)
                 replacement = style(replacement, reset=True)
@@ -144,14 +144,14 @@ class Rice(object):
         if args['<id>'] is not None:
             try:
                 index = _from_user_index(args['<id>'])
-                value = self.bot.get_user_value(user, mode)[index]
+                value = self.bot.get_user_value(user, category)[index]
             except (ValueError, IndexError, TypeError):
                 return 'Invalid ID.'
 
             value = style(value, reset=True)
             return f'{value} {user_tag}'
 
-        values = self.bot.get_user_value(user, mode)
+        values = self.bot.get_user_value(user, category)
         if values:
             indexed_values = []
             for index, item in enumerate(values):
@@ -168,7 +168,7 @@ class Rice(object):
 
             return f'{user_tag} {formatted_values}'
 
-        return f'{user} has no {mode}.'
+        return f'{user} has no {category}.'
 
     @command(permission='view')
     def station(self, mask, target, args):
