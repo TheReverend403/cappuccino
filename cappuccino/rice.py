@@ -134,7 +134,7 @@ class Rice(object):
         if args['<user>'] is not None and args['<user>'].isdigit() and args['<id>'] is None:
             args['<user>'], args['<id>'] = None, args['<user>']
 
-        seperator = style(' \\ ', fg=Color.LIGHT_GRAY)
+        seperator = style(' | ', fg=Color.LIGHT_GRAY)
         user = args['<user>'] or mask.nick
         user_tag = style(user, fg=Color.GREEN)
         user_tag = f'{user_tag}{seperator}'
