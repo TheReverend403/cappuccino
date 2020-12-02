@@ -155,9 +155,13 @@ class Rice(object):
         if values:
             indexed_values = []
             for index, item in enumerate(values):
+                item = style(item, reset=True)
+                if len(values) == 1:
+                    indexed_values.append(item)
+                    break
+
                 index = _to_user_index(index)
                 id_prefix = style(f'#{index}', fg=Color.PURPLE)
-                item = style(item, reset=True)
                 indexed_values.append(f'{id_prefix} {item}')
 
             formatted_values = seperator.join(indexed_values)
