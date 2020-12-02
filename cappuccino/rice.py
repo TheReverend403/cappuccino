@@ -161,8 +161,8 @@ class Rice(object):
             indexed_values = []
             for index, item in enumerate(values):
                 item = style(item, reset=True)
-                indexed_values.append(item)
-                if len(values) == 1:
+                if len(values) < 2:
+                    indexed_values.append(item)
                     break
 
                 index = _to_user_index(index)
