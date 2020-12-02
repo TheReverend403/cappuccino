@@ -43,13 +43,9 @@ _EIGHTBALL_RESPONSES = ['Signs point to yes.', 'Yes.', 'Reply hazy, try again.',
 
 @irc3.plugin
 class Fun(object):
-    requires = [
-        'cappuccino.cache'
-    ]
-
     def __init__(self, bot):
         self.bot = bot
-        self.fact_cache = None
+        self._cat_cache = []
 
     def reply(self, target: str, message: str):
         # Only reply a certain percentage of the time. AKA rate-limiting. Sort of.
@@ -163,6 +159,16 @@ class Fun(object):
         except RequestException as ex:
             yield ex.strerror
 
+    def _get_cat_fact(self, limit=1000, max_length=200):
+        if not self._cat_cache:
+            log.debug('Fetching cat facts.')
+            url = f'https://catfact.ninja/facts?limit={limit}&max_length={max_length}'
+            with self.bot.requests.get(url) as response:
+                self._cat_cache = [fact['fact'] for fact in response.json()['data']]
+                random.shuffle(self._cat_cache)
+
+        return self._cat_cache.pop()
+
     @command(permission='view')
     def catfact(self, mask, target, args):
         """Grab a random cat fact.
@@ -170,12 +176,5 @@ class Fun(object):
             %%catfact
         """
 
-        @self.bot.cache(ttl=60*60*24*7)
-        def _get_cat_facts(limit=1000, max_length=200):
-            log.debug('Fetching cat facts.')
-            url = f'https://catfact.ninja/facts?limit={limit}&max_length={max_length}'
-            with self.bot.requests.get(url) as response:
-                return [fact['fact'] for fact in response.json()['data']]
-
-        yield random.choice(_get_cat_facts())
+        yield self._get_cat_fact()
 

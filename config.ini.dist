@@ -96,6 +96,3 @@ dsn =
 enable_http_server = false
 http_host = 127.0.0.1
 http_port = 8080
-
-[cappuccino.cache]
-redis_url = redis://localhost:6379/0
