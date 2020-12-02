@@ -136,8 +136,10 @@ class Rice(object):
 
         seperator = style(' | ', fg=Color.LIGHT_GRAY)
         user = args['<user>'] or mask.nick
+        user_prefix = style('[', fg=Color.LIGHT_GRAY)
+        user_suffix = style(']', fg=Color.LIGHT_GRAY)
         user_tag = style(user, fg=Color.GREEN)
-        user_tag = f'{user_tag}{seperator}'
+        user_tag = f'{user_prefix}{user_tag}{user_suffix}'
 
         if args['<id>'] is not None:
             try:
@@ -160,7 +162,7 @@ class Rice(object):
 
             formatted_values = seperator.join(indexed_values)
 
-            return f'{user_tag}{formatted_values}'
+            return f'{user_tag} {formatted_values}'
 
         return f'{user} has no {mode}.'
 
