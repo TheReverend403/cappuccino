@@ -19,15 +19,12 @@ import irc3
 from humanize import naturaltime
 from irc3.plugins.command import command
 
-_DB_KEY = 'last_seen'
+_DB_KEY = "last_seen"
 
 
 @irc3.plugin
 class Seen(object):
-    requires = [
-        'irc3.plugins.command',
-        'cappuccino.userdb'
-    ]
+    requires = ["irc3.plugins.command", "cappuccino.userdb"]
 
     def __init__(self, bot):
         self.bot = bot
@@ -38,37 +35,42 @@ class Seen(object):
     def set_last_seen(self, nick: str, timestamp: datetime):
         self.bot.set_user_value(nick, _DB_KEY, timestamp)
 
-    @command(permission='view', aliases=['died'])
+    @command(permission="view", aliases=["died"])
     def seen(self, mask, target, args):
         """Check when a user was last seen active in any channel.
 
-            %%seen <nick>
+        %%seen <nick>
         """
 
-        nick = args['<nick>']
+        nick = args["<nick>"]
 
         if nick.lower() == self.bot.nick.lower():
-            return 'I\'m right here, idiot. -_-'
+            return "I'm right here, idiot. -_-"
 
         if nick.lower() == mask.nick.lower():
-            return 'Are you seriously asking me that?'
+            return "Are you seriously asking me that?"
 
         if not self.bot.get_user_value(nick, _DB_KEY):
-            return f'I haven\'t seen any activity from {nick} yet.'
+            return f"I haven't seen any activity from {nick} yet."
 
         last_seen = self.get_last_seen(nick)
         time_now = datetime.utcnow()
         duration = naturaltime(time_now - last_seen)
-        full_date = last_seen.strftime(f'%b %d %Y %H:%M UTC')
+        full_date = last_seen.strftime("%b %d %Y %H:%M UTC")
 
-        if nick == 'kori':
-            return f'{nick} was right there {duration}. ({full_date})'
+        if nick == "kori":
+            return f"{nick} was right there {duration}. ({full_date})"
 
-        return f'{nick} was last seen {duration}. ({full_date})'
+        return f"{nick} was last seen {duration}. ({full_date})"
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def on_privmsg(self, target, event, mask, data):
-        if event == 'NOTICE' or data.startswith('\x01VERSION') or not target.is_channel or mask.nick == self.bot.nick:
+        if (
+            event == "NOTICE"
+            or data.startswith("\x01VERSION")
+            or not target.is_channel
+            or mask.nick == self.bot.nick
+        ):
             return
 
         self.set_last_seen(mask.nick, datetime.utcnow())

@@ -19,51 +19,41 @@ from logging.config import dictConfig
 import yaml
 
 DEFAULT_CONFIG = {
-    'version': 1,
-    'formatters': {
-        'standard': {
-            'format': '%(asctime)s [%(levelname)-5s] %(name)s: %(message)s'
+    "version": 1,
+    "formatters": {
+        "standard": {"format": "%(asctime)s [%(levelname)-5s] %(name)s: %(message)s"},
+    },
+    "handlers": {
+        "default": {
+            "level": "INFO",
+            "formatter": "standard",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",  # Default is stderr
         },
     },
-    'handlers': {
-        'default': {
-            'level': 'INFO',
-            'formatter': 'standard',
-            'class': 'logging.StreamHandler',
-            'stream': 'ext://sys.stdout',  # Default is stderr
-        },
+    "root": {
+        "handlers": ["default"],
+        "level": "INFO",
     },
-    'root': {
-        'handlers': ['default'],
-        'level': 'INFO',
+    "loggers": {
+        "irc3": {"handlers": ["default"], "propagate": False},
+        "raw": {"handlers": ["default"], "propagate": False},
+        "cappuccino": {"handlers": ["default"], "level": "INFO", "propagate": False},
     },
-    'loggers': {
-        'irc3': {
-            'handlers': ['default'],
-            'propagate': False
-        },
-        'raw': {
-            'handlers': ['default'],
-            'propagate': False
-        },
-        'cappuccino': {
-            'handlers': ['default'],
-            'level': 'INFO',
-            'propagate': False
-        },
-    }
 }
 
 
 def setup_logging():
     try:
-        with open('logging.yml', 'r') as fd:
+        with open("logging.yml", "r") as fd:
             dictConfig(yaml.safe_load(fd))
-            logging.getLogger(__name__).info('Using logging.yml for logging config.')
+            logging.getLogger(__name__).info("Using logging.yml for logging config.")
 
     except FileNotFoundError:
         dictConfig(DEFAULT_CONFIG)
-        logging.getLogger(__name__).info('logging.yml not found, using default logging config.')
+        logging.getLogger(__name__).info(
+            "logging.yml not found, using default logging config."
+        )
     except yaml.YAMLError as exc:
         dictConfig(DEFAULT_CONFIG)
         logging.getLogger(__name__).exception(exc)

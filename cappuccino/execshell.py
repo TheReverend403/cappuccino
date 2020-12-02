@@ -21,47 +21,58 @@ from irc3.plugins.command import command
 
 
 def _is_multiline_string(text: str):
-    return text.count('\n') > 1  # require minimum 2 newlines to account for the newline at the end of command output.
+    return (
+        text.count("\n") > 1
+    )  # require minimum 2 newlines to account for the newline at the end of command output.
 
 
 def _exec_wrapper(cmd: dict, input_data: str = None) -> str:
     if input_data:
-        input_data = input_data.encode('UTF-8')
+        input_data = input_data.encode("UTF-8")
 
-    proc = subprocess.run(cmd, input=input_data, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=5)
-    return proc.stdout.decode('UTF-8').strip()
+    proc = subprocess.run(
+        cmd,
+        input=input_data,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        timeout=5,
+    )
+    return proc.stdout.decode("UTF-8").strip()
 
 
 @irc3.plugin
 class ExecShell(object):
-    requires = [
-        'irc3.plugins.command',
-        'cappuccino.botui'
-    ]
+    requires = ["irc3.plugins.command", "cappuccino.botui"]
 
     def __init__(self, bot):
         self.bot = bot
 
-    @command(permission='admin', show_in_help_list=False, options_first=True, use_shlex=True)
+    @command(
+        permission="admin", show_in_help_list=False, options_first=True, use_shlex=True
+    )
     def exec(self, mask, target, args):
         """Run a system command and upload the output to ix.io.
 
-            %%exec <command>...
+        %%exec <command>...
         """
 
         try:
-            output = _exec_wrapper(args['<command>'])
+            output = _exec_wrapper(args["<command>"])
             if not output:
-                return f'{mask.nick}: Command returned no output.'
+                return f"{mask.nick}: Command returned no output."
 
             # Don't paste single line outputs.
             if not _is_multiline_string(output):
-                return f'{mask.nick}: {output}'
+                return f"{mask.nick}: {output}"
 
             # Upload result of command to ix.io to avoid flooding channels with long output.
-            result = self.bot.requests.post('http://ix.io', data={'f:1': output})
+            result = self.bot.requests.post("http://ix.io", data={"f:1": output})
 
-        except (FileNotFoundError, requests.RequestException, subprocess.TimeoutExpired) as ex:
-            return f'{mask.nick}: {ex}'
+        except (
+            FileNotFoundError,
+            requests.RequestException,
+            subprocess.TimeoutExpired,
+        ) as ex:
+            return f"{mask.nick}: {ex}"
 
-        return f'{mask.nick}: {result.text}'
+        return f"{mask.nick}: {result.text}"

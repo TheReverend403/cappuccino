@@ -37,10 +37,7 @@ def _from_user_index(index: int):
 
 @irc3.plugin
 class Rice(object):
-    requires = [
-        'irc3.plugins.command',
-        'cappuccino.userdb'
-    ]
+    requires = ["irc3.plugins.command", "cappuccino.userdb"]
 
     def __init__(self, bot):
         self.bot = bot
@@ -48,43 +45,43 @@ class Rice(object):
     def _generic_db(self, mask, target, args):
         # Get name of command _generic_db is being called from.
         category = inspect.stack()[1][3]
-        category = category if category.endswith('s') else category + 's'
+        category = category if category.endswith("s") else category + "s"
 
-        if args['<values>']:
-            args['<values>'] = [arg.strip() for arg in args['<values>'] if arg.strip()]
+        if args["<values>"]:
+            args["<values>"] = [arg.strip() for arg in args["<values>"] if arg.strip()]
 
-            if len(args['<values>']) == 0:
-                return f'{category} cannot be empty!'
+            if len(args["<values>"]) == 0:
+                return f"{category} cannot be empty!"
 
-        if args['--add'] or args['-a']:
+        if args["--add"] or args["-a"]:
             values = self.bot.get_user_value(mask.nick, category) or []
-            if len(values) + len(args['<values>']) > MAX_USER_VALUES:
-                return f'You can only set {MAX_USER_VALUES} {category}! Consider deleting or replacing some.'
+            if len(values) + len(args["<values>"]) > MAX_USER_VALUES:
+                return f"You can only set {MAX_USER_VALUES} {category}! Consider deleting or replacing some."
 
-            for value in args['<values>']:
+            for value in args["<values>"]:
                 values.append(value)
 
             self.bot.set_user_value(mask.nick, category, values)
-            return f'{category} updated.'
+            return f"{category} updated."
 
-        if args['--set'] or args['-s']:
-            values = args['<values>']
+        if args["--set"] or args["-s"]:
+            values = args["<values>"]
 
             if len(values) > MAX_USER_VALUES:
-                return f'You can only set {MAX_USER_VALUES} {category}! Consider deleting or replacing some.'
+                return f"You can only set {MAX_USER_VALUES} {category}! Consider deleting or replacing some."
 
             self.bot.set_user_value(mask.nick, category, values)
-            return f'{category} updated.'
+            return f"{category} updated."
 
-        if args['--delete'] or args['-d']:
+        if args["--delete"] or args["-d"]:
             values = self.bot.get_user_value(mask.nick, category)
             if not values:
-                return f'You do not have any {category} to remove.'
+                return f"You do not have any {category} to remove."
 
-            indexes = set(args['<ids>'])
-            if '*' in indexes:
+            indexes = set(args["<ids>"])
+            if "*" in indexes:
                 self.bot.del_user_value(mask.nick, category)
-                return f'Removed all of your {category}.'
+                return f"Removed all of your {category}."
 
             deleted_list = []
             # Delete values in descending order to prevent re-ordering of the list while deleting.
@@ -96,26 +93,28 @@ class Rice(object):
                 except IndexError:
                     pass
                 except ValueError:
-                    return 'Invalid ID(s)'
+                    return "Invalid ID(s)"
 
             if not deleted_list:
-                return f'No {category} were removed. Maybe you supplied the wrong IDs?'
+                return f"No {category} were removed. Maybe you supplied the wrong IDs?"
 
             self.bot.set_user_value(mask.nick, category, values)
-            deleted_list = ', '.join([style(deleted, reset=True) for deleted in deleted_list])
-            return f'Removed {deleted_list}.'
+            deleted_list = ", ".join(
+                [style(deleted, reset=True) for deleted in deleted_list]
+            )
+            return f"Removed {deleted_list}."
 
-        if args['--replace'] or args['-r']:
+        if args["--replace"] or args["-r"]:
             try:
-                index = _from_user_index(args['<id>'])
+                index = _from_user_index(args["<id>"])
             except ValueError:
-                return 'Invalid ID'
+                return "Invalid ID"
 
-            replacement = args['<value>'].strip()
+            replacement = args["<value>"].strip()
 
             values = self.bot.get_user_value(mask.nick, category)
             if not values:
-                return f'You do not have any {category} to replace.'
+                return f"You do not have any {category} to replace."
 
             try:
                 old_value = values[index]
@@ -124,32 +123,38 @@ class Rice(object):
 
                 old_value = style(old_value, reset=True)
                 replacement = style(replacement, reset=True)
-                return f'Replaced {old_value} with {replacement}'
+                return f"Replaced {old_value} with {replacement}"
             except IndexError:
-                return 'Invalid ID.'
+                return "Invalid ID."
 
-        if args['<user>'] is not None and re.match('^https?://.*', args['<user>'], re.IGNORECASE | re.DOTALL):
-            return 'Did you mean to use --add (-a) or --set (-s) there?'
+        if args["<user>"] is not None and re.match(
+            "^https?://.*", args["<user>"], re.IGNORECASE | re.DOTALL
+        ):
+            return "Did you mean to use --add (-a) or --set (-s) there?"
 
-        if args['<user>'] is not None and args['<user>'].isdigit() and args['<id>'] is None:
-            args['<user>'], args['<id>'] = None, args['<user>']
+        if (
+            args["<user>"] is not None
+            and args["<user>"].isdigit()
+            and args["<id>"] is None
+        ):
+            args["<user>"], args["<id>"] = None, args["<user>"]
 
-        seperator = style(' | ', fg=Color.LIGHT_GRAY)
-        user = args['<user>'] or mask.nick
-        user_prefix = style('[', fg=Color.LIGHT_GRAY)
-        user_suffix = style(']', fg=Color.LIGHT_GRAY)
+        seperator = style(" | ", fg=Color.LIGHT_GRAY)
+        user = args["<user>"] or mask.nick
+        user_prefix = style("[", fg=Color.LIGHT_GRAY)
+        user_suffix = style("]", fg=Color.LIGHT_GRAY)
         user_tag = style(user, fg=Color.GREEN)
-        user_tag = f'{user_prefix}{user_tag}{user_suffix}'
+        user_tag = f"{user_prefix}{user_tag}{user_suffix}"
 
-        if args['<id>'] is not None:
+        if args["<id>"] is not None:
             try:
-                index = _from_user_index(args['<id>'])
+                index = _from_user_index(args["<id>"])
                 value = self.bot.get_user_value(user, category)[index]
             except (ValueError, IndexError, TypeError):
-                return 'Invalid ID.'
+                return "Invalid ID."
 
             value = style(value, reset=True)
-            return f'{value} {user_tag}'
+            return f"{value} {user_tag}"
 
         values = self.bot.get_user_value(user, category)
         if values:
@@ -161,74 +166,74 @@ class Rice(object):
                     break
 
                 index = _to_user_index(index)
-                id_prefix = style(f'#{index}', fg=Color.PURPLE)
-                indexed_values.append(f'{id_prefix} {item}')
+                id_prefix = style(f"#{index}", fg=Color.PURPLE)
+                indexed_values.append(f"{id_prefix} {item}")
 
             formatted_values = seperator.join(indexed_values)
 
-            return f'{user_tag} {formatted_values}'
+            return f"{user_tag} {formatted_values}"
 
-        return f'{user} has no {category}.'
+        return f"{user} has no {category}."
 
-    @command(permission='view')
+    @command(permission="view")
     def station(self, mask, target, args):
         """
-            %%station [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
+        %%station [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view', aliases=['desktop', 'dt'])
+    @command(permission="view", aliases=["desktop", "dt"])
     def dtop(self, mask, target, args):
         """
-            %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
+        %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view', aliases=['git'])
+    @command(permission="view", aliases=["git"])
     def dotfiles(self, mask, target, args):
         """
-            %%dotfiles [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
+        %%dotfiles [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view', aliases=['hw'])
+    @command(permission="view", aliases=["hw"])
     def handwriting(self, mask, target, args):
         """
-            %%handwriting [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
+        %%handwriting [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view')
+    @command(permission="view")
     def distro(self, mask, target, args):
         """
-            %%distro [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
+        %%distro [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view', aliases=['phone', 'hscr', 'hs'])
+    @command(permission="view", aliases=["phone", "hscr", "hs"])
     def homescreen(self, mask, target, args):
         """
-            %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
+        %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view')
+    @command(permission="view")
     def selfie(self, mask, target, args):
         """
-            %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
+        %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view')
+    @command(permission="view")
     def pet(self, mask, target, args):
         """
-            %%pet [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
+        %%pet [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)
 
-    @command(permission='view', aliases=['site'])
+    @command(permission="view", aliases=["site"])
     def website(self, mask, target, args):
         """
-            %%website [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
+        %%website [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
         """
         yield self._generic_db(mask, target, args)

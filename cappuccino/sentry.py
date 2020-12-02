@@ -25,8 +25,8 @@ log = logging.getLogger(__name__)
 
 
 def _before_send(event, hint):
-    if 'exc_info' in hint:
-        exc_type, exc_value, tb = hint['exc_info']
+    if "exc_info" in hint:
+        exc_type, exc_value, tb = hint["exc_info"]
         if isinstance(exc_value, (RequestException, TimeoutError)):
             return None
 
@@ -35,28 +35,27 @@ def _before_send(event, hint):
 
 @irc3.plugin
 class Sentry(object):
-    requires = [
-        'irc3.plugins.command',
-        'cappuccino.botui'
-    ]
+    requires = ["irc3.plugins.command", "cappuccino.botui"]
 
     def __init__(self, bot):
         self.bot = bot
         self.config = self.bot.config.get(__name__, {})
 
-        dsn = self.config.get('dsn', None)
+        dsn = self.config.get("dsn", None)
         if not dsn:
-            log.warning('Missing Sentry DSN')
+            log.warning("Missing Sentry DSN")
         else:
-            sentry_sdk.init(dsn,
-                            before_send=_before_send,
-                            release=self.bot.version,
-                            integrations=[SqlalchemyIntegration()])
+            sentry_sdk.init(
+                dsn,
+                before_send=_before_send,
+                release=self.bot.version,
+                integrations=[SqlalchemyIntegration()],
+            )
 
-    @command(name='testsentry', permission='admin', show_in_help_list=False)
+    @command(name="testsentry", permission="admin", show_in_help_list=False)
     def testsentry(self, mask, target, args):
         """Force an exception to test Sentry.
 
-            %%testsentry
+        %%testsentry
         """
-        raise Exception('Sentry test')
+        raise Exception("Sentry test")

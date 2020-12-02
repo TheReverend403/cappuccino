@@ -25,9 +25,11 @@ class Database(object):
     meta = None
 
     def __init__(self, plugin):
-        log.debug(f'Initialising database for {plugin.__module__}')
+        log.debug(f"Initialising database for {plugin.__module__}")
         if not Database.instance:
-            Database.instance = self.__Singleton(create_engine(plugin.bot.config.get('database', {}).get('uri')))
+            Database.instance = self.__Singleton(
+                create_engine(plugin.bot.config.get("database", {}).get("uri"))
+            )
             Database.meta = MetaData(bind=Database.instance.engine, reflect=True)
 
     def __getattr__(self, name):

@@ -24,108 +24,109 @@ from requests import Session
 
 @irc3.plugin
 class BotUI(object):
-    requires = [
-        'irc3.plugins.command',
-        'irc3.plugins.userlist'
-    ]
+    requires = ["irc3.plugins.command", "irc3.plugins.userlist"]
 
     def __init__(self, bot):
         self.bot = bot
-        self.bot.version = subprocess.check_output(['git', 'describe']).decode('UTF-8').strip()
+        self.bot.version = (
+            subprocess.check_output(["git", "describe"]).decode("UTF-8").strip()
+        )
         requests.packages.urllib3.disable_warnings()
         self.bot.requests = Session()
-        self.bot.requests.headers.update({
-            'User-Agent': 'cappuccino (https://github.com/FoxDev/cappuccino)',
-            'Accept-Language': 'en-GB,en-US,en;q=0.5',
-            'timeout': '5',
-            'allow_redirects': 'true',
-        })
+        self.bot.requests.headers.update(
+            {
+                "User-Agent": "cappuccino (https://github.com/FoxDev/cappuccino)",
+                "Accept-Language": "en-GB,en-US,en;q=0.5",
+                "timeout": "5",
+                "allow_redirects": "true",
+            }
+        )
 
-    @command(permission='view', aliases=['source', 'version'])
+    @command(permission="view", aliases=["source", "version"])
     def bots(self, mask, target, args):
         """Report in!
 
-            %%bots
+        %%bots
         """
         pyver = platform.python_version()
-        yield f'Reporting in! [cappuccino {self.bot.version}, Python {pyver}] https://github.com/FoxDev/cappuccino'
+        yield f"Reporting in! [cappuccino {self.bot.version}, Python {pyver}] https://github.com/FoxDev/cappuccino"
 
-    @command(permission='admin', show_in_help_list=False)
+    @command(permission="admin", show_in_help_list=False)
     def join(self, mask, target, args):
         """Join a channel.
 
-            %%join <channel> [<password>]
+        %%join <channel> [<password>]
         """
 
-        channel = args['<channel>']
-        if args['<password>']:
+        channel = args["<channel>"]
+        if args["<password>"]:
             channel += f' {args["<password>"]}'
 
         self.bot.join(channel)
 
-    @command(permission='admin', show_in_help_list=False)
+    @command(permission="admin", show_in_help_list=False)
     def part(self, mask, target, args):
         """Leave a channel.
 
-            %%part [<channel>]
+        %%part [<channel>]
         """
 
-        if args['<channel>']:
-            target = args['<channel>']
+        if args["<channel>"]:
+            target = args["<channel>"]
 
         self.bot.part(target)
 
-    @command(permission='admin', show_in_help_list=False)
+    @command(permission="admin", show_in_help_list=False)
     def quit(self, mask, target, args):
         """Shut the bot down.
 
-            %%quit
+        %%quit
         """
 
         self.bot.quit()
 
-    @command(permission='admin', show_in_help_list=False)
+    @command(permission="admin", show_in_help_list=False)
     def nick(self, mask, target, args):
         """Change nickname of the bot.
 
-            %%nick <nick>
+        %%nick <nick>
         """
 
-        self.bot.set_nick(args['<nick>'])
+        self.bot.set_nick(args["<nick>"])
 
-    @command(permission='admin', show_in_help_list=False)
+    @command(permission="admin", show_in_help_list=False)
     def mode(self, mask, target, args):
         """Set user mode for the bot.
 
-            %%mode <mode-cmd>
+        %%mode <mode-cmd>
         """
 
-        self.bot.mode(self.bot.nick, args['<mode-cmd>'])
+        self.bot.mode(self.bot.nick, args["<mode-cmd>"])
 
-    @command(permission='admin', show_in_help_list=False)
+    @command(permission="admin", show_in_help_list=False)
     def msg(self, mask, target, args):
         """Send a message.
 
-            %%msg <target> <message>...
+        %%msg <target> <message>...
         """
 
-        msg = ' '.join(args['<message>'] or [])
-        self.bot.privmsg(args['<target>'], msg)
+        msg = " ".join(args["<message>"] or [])
+        self.bot.privmsg(args["<target>"], msg)
 
-    @command(permission='admin', aliases=['bc', 'broadcast'], show_in_help_list=False)
+    @command(permission="admin", aliases=["bc", "broadcast"], show_in_help_list=False)
     def psa(self, mask, target, args):
         """Broadcast a message to all channels.
 
-            %%psa <message>...
+        %%psa <message>...
         """
-        message = ' '.join(args['<message>'])
+        message = " ".join(args["<message>"])
         for channel in self.bot.channels:
-            self.bot.privmsg(channel, f'[PSA] {message}')
+            self.bot.privmsg(channel, f"[PSA] {message}")
 
-    @command(permission='view')
+    @command(permission="view")
     def ping(self, mask, target, args):
         """Ping!
 
-            %%ping
+        %%ping
         """
-        self.bot.privmsg(target, f'{mask.nick}: Pong!')
+        self.bot.privmsg(target, f"{mask.nick}: Pong!")

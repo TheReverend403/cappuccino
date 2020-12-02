@@ -17,11 +17,11 @@ from enum import Enum
 
 
 class ChannelMode(Enum):
-    VOICE = '+'
-    HALF_OP = '%'
-    OP = '@'
-    SUPER_OP = '&'
-    OWNER = '~'
+    VOICE = "+"
+    HALF_OP = "%"
+    OP = "@"
+    SUPER_OP = "&"
+    OWNER = "~"
 
 
 def is_chanop(botcontext, channel: str, nick: str) -> bool:

@@ -26,80 +26,93 @@ from cappuccino.util.formatting import Color, style
 
 @irc3.plugin
 class Seen(object):
-    requires = [
-        'irc3.plugins.command',
-        'cappuccino.botui'
-    ]
+    requires = ["irc3.plugins.command", "cappuccino.botui"]
 
     def __init__(self, bot):
         self.bot = bot
         self.db = Database(self)
-        self.triggers = self.db.meta.tables['triggers']
+        self.triggers = self.db.meta.tables["triggers"]
 
     def _get_trigger(self, channel: str, trigger: str):
-        select_query = select([self.triggers.c.response]). \
-            where(func.lower(self.triggers.c.trigger) == trigger.lower()). \
-            where(func.lower(self.triggers.c.channel) == channel.lower())
+        select_query = (
+            select([self.triggers.c.response])
+            .where(func.lower(self.triggers.c.trigger) == trigger.lower())
+            .where(func.lower(self.triggers.c.channel) == channel.lower())
+        )
 
         return self.db.execute(select_query).scalar()
 
     def _set_trigger(self, channel: str, trigger: str, text: str):
         if self._get_trigger(channel, trigger):
-            update_stmnt = update(self.triggers). \
-                where(func.lower(self.triggers.c.trigger) == trigger.lower()). \
-                where(func.lower(self.triggers.c.channel) == channel.lower()). \
-                values(response=text)
+            update_stmnt = (
+                update(self.triggers)
+                .where(func.lower(self.triggers.c.trigger) == trigger.lower())
+                .where(func.lower(self.triggers.c.channel) == channel.lower())
+                .values(response=text)
+            )
 
             self.db.execute(update_stmnt)
             return
 
-        self.db.execute(insert(self.triggers).values(channel=channel, trigger=trigger, response=text))
+        self.db.execute(
+            insert(self.triggers).values(
+                channel=channel, trigger=trigger, response=text
+            )
+        )
 
     def _delete_trigger(self, channel: str, trigger: str) -> bool:
-        delete_stmt = delete(self.triggers). \
-            where(func.lower(self.triggers.c.trigger) == trigger.lower()). \
-            where(func.lower(self.triggers.c.channel) == channel.lower()). \
-            returning(self.triggers.c.trigger)
+        delete_stmt = (
+            delete(self.triggers)
+            .where(func.lower(self.triggers.c.trigger) == trigger.lower())
+            .where(func.lower(self.triggers.c.channel) == channel.lower())
+            .returning(self.triggers.c.trigger)
+        )
 
         return self.db.execute(delete_stmt).scalar() is not None
 
-    @command(permission='view')
+    @command(permission="view")
     def trigger(self, mask, target, args):
         """Manages predefined responses to message triggers.
 
-            %%trigger (set <trigger> <response>... | del <trigger> | list)
+        %%trigger (set <trigger> <response>... | del <trigger> | list)
         """
 
         if not target.is_channel:
-            return 'This command can only be used in channels.'
+            return "This command can only be used in channels."
 
-        if (args['set'] or args['del']) and not is_chanop(self.bot, target, mask.nick):
-            return 'Only channel operators may modify channel triggers.'
+        if (args["set"] or args["del"]) and not is_chanop(self.bot, target, mask.nick):
+            return "Only channel operators may modify channel triggers."
 
-        trigger = args['<trigger>']
-        if args['set']:
-            self._set_trigger(target, trigger, ' '.join(args['<response>']))
-            return f'Trigger \'{trigger}\' set.'
+        trigger = args["<trigger>"]
+        if args["set"]:
+            self._set_trigger(target, trigger, " ".join(args["<response>"]))
+            return f"Trigger '{trigger}' set."
 
-        if args['del']:
-            return f'Deleted trigger \'{trigger}\'.' if self._delete_trigger(target, trigger) else 'No such trigger.'
+        if args["del"]:
+            return (
+                f"Deleted trigger '{trigger}'."
+                if self._delete_trigger(target, trigger)
+                else "No such trigger."
+            )
 
-        if args['list']:
-            list_query = select([self.triggers.c.trigger]).where(func.lower(self.triggers.c.channel) == target.lower())
+        if args["list"]:
+            list_query = select([self.triggers.c.trigger]).where(
+                func.lower(self.triggers.c.channel) == target.lower()
+            )
             trigger_list = [row[0] for row in self.db.execute(list_query)]
 
             if trigger_list:
-                trigger_list = ', '.join(trigger_list)
-                return f'Available triggers for {target}: {trigger_list}'
+                trigger_list = ", ".join(trigger_list)
+                return f"Available triggers for {target}: {trigger_list}"
 
-            return f'No triggers available for {target}'
+            return f"No triggers available for {target}"
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def on_privmsg(self, target, event, mask, data):
-        if mask.nick == self.bot.nick or event == 'NOTICE':
+        if mask.nick == self.bot.nick or event == "NOTICE":
             return
 
-        captured_triggers = re.findall(r'\?([A-Za-z]+)', data)
+        captured_triggers = re.findall(r"\?([A-Za-z]+)", data)
         if not captured_triggers:
             return
 
@@ -109,7 +122,7 @@ class Seen(object):
             response = self._get_trigger(target, trigger)
             trigger = style(trigger.lower(), fg=Color.ORANGE)
             if response is not None:
-                responses.append(f'[{trigger}] {response}')
+                responses.append(f"[{trigger}] {response}")
 
         for response in responses:
             self.bot.privmsg(target, response)

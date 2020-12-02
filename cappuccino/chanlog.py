@@ -23,15 +23,20 @@ from cappuccino.util.database import Database
 
 @irc3.plugin
 class Chanlog(object):
-
     def __init__(self, bot):
         self.bot = bot
         self.db = Database(self)
-        self.chanlog = self.db.meta.tables['chanlog']
+        self.chanlog = self.db.meta.tables["chanlog"]
         self.default_nick = self.bot.nick
 
-    def _add_event(self, event: str, data: str = None,
-                   user: IrcString = None, channel: IrcString = None, target: str = None):
+    def _add_event(
+        self,
+        event: str,
+        data: str = None,
+        user: IrcString = None,
+        channel: IrcString = None,
+        target: str = None,
+    ):
 
         if channel and not channel.is_channel:
             channel = None
@@ -43,13 +48,17 @@ class Chanlog(object):
             return
 
         if data:
-            data = data.replace('\x00', '')
-        self.db.execute(insert(self.chanlog).values(user=user, channel=channel, event=event, target=target, data=data))
+            data = data.replace("\x00", "")
+        self.db.execute(
+            insert(self.chanlog).values(
+                user=user, channel=channel, event=event, target=target, data=data
+            )
+        )
 
     @irc3.event(rfc.PRIVMSG)
-    @irc3.event(rfc.PRIVMSG, iotype='out')
+    @irc3.event(rfc.PRIVMSG, iotype="out")
     def on_privmsg(self, mask=None, event=None, target=None, data=None):
-        if event == 'NOTICE' or data.startswith('\x01VERSION') or not target.is_channel:
+        if event == "NOTICE" or data.startswith("\x01VERSION") or not target.is_channel:
             return
 
         if not mask:
@@ -60,15 +69,15 @@ class Chanlog(object):
     @irc3.event(rfc.JOIN_PART_QUIT)
     def on_join_part_quit(self, mask=None, event=None, channel=None, data=None):
         # Keep it clean.
-        if data and event == 'QUIT':
-            data = data.replace('Quit: ', '')
+        if data and event == "QUIT":
+            data = data.replace("Quit: ", "")
 
         if not mask:
             mask = self.bot.nick
 
         self._add_event(event, user=mask, data=data, channel=channel)
 
-    @irc3.event(rfc.JOIN_PART_QUIT, iotype='out')
+    @irc3.event(rfc.JOIN_PART_QUIT, iotype="out")
     def on_join_part_quit_out(self, *args, **kwargs):
         yield self.on_join_part_quit(*args, **kwargs)
 
@@ -82,7 +91,7 @@ class Chanlog(object):
 
         self._add_event(event, data=data, user=mask, channel=channel, target=target)
 
-    @irc3.event(rfc.KICK, iotype='out')
+    @irc3.event(rfc.KICK, iotype="out")
     def on_kick_out(self, *args, **kwargs):
         yield self.on_kick(*args, **kwargs)
 
@@ -91,21 +100,21 @@ class Chanlog(object):
         if not nick:
             nick = self.bot.nick
 
-        self._add_event('NICK', user=nick, data=new_nick)
+        self._add_event("NICK", user=nick, data=new_nick)
 
-    @irc3.event(rfc.NEW_NICK, iotype='out')
+    @irc3.event(rfc.NEW_NICK, iotype="out")
     def on_new_nick_out(self, *args, **kwargs):
         yield self.on_new_nick(*args, **kwargs)
 
     @irc3.event(rfc.TOPIC)
-    @irc3.event(rfc.TOPIC, iotype='out')
+    @irc3.event(rfc.TOPIC, iotype="out")
     def on_topic(self, mask=None, channel=None, data=None):
         if not mask:
             mask = self.bot.nick
 
-        self._add_event('TOPIC', user=mask, data=data, channel=channel)
+        self._add_event("TOPIC", user=mask, data=data, channel=channel)
 
-    @irc3.event(rfc.TOPIC, iotype='out')
+    @irc3.event(rfc.TOPIC, iotype="out")
     def on_topic_out(self, *args, **kwargs):
         yield self.on_topic(*args, **kwargs)
 
@@ -119,6 +128,6 @@ class Chanlog(object):
 
         self._add_event(event, data=modes, user=mask, channel=target, target=data)
 
-    @irc3.event(rfc.MODE, iotype='out')
+    @irc3.event(rfc.MODE, iotype="out")
     def on_mode_out(self, *args, **kwargs):
         yield self.on_mode(*args, **kwargs)

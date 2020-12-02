@@ -23,87 +23,96 @@ from cappuccino.util.formatting import style
 
 log = logging.getLogger(__name__)
 
-_DB_KEY = 'lastfm'
+_DB_KEY = "lastfm"
 _MAX_TRACK_ARTIST_LEN = 32
 _MAX_TRACK_TITLE_LEN = 75
 
 
 @irc3.plugin
 class LastFM(object):
-    requires = [
-        'irc3.plugins.command',
-        'cappuccino.userdb'
-    ]
+    requires = ["irc3.plugins.command", "cappuccino.userdb"]
 
     def __init__(self, bot):
         self.bot = bot
         self.config = self.bot.config.get(__name__, {})
 
-        api_key = self.config.get('api_key', None)
+        api_key = self.config.get("api_key", None)
         if not api_key:
-            log.error('Missing last.fm API key')
+            log.error("Missing last.fm API key")
             return
 
         self.lastfm = pylast.LastFMNetwork(api_key=api_key)
 
-    @command(name='np', permission='view', aliases=['lastfm'])
+    @command(name="np", permission="view", aliases=["lastfm"])
     def now_playing(self, mask, target, args):
         """View currently playing track info.
 
-            %%np [(-s | --set) <username> | <username>]
+        %%np [(-s | --set) <username> | <username>]
         """
 
         try:
-            if args['--set'] or args['-s']:
-                lastfm_username = args['<username>']
+            if args["--set"] or args["-s"]:
+                lastfm_username = args["<username>"]
                 try:
-                    lastfm_username = self.lastfm.get_user(lastfm_username).get_name(properly_capitalized=True)
+                    lastfm_username = self.lastfm.get_user(lastfm_username).get_name(
+                        properly_capitalized=True
+                    )
                 except pylast.WSError:
-                    return 'No such last.fm user. Are you trying to trick me? :^)'
+                    return "No such last.fm user. Are you trying to trick me? :^)"
                 else:
                     self.bot.set_user_value(mask.nick, _DB_KEY, lastfm_username)
-                    return 'last.fm username set.'
+                    return "last.fm username set."
 
-            base_command = self.bot.config.cmd + 'np'
-            irc_username = args['<username>'] or mask.nick
+            base_command = self.bot.config.cmd + "np"
+            irc_username = args["<username>"] or mask.nick
             lastfm_username = self.bot.get_user_value(irc_username, _DB_KEY)
 
             if not lastfm_username:
                 if irc_username == mask.nick:
-                    return f'You have no last.fm username set. ' \
-                           f'Please set one with {base_command} --set <username>'
+                    return (
+                        f"You have no last.fm username set. "
+                        f"Please set one with {base_command} --set <username>"
+                    )
 
-                return f'{irc_username} has no last.fm username set. ' \
-                       f'Ask them to set one with {base_command} --set <username>'
+                return (
+                    f"{irc_username} has no last.fm username set. "
+                    f"Ask them to set one with {base_command} --set <username>"
+                )
 
             try:
                 lastfm_user = self.lastfm.get_user(lastfm_username)
             except pylast.WSError:
-                return f'No such last.fm user ({lastfm_username}). ' \
-                       f'Please set a valid user with {base_command} --set <username>'
+                return (
+                    f"No such last.fm user ({lastfm_username}). "
+                    f"Please set a valid user with {base_command} --set <username>"
+                )
 
             formatted_name = irc_username
             if irc_username.lower() != lastfm_username.lower():
-                formatted_name += f' ({lastfm_username})'
+                formatted_name += f" ({lastfm_username})"
 
             current_track = lastfm_user.get_now_playing()
             if not current_track:
-                return f'{formatted_name} is not listening to anything right now.'
+                return f"{formatted_name} is not listening to anything right now."
 
             artist = current_track.get_artist().get_name().strip()
             title = current_track.get_title().strip()
 
             if len(artist) > _MAX_TRACK_ARTIST_LEN:
-                artist = ''.join(artist[:_MAX_TRACK_ARTIST_LEN]) + '...'
+                artist = "".join(artist[:_MAX_TRACK_ARTIST_LEN]) + "..."
             if len(title) > _MAX_TRACK_TITLE_LEN:
-                title = ''.join(title[:_MAX_TRACK_TITLE_LEN]) + '...'
+                title = "".join(title[:_MAX_TRACK_TITLE_LEN]) + "..."
 
             artist = style(artist, bold=True)
             title = style(title, bold=True)
-            track_info = f'{title} by {artist}'
+            track_info = f"{title} by {artist}"
 
-        except (pylast.NetworkError, pylast.MalformedResponseError, pylast.WSError) as err:
+        except (
+            pylast.NetworkError,
+            pylast.MalformedResponseError,
+            pylast.WSError,
+        ) as err:
             error = style(err, bold=True)
-            return f'{mask.nick}: A last.fm error occurred: {error}'
+            return f"{mask.nick}: A last.fm error occurred: {error}"
 
-        return f'{formatted_name} is now playing {track_info}'
+        return f"{formatted_name} is now playing {track_info}"

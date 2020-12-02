@@ -21,21 +21,23 @@ import irc3
 
 from cappuccino.util.formatting import Color, style
 
-_SED_PRIVMSG = r'\s*s[/|\\!\.,\\].+'
-_SED_CHECKER = re.compile('^' + _SED_PRIVMSG)
+_SED_PRIVMSG = r"\s*s[/|\\!\.,\\].+"
+_SED_CHECKER = re.compile("^" + _SED_PRIVMSG)
 
 
 def _sed_wrapper(text: str, command: str) -> str:
     # Must be GNU sed
-    arguments = ['sed', '--sandbox', '--regexp-extended', command]
-    sed_input = text.strip().encode('UTF-8')
-    sed = subprocess.run(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, input=sed_input)
-    stream = sed.stdout.decode('UTF-8').strip()
+    arguments = ["sed", "--sandbox", "--regexp-extended", command]
+    sed_input = text.strip().encode("UTF-8")
+    sed = subprocess.run(
+        arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, input=sed_input
+    )
+    stream = sed.stdout.decode("UTF-8").strip()
 
     if sed.returncode != 0:
         if not stream:
-            return 'Unknown sed error.'
-        raise EditorException(stream.replace('sed: -e ', ''))
+            return "Unknown sed error."
+        raise EditorException(stream.replace("sed: -e ", ""))
 
     return stream
 
@@ -53,18 +55,21 @@ class EditorException(Exception):
 
 @irc3.plugin
 class Sed(object):
-
     def __init__(self, bot):
         self.bot = bot
         self.history_buffer = {}
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def update_chat_history(self, target, event, mask, data):
-        if event != 'PRIVMSG' or _SED_CHECKER.match(data) or data.startswith(self.bot.config.cmd):
+        if (
+            event != "PRIVMSG"
+            or _SED_CHECKER.match(data)
+            or data.startswith(self.bot.config.cmd)
+        ):
             return
 
         # Strip ACTION data and just use the message.
-        data = data.replace('\x01ACTION ', '').replace('\x01', '')
+        data = data.replace("\x01ACTION ", "").replace("\x01", "")
         line = (mask.nick, data)
 
         if target in self.history_buffer:
@@ -75,7 +80,11 @@ class Sed(object):
         queue.append(line)
         self.history_buffer.update({target: queue})
 
-    @irc3.event(r':(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<command>{0})'.format(_SED_PRIVMSG))
+    @irc3.event(
+        r":(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<command>{0})".format(
+            _SED_PRIVMSG
+        )
+    )
     def sed(self, mask, target, command):
         if target not in self.history_buffer:
             return
@@ -95,19 +104,23 @@ class Sed(object):
             # Prevent spam.
             max_extra_chars = 32
             max_len = len(message) + max_extra_chars
-            error_msg = 'Replacement would be too long. I won\'t post it to prevent potential spam.'
-            if len(new_message) > len(error_msg) and len(new_message) > max_len or len(new_message) > 256:
+            error_msg = "Replacement would be too long. I won't post it to prevent potential spam."
+            if (
+                len(new_message) > len(error_msg)
+                and len(new_message) > max_len
+                or len(new_message) > 256
+            ):
                 self.bot.notice(mask.nick, style(error_msg, fg=Color.RED))
                 return
 
-            emphasised_meant = style('meant', bold=True)
+            emphasised_meant = style("meant", bold=True)
             if mask.nick == target_user:
                 if target.is_channel:
-                    prefix = f'{mask.nick} {emphasised_meant} to say:'
+                    prefix = f"{mask.nick} {emphasised_meant} to say:"
                 else:
                     self.bot.privmsg(mask.nick, new_message)
                     return
             else:
-                prefix = f'{mask.nick} thinks {target_user} {emphasised_meant} to say:'
-            self.bot.privmsg(target, f'{prefix} {new_message}')
+                prefix = f"{mask.nick} thinks {target_user} {emphasised_meant} to say:"
+            self.bot.privmsg(target, f"{prefix} {new_message}")
             return

@@ -22,23 +22,26 @@ log = getLogger(__name__)
 
 @irc3.plugin
 class NickServ(object):
-
     def __init__(self, bot):
         self.bot = bot
 
-    @irc3.event(r':(?P<nickserv>NickServ)!\S+@\S+ NOTICE .* :This nickname is registered.*')
+    @irc3.event(
+        r":(?P<nickserv>NickServ)!\S+@\S+ NOTICE .* :This nickname is registered.*"
+    )
     def login_attempt(self, nickserv):
         try:
-            password = self.bot.config[__name__]['password']
+            password = self.bot.config[__name__]["password"]
         except KeyError:
-            log.warning('This nick is registered but no nickserv password is set in config.ini')
+            log.warning(
+                "This nick is registered but no nickserv password is set in config.ini"
+            )
         else:
-            self.bot.privmsg(nickserv, f'IDENTIFY {password}')
+            self.bot.privmsg(nickserv, f"IDENTIFY {password}")
 
-    @irc3.event(r':(?P<mask>NickServ!\S+@\S+) NOTICE .* :Password accepted.*')
+    @irc3.event(r":(?P<mask>NickServ!\S+@\S+) NOTICE .* :Password accepted.*")
     def login_succeeded(self, mask):
-        log.info(f'Authenticated with {mask}')
+        log.info(f"Authenticated with {mask}")
 
-    @irc3.event(r':(?P<mask>NickServ!\S+@\S+) NOTICE .* :Password incorrect.*')
+    @irc3.event(r":(?P<mask>NickServ!\S+@\S+) NOTICE .* :Password incorrect.*")
     def login_failed(self, mask):
-        log.error(f'Failed to authenticate with {mask} due to an incorrect password')
+        log.error(f"Failed to authenticate with {mask} due to an incorrect password")
