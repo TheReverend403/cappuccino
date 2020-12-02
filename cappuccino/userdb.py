@@ -58,21 +58,19 @@ class UserDB(object):
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
-        select_query = select([self.ricedb.c[key]]).where(
-            func.lower(self.ricedb.c.nick) == username.lower()
-        )
-        result = self.db.execute(select_query).scalar()
-        return result
+        return self.db.execute(
+            select([self.ricedb.c[key]]).where(
+                func.lower(self.ricedb.c.nick) == username.lower()
+            )
+        ).scalar()
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
-        update_query = (
+        self.db.execute(
             update(self.ricedb)
             .where(func.lower(self.ricedb.c.nick) == username.lower())
             .values(**{key: None})
         )
-
-        self.db.execute(update_query)
 
     @irc3.extend
     def set_user_value(self, username: str, key, value=None):
@@ -88,13 +86,6 @@ class UserDB(object):
         if user_exists is None:
             self.db.execute(insert(self.ricedb).values(nick=username, **{key: value}))
             return
-
-        update_query = (
-            update(self.ricedb)
-            .where(func.lower(self.ricedb.c.nick) == username.lower())
-            .values(nick=username, **{key: value})
-        )  # Also update nick to fix the mass lowercasing I did on the old DB.
-        self.db.execute(update_query)
 
     def _json_dump(self):
         bottle.response.content_type = "application/json"

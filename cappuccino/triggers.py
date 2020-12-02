@@ -34,24 +34,20 @@ class Seen(object):
         self.triggers = self.db.meta.tables["triggers"]
 
     def _get_trigger(self, channel: str, trigger: str):
-        select_query = (
+        return self.db.execute(
             select([self.triggers.c.response])
             .where(func.lower(self.triggers.c.trigger) == trigger.lower())
             .where(func.lower(self.triggers.c.channel) == channel.lower())
-        )
-
-        return self.db.execute(select_query).scalar()
+        ).scalar()
 
     def _set_trigger(self, channel: str, trigger: str, text: str):
         if self._get_trigger(channel, trigger):
-            update_stmnt = (
+            self.db.execute(
                 update(self.triggers)
                 .where(func.lower(self.triggers.c.trigger) == trigger.lower())
                 .where(func.lower(self.triggers.c.channel) == channel.lower())
                 .values(response=text)
             )
-
-            self.db.execute(update_stmnt)
             return
 
         self.db.execute(
@@ -61,14 +57,25 @@ class Seen(object):
         )
 
     def _delete_trigger(self, channel: str, trigger: str) -> bool:
-        delete_stmt = (
-            delete(self.triggers)
-            .where(func.lower(self.triggers.c.trigger) == trigger.lower())
-            .where(func.lower(self.triggers.c.channel) == channel.lower())
-            .returning(self.triggers.c.trigger)
+        return (
+            self.db.execute(
+                delete(self.triggers)
+                .where(func.lower(self.triggers.c.trigger) == trigger.lower())
+                .where(func.lower(self.triggers.c.channel) == channel.lower())
+                .returning(self.triggers.c.trigger)
+            ).scalar()
+            is not None
         )
 
-        return self.db.execute(delete_stmt).scalar() is not None
+    def _get_triggers_list(self, channel: str) -> list:
+        return [
+            row[0]
+            for row in self.db.execute(
+                select([self.triggers.c.trigger]).where(
+                    func.lower(self.triggers.c.channel) == channel.lower()
+                )
+            )
+        ]
 
     @command(permission="view")
     def trigger(self, mask, target, args):
@@ -96,11 +103,7 @@ class Seen(object):
             )
 
         if args["list"]:
-            list_query = select([self.triggers.c.trigger]).where(
-                func.lower(self.triggers.c.channel) == target.lower()
-            )
-            trigger_list = [row[0] for row in self.db.execute(list_query)]
-
+            trigger_list = self._list_triggers()
             if trigger_list:
                 trigger_list = ", ".join(trigger_list)
                 return f"Available triggers for {target}: {trigger_list}"
