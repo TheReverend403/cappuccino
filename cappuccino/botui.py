@@ -41,7 +41,7 @@ class BotUI(object):
             'allow_redirects': 'true',
         })
 
-    @command(permission='view')
+    @command(permission='view', aliases=['source', 'version'])
     def bots(self, mask, target, args):
         """Report in!
 
