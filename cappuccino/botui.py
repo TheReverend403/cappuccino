@@ -50,8 +50,8 @@ class BotUI(object):
         """
         pyver = platform.python_version()
         yield (
-            f"Reporting in! [cappuccino {self.bot.version}, Python {pyver}] "
-            f"https://github.com/FoxDev/cappuccino"
+            f"Reporting in! [cappuccino {self.bot.version}, Python {pyver}]"
+            f" https://github.com/FoxDev/cappuccino"
         )
 
     @command(permission="admin", show_in_help_list=False)

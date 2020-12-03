@@ -70,21 +70,21 @@ class LastFM(object):
             if not lastfm_username:
                 if irc_username == mask.nick:
                     return (
-                        f"You have no last.fm username set. "
-                        f"Please set one with {base_command} --set <username>"
+                        f"You have no last.fm username set."
+                        f" Please set one with {base_command} --set <username>"
                     )
 
                 return (
-                    f"{irc_username} has no last.fm username set. "
-                    f"Ask them to set one with {base_command} --set <username>"
+                    f"{irc_username} has no last.fm username set."
+                    f" Ask them to set one with {base_command} --set <username>"
                 )
 
             try:
                 lastfm_user = self.lastfm.get_user(lastfm_username)
             except pylast.WSError:
                 return (
-                    f"No such last.fm user ({lastfm_username}). "
-                    f"Please set a valid user with {base_command} --set <username>"
+                    f"No such last.fm user ({lastfm_username})."
+                    f" Please set a valid user with {base_command} --set <username>"
                 )
 
             formatted_name = irc_username

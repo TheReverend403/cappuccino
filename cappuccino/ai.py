@@ -172,8 +172,8 @@ class Ai(object):
             ai_status = "enabled" if self._is_active(target) else "disabled"
             line_counts = f"{intcomma(channel_line_count)}/{intcomma(line_count)}"
             return (
-                f"Chatbot is currently {ai_status} for {target}. "
-                f"Channel/global line count: {line_counts} ({channel_percentage}%)."
+                f"Chatbot is currently {ai_status} for {target}."
+                f" Channel/global line count: {line_counts} ({channel_percentage}%)."
             )
 
         if not is_chanop(self.bot, target, mask.nick):
@@ -213,7 +213,7 @@ class Ai(object):
         start = timer()
         generated_reply = self.text_model.make_short_sentence(self.max_reply_length)
         end = timer()
-        log.debug(f"Generating sentence took {(end - start)*1000} milliseconds.")
+        log.debug(f"Generating sentence took {(end - start) * 1000} milliseconds.")
 
         if not generated_reply:
             self.bot.privmsg(

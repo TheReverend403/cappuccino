@@ -81,9 +81,7 @@ class Sed(object):
         self.history_buffer.update({target: queue})
 
     @irc3.event(
-        r":(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<command>{0})".format(
-            _SED_PRIVMSG
-        )
+        rf":(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<command>{_SED_PRIVMSG})"
     )
     def sed(self, mask, target, command):
         if target not in self.history_buffer:
@@ -105,8 +103,8 @@ class Sed(object):
             max_extra_chars = 32
             max_len = len(message) + max_extra_chars
             error_msg = (
-                "Replacement would be too long. "
-                "I won't post it to prevent potential spam."
+                "Replacement would be too long."
+                " I won't post it to prevent potential spam."
             )
             if (
                 len(new_message) > len(error_msg)
