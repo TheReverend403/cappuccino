@@ -87,6 +87,12 @@ class UserDB(object):
             self.db.execute(insert(self.ricedb).values(nick=username, **{key: value}))
             return
 
+        self.db.execute(
+            update(self.ricedb)
+            .where(func.lower(self.ricedb.c.nick) == username.lower())
+            .values(nick=username, **{key: value})
+        )
+
     def _json_dump(self):
         bottle.response.content_type = "application/json"
 
