@@ -25,6 +25,7 @@ poetry install # Optionally install plugin dependencies with: --extras 'sentry a
 cp config.ini.dist config.ini
 $EDITOR config.ini
 poetry run irc3 config.ini
+poetry run alembic upgrade head
 ```
 
 ## Developers
