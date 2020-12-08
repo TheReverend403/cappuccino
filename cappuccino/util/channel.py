@@ -25,6 +25,7 @@ class ChannelMode(Enum):
 
 
 def is_chanop(botcontext, channel: str, nick: str) -> bool:
+    """Checks whether a user is a chanop (has mode +h or above)."""
     for mode in ChannelMode:
         # Voiced users aren't channel operators.
         if mode is ChannelMode.VOICE:
