@@ -13,7 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import logging
 import random
 import re
 from timeit import default_timer as timer
@@ -34,8 +33,6 @@ from cappuccino.util.formatting import unstyle
 _CMD_PATTERN = re.compile(r"^\s*([.!~`$])+")
 _SED_CHECKER = re.compile(r"^\s*s[/|\\!.,].+")
 _URL_CHECKER = re.compile(r".*https?://.*", re.IGNORECASE | re.UNICODE)
-
-log = logging.getLogger(__name__)
 
 
 def _should_ignore_message(line):
@@ -67,25 +64,27 @@ class Ai(Plugin):
         self._text_model = self._get_text_model()
 
     def _get_text_model(self):
-        log.info("Creating text model...")
+        self.logger.info("Creating text model...")
         start = timer()
         corpus = self._get_lines()
         end = timer()
 
         if not corpus:
-            log.warning(
+            self.logger.warning(
                 "Not enough lines in corpus for markovify to generate a decent reply."
             )
             return
 
-        log.debug(f"Queried {len(corpus)} rows in {(end - start) * 1000} milliseconds.")
+        self.logger.debug(
+            f"Queried {len(corpus)} rows in {(end - start) * 1000} milliseconds."
+        )
 
         start = timer()
         model = markovify.NewlineText(
             "\n".join(corpus), retain_original=False
         ).compile()
         end = timer()
-        log.info(f"Created text model in {(end - start) * 1000} milliseconds.")
+        self.logger.info(f"Created text model in {(end - start) * 1000} milliseconds.")
 
         return model
 
@@ -216,7 +215,9 @@ class Ai(Plugin):
         start = timer()
         generated_reply = self._text_model.make_short_sentence(self._max_reply_length)
         end = timer()
-        log.debug(f"Generating sentence took {(end - start) * 1000} milliseconds.")
+        self.logger.debug(
+            f"Generating sentence took {(end - start) * 1000} milliseconds."
+        )
 
         if not generated_reply:
             self.bot.privmsg(

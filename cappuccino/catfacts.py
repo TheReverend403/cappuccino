@@ -12,16 +12,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
+
 import random
-from logging import getLogger
 
 import irc3
 from irc3.plugins.command import command
 from requests import RequestException
 
 from cappuccino import Plugin
-
-log = getLogger(__name__)
 
 
 @irc3.plugin
@@ -37,7 +35,7 @@ class CatFacts(Plugin):
 
     def _get_cat_fact(self):
         if not self._cache:
-            log.debug("Fetching cat facts.")
+            self.logger.debug("Fetching cat facts.")
             request_parameters = {"limit": self._limit}
             if self._max_length > 0:
                 request_parameters.update({"max_length": self._max_length})
@@ -47,6 +45,7 @@ class CatFacts(Plugin):
             ) as response:
                 self._cache = [fact["fact"] for fact in response.json()["data"]]
                 random.shuffle(self._cache)
+                self.logger.debug(f"Loaded {len(self._cache)} facts.")
 
         return self._cache.pop()
 

@@ -17,7 +17,6 @@ import cgi
 import concurrent
 import html
 import ipaddress
-import logging
 import random
 import re
 import socket
@@ -32,8 +31,6 @@ from humanize import naturalsize
 
 from cappuccino import Plugin
 from cappuccino.util.formatting import Color, style, truncate_with_ellipsis, unstyle
-
-log = logging.getLogger(__name__)
 
 
 class ResponseBodyTooLarge(requests.RequestException):
@@ -111,7 +108,7 @@ class UrlInfo(Plugin):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(urls)) as executor:
             messages = []
-            log.debug(f"Retrieving page titles for {urls}")
+            self.logger.debug(f"Retrieving page titles for {urls}")
 
             future_to_url = {
                 executor.submit(self._process_url, url): url for url in urls
@@ -125,7 +122,7 @@ class UrlInfo(Plugin):
                 except InvalidIPAddress:
                     return
                 except ContentTypeNotAllowed as ex:
-                    log.debug(ex)
+                    self.logger.debug(ex)
                 except (socket.gaierror, ValueError, requests.RequestException) as ex:
                     hostname = style(hostname, fg=Color.RED)
 

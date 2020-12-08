@@ -68,6 +68,7 @@ class BotUI(Plugin):
             channel += f' {args["<password>"]}'
 
         self.bot.join(channel)
+        self.logger.info(f"Joined {channel}")
 
     @command(permission="admin", show_in_help_list=False)
     def part(self, mask, target, args):
@@ -80,6 +81,7 @@ class BotUI(Plugin):
             target = args["<channel>"]
 
         self.bot.part(target)
+        self.logger.info(f"Parted {target}")
 
     @command(permission="admin", show_in_help_list=False)
     def quit(self, mask, target, args):
@@ -88,6 +90,7 @@ class BotUI(Plugin):
         %%quit
         """
 
+        self.logger.info(f"Shutting down as requested by {mask}")
         self.bot.quit()
 
     @command(permission="admin", show_in_help_list=False)
@@ -127,6 +130,7 @@ class BotUI(Plugin):
         message = " ".join(args["<message>"])
         for channel in self.bot.channels:
             self.bot.privmsg(channel, f"[PSA] {message}")
+        self.logger.info(f"Sent PSA requested by {mask}: {message}")
 
     @command(permission="view")
     def ping(self, mask, target, args):

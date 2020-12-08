@@ -13,8 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-from logging import getLogger
-
 import random
 import re
 
@@ -25,7 +23,6 @@ from requests import RequestException
 from cappuccino import Plugin
 from cappuccino.util.formatting import Color, style
 
-log = getLogger(__name__)
 _RANDOM_CHANCE = 0.33
 _DECIDE_DELIMITERS = [" or ", ",", "|"]
 # Borrowed from https://github.com/GeneralUnRest/8ball-bot/blob/master/8ball.js
@@ -173,8 +170,8 @@ class Fun(Plugin):
         r":TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#(?i)DontJoinItsATrap) :.*PART THE CHANNEL.*"  # noqa: E501
     )
     def antitrap(self, target):
-        log.info(f"Parting {target}")
         self.bot.part(target)
+        self.logger.info(f"Parted {target} (antitrap)")
 
     @irc3.event(
         r":(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b"  # noqa: E501
@@ -200,5 +197,8 @@ class Fun(Plugin):
                 "http://whatthecommit.com/index.txt"
             ) as response:
                 yield f'git commit -m "{response.text.strip()}"'
-        except RequestException as ex:
-            yield ex.strerror
+        except RequestException:
+            yield (
+                "Failed to fetch a random git commit."
+                " Sorry, you'll have to figure one out yourself."
+            )

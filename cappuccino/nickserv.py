@@ -13,13 +13,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-from logging import getLogger
-
 import irc3
 
 from cappuccino import Plugin
-
-log = getLogger(__name__)
 
 
 @irc3.plugin
@@ -30,7 +26,7 @@ class NickServ(Plugin):
     def login_attempt(self, nickserv):
         password = self.config.get("password", None)
         if not password:
-            log.warning(
+            self.logger.warning(
                 "This nick is registered but no nickserv password is set in config.ini"
             )
             return
@@ -39,8 +35,10 @@ class NickServ(Plugin):
 
     @irc3.event(r":(?P<mask>NickServ!\S+@\S+) NOTICE .* :Password accepted.*")
     def login_succeeded(self, mask):
-        log.info(f"Authenticated with {mask}")
+        self.logger.info(f"Authenticated with {mask}")
 
     @irc3.event(r":(?P<mask>NickServ!\S+@\S+) NOTICE .* :Password incorrect.*")
     def login_failed(self, mask):
-        log.error(f"Failed to authenticate with {mask} due to an incorrect password")
+        self.logger.warning(
+            f"Failed to authenticate with {mask} due to an incorrect password"
+        )

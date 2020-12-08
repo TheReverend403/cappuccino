@@ -17,7 +17,7 @@ import logging
 
 from sqlalchemy import MetaData, create_engine
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class Database(object):
@@ -25,7 +25,7 @@ class Database(object):
     meta = None
 
     def __init__(self, plugin):
-        log.debug(f"Initialising database for {plugin.__module__}")
+        logger.debug(f"Initialising database for {plugin.__module__}")
         if not Database.instance:
             Database.instance = self.__Singleton(
                 create_engine(plugin.bot.config.get("database", {}).get("uri"))
