@@ -58,3 +58,10 @@ def style(
 
 def unstyle(text) -> str:
     return ircstyle.unstyle(str(text))
+
+
+def truncate_with_elipsis(text: str, max_length: int) -> str:
+    """Truncates a string to max_length - 3 and adds an ellipsis."""
+    if len(text) > max_length:
+        return "".join(text[: max_length - 3]) + "..."
+    return text
