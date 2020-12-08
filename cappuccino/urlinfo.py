@@ -88,7 +88,7 @@ class UrlInfo(object):
         ).split()
 
     @irc3.event(
-        rf":(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{_url_regex.pattern}).*"
+        rf":(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{_url_regex.pattern}).*"  # noqa: E501
     )
     def on_url(self, mask, target, data):
         if (

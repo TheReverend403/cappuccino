@@ -186,61 +186,61 @@ class Rice(object):
     def station(self, mask, target, args):
         """
         %%station [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
-        """
+        """  # noqa: E501
         yield self._generic_db(mask, target, args)
 
     @command(permission="view", aliases=["desktop", "dt"])
     def dtop(self, mask, target, args):
         """
         %%dtop [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
-        """
+        """  # noqa: E501
         yield self._generic_db(mask, target, args)
 
     @command(permission="view", aliases=["git"])
     def dotfiles(self, mask, target, args):
         """
         %%dotfiles [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
-        """
+        """  # noqa: E501
         yield self._generic_db(mask, target, args)
 
     @command(permission="view", aliases=["hw"])
     def handwriting(self, mask, target, args):
         """
         %%handwriting [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
-        """
+        """  # noqa: E501
         yield self._generic_db(mask, target, args)
 
     @command(permission="view")
     def distro(self, mask, target, args):
         """
         %%distro [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
-        """
+        """  # noqa: E501
         yield self._generic_db(mask, target, args)
 
     @command(permission="view", aliases=["phone", "hscr", "hs"])
     def homescreen(self, mask, target, args):
         """
         %%homescreen [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
-        """
+        """  # noqa: E501
         yield self._generic_db(mask, target, args)
 
     @command(permission="view")
     def selfie(self, mask, target, args):
         """
         %%selfie [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
-        """
+        """  # noqa: E501
         yield self._generic_db(mask, target, args)
 
     @command(permission="view")
     def pet(self, mask, target, args):
         """
         %%pet [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
-        """
+        """  # noqa: E501
         yield self._generic_db(mask, target, args)
 
     @command(permission="view", aliases=["site"])
     def website(self, mask, target, args):
         """
         %%website [((-s | --set) <values>... | (-a | --add) <values>... | (-d | --delete) <ids>... | (-r | --replace) <id> <value>) | [<user>] [<id>]]
-        """
+        """  # noqa: E501
         yield self._generic_db(mask, target, args)

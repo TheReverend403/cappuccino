@@ -93,7 +93,10 @@ class Fun(object):
         ]
 
         if not options:
-            return f"{mask.nick}: I can't make a decision for you if you don't give me any choices >:V"
+            return (
+                f"{mask.nick}:"
+                f" I can't make a decision for you if you don't give me any choices >:V"
+            )
 
         options_length = len(options)
         if options_length == 1:
@@ -138,13 +141,13 @@ class Fun(object):
         self.reply(target, style("3===D", bold=True))
 
     @irc3.event(
-        r"^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*homo.*"
+        r"^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*homo.*"  # noqa: E501
     )
     def homo(self, target, mask):
         self.reply(target, f"hahahaha {mask.nick} said homo xDDD")
 
     @irc3.event(
-        r"^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*loli.*"
+        r"^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*loli.*"  # noqa: E501
     )
     def loli(self, target, mask):
         link = style("https://pedo.help", fg=Color.BLUE)
@@ -168,19 +171,22 @@ class Fun(object):
             return
 
     @irc3.event(
-        r":TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#(?i)DontJoinItsATrap) :.*PART THE CHANNEL.*"
+        r":TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#(?i)DontJoinItsATrap) :.*PART THE CHANNEL.*"  # noqa: E501
     )
     def antitrap(self, target):
         log.info("Parting {0}".format(target))
         self.bot.part(target)
 
     @irc3.event(
-        r":(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b"
+        r":(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b"  # noqa: E501
     )
     def gravity(self, mask, target):
         self.reply(
             target,
-            f"{mask.nick}: A direction away from the center of gravity of a celestial object.",
+            (
+                f"{mask.nick}:"
+                f" A direction away from the center of gravity of a celestial object."
+            ),
         )
 
     @command(permission="view", aliases=["whatthecommit"])
