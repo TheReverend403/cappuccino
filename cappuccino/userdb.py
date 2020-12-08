@@ -18,6 +18,7 @@ import threading
 import bottle
 from sqlalchemy import desc, func, insert, nullslast, select, update
 
+from cappuccino import Plugin
 from cappuccino.util.database import Database
 from cappuccino.util.formatting import unstyle
 
@@ -36,10 +37,9 @@ def _strip_path():
 
 
 @irc3.plugin
-class UserDB(object):
+class UserDB(Plugin):
     def __init__(self, bot):
-        self.bot = bot
-        self.config = self.bot.config.get(__name__, {})
+        super().__init__(bot)
         self.db = Database(self)
         self.ricedb = self.db.meta.tables["ricedb"]
 

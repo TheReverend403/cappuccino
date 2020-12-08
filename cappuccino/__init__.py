@@ -60,3 +60,9 @@ def setup_logging():
 
 
 setup_logging()
+
+
+class Plugin(object):
+    def __init__(self, bot):
+        self.bot = bot
+        self.config = self.bot.config.get(self.__class__.__module__, {})

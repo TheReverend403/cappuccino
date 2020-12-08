@@ -22,6 +22,7 @@ import irc3
 from irc3.plugins.command import command
 from requests import RequestException
 
+from cappuccino import Plugin
 from cappuccino.util.formatting import Color, style
 
 log = getLogger(__name__)
@@ -53,10 +54,7 @@ _EIGHTBALL_RESPONSES = [
 
 
 @irc3.plugin
-class Fun(object):
-    def __init__(self, bot):
-        self.bot = bot
-
+class Fun(Plugin):
     def reply(self, target: str, message: str):
         # Only reply a certain percentage of the time. AKA rate-limiting. Sort of.
         if random.random() <= _RANDOM_CHANCE:

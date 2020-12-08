@@ -30,6 +30,7 @@ import irc3
 import requests
 from humanize import naturalsize
 
+from cappuccino import Plugin
 from cappuccino.util.formatting import Color, style, unstyle
 
 log = logging.getLogger(__name__)
@@ -62,7 +63,7 @@ def _clean_url(url: str):
 
 
 @irc3.plugin
-class UrlInfo(object):
+class UrlInfo(Plugin):
     requires = ["cappuccino.botui"]
 
     _max_bytes = 10 * 1000 * 1000  # 10M
@@ -75,8 +76,7 @@ class UrlInfo(object):
     _allowed_content_types = ["text", "video", "application"]
 
     def __init__(self, bot):
-        self.bot = bot
-        self.config = self.bot.config.get(__name__, {})
+        super().__init__(bot)
         self.ignore_nicks = self.config.get("ignore_nicks", "").split()
         self.ignore_hostnames = self.config.get("ignore_hostnames", "").split()
         self.real_user_agent = self.bot.requests.headers.get("User-Agent")

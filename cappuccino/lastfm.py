@@ -19,6 +19,7 @@ import irc3
 import pylast
 from irc3.plugins.command import command
 
+from cappuccino import Plugin
 from cappuccino.util.formatting import style, truncate_with_ellipsis
 
 log = logging.getLogger(__name__)
@@ -39,13 +40,11 @@ def _add_lastfm_suffix(irc_username: str, lastfm_username: str) -> str:
 
 
 @irc3.plugin
-class LastFM(object):
+class LastFM(Plugin):
     requires = ["irc3.plugins.command", "cappuccino.userdb"]
 
     def __init__(self, bot):
-        self.bot = bot
-        self.config = self.bot.config.get(__name__, {})
-
+        super().__init__(bot)
         api_key = self.config.get("api_key", None)
         if not api_key:
             log.error("Missing last.fm API key")

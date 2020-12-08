@@ -21,6 +21,8 @@ from irc3.plugins.command import command
 from requests import RequestException
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
+from cappuccino import Plugin
+
 log = logging.getLogger(__name__)
 
 
@@ -34,13 +36,11 @@ def _before_send(event, hint):
 
 
 @irc3.plugin
-class Sentry(object):
+class Sentry(Plugin):
     requires = ["irc3.plugins.command", "cappuccino.botui"]
 
     def __init__(self, bot):
-        self.bot = bot
-        self.config = self.bot.config.get(__name__, {})
-
+        super().__init__(bot)
         dsn = self.config.get("dsn", None)
         if not dsn:
             log.warning("Missing Sentry DSN")

@@ -17,26 +17,25 @@ from logging import getLogger
 
 import irc3
 
+from cappuccino import Plugin
+
 log = getLogger(__name__)
 
 
 @irc3.plugin
-class NickServ(object):
-    def __init__(self, bot):
-        self.bot = bot
-
+class NickServ(Plugin):
     @irc3.event(
         r":(?P<nickserv>NickServ)!\S+@\S+ NOTICE .* :This nickname is registered.*"
     )
     def login_attempt(self, nickserv):
-        try:
-            password = self.bot.config[__name__]["password"]
-        except KeyError:
+        password = self.config.get("password")
+        if not password:
             log.warning(
                 "This nick is registered but no nickserv password is set in config.ini"
             )
-        else:
-            self.bot.privmsg(nickserv, f"IDENTIFY {password}")
+            return
+
+        self.bot.privmsg(nickserv, f"IDENTIFY {password}")
 
     @irc3.event(r":(?P<mask>NickServ!\S+@\S+) NOTICE .* :Password accepted.*")
     def login_succeeded(self, mask):

@@ -19,6 +19,8 @@ import irc3
 import requests
 from irc3.plugins.command import command
 
+from cappuccino import Plugin
+
 
 def _is_multiline_string(text: str):
     # require minimum 2 newlines to account for the newline at the end of output.
@@ -40,11 +42,8 @@ def _exec_wrapper(cmd: dict, input_data: str = None) -> str:
 
 
 @irc3.plugin
-class ExecShell(object):
+class ExecShell(Plugin):
     requires = ["irc3.plugins.command", "cappuccino.botui"]
-
-    def __init__(self, bot):
-        self.bot = bot
 
     @command(
         permission="admin", show_in_help_list=False, options_first=True, use_shlex=True

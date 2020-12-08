@@ -18,13 +18,14 @@ from irc3 import rfc
 from irc3.utils import IrcString
 from sqlalchemy import insert
 
+from cappuccino import Plugin
 from cappuccino.util.database import Database
 
 
 @irc3.plugin
-class Chanlog(object):
+class Chanlog(Plugin):
     def __init__(self, bot):
-        self.bot = bot
+        super().__init__(bot)
         self.db = Database(self)
         self.chanlog = self.db.meta.tables["chanlog"]
         self.default_nick = self.bot.nick

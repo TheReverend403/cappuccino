@@ -19,17 +19,18 @@ import irc3
 from irc3.plugins.command import command
 from sqlalchemy import delete, func, insert, select, update
 
+from cappuccino import Plugin
 from cappuccino.util.channel import is_chanop
 from cappuccino.util.database import Database
 from cappuccino.util.formatting import Color, style
 
 
 @irc3.plugin
-class Seen(object):
+class Triggers(Plugin):
     requires = ["irc3.plugins.command", "cappuccino.botui"]
 
     def __init__(self, bot):
-        self.bot = bot
+        super().__init__(bot)
         self.db = Database(self)
         self.triggers = self.db.meta.tables["triggers"]
 

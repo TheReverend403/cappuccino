@@ -19,6 +19,7 @@ import re
 import irc3
 from irc3.plugins.command import command
 
+from cappuccino import Plugin
 from cappuccino.util.formatting import Color, style
 
 MAX_USER_VALUES = 6
@@ -36,11 +37,8 @@ def _from_user_index(index: int):
 
 
 @irc3.plugin
-class Rice(object):
+class Rice(Plugin):
     requires = ["irc3.plugins.command", "cappuccino.userdb"]
-
-    def __init__(self, bot):
-        self.bot = bot
 
     def _generic_db(self, mask, target, args):
         # Get name of command _generic_db is being called from.

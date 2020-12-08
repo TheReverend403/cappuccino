@@ -19,14 +19,15 @@ import irc3
 from irc3.plugins.command import command
 from requests import RequestException
 
+from cappuccino import Plugin
+
 log = getLogger(__name__)
 
 
 @irc3.plugin
-class CatFacts(object):
+class CatFacts(Plugin):
     def __init__(self, bot):
-        self.bot = bot
-        self.config = self.bot.config.get(__name__, {})
+        super().__init__(bot)
         self._cache = []
         self._limit = self.config.get("limit", 1000)
         self._max_length = self.config.get("max_length", 200)

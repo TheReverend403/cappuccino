@@ -21,13 +21,15 @@ import requests
 from irc3.plugins.command import command
 from requests import Session
 
+from cappuccino import Plugin
+
 
 @irc3.plugin
-class BotUI(object):
+class BotUI(Plugin):
     requires = ["irc3.plugins.command", "irc3.plugins.userlist"]
 
     def __init__(self, bot):
-        self.bot = bot
+        super().__init__(bot)
         self.bot.version = (
             subprocess.check_output(["git", "describe"]).decode("UTF-8").strip()
         )

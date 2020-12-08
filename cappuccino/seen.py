@@ -19,15 +19,14 @@ import irc3
 from humanize import naturaltime
 from irc3.plugins.command import command
 
+from cappuccino import Plugin
+
 _DB_KEY = "last_seen"
 
 
 @irc3.plugin
-class Seen(object):
+class Seen(Plugin):
     requires = ["irc3.plugins.command", "cappuccino.userdb"]
-
-    def __init__(self, bot):
-        self.bot = bot
 
     def get_last_seen(self, nick: str):
         return self.bot.get_user_value(nick, _DB_KEY)

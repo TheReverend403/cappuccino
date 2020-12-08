@@ -19,6 +19,7 @@ import subprocess
 
 import irc3
 
+from cappuccino import Plugin
 from cappuccino.util.formatting import Color, style
 
 _SED_PRIVMSG = r"\s*s[/|\\!\.,\\].+"
@@ -54,9 +55,9 @@ class EditorException(Exception):
 
 
 @irc3.plugin
-class Sed(object):
+class Sed(Plugin):
     def __init__(self, bot):
-        self.bot = bot
+        super().__init__(bot)
         self.history_buffer = {}
 
     @irc3.event(irc3.rfc.PRIVMSG)

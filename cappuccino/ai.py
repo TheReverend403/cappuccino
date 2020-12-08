@@ -26,6 +26,7 @@ from irc3.utils import IrcString
 from sqlalchemy import func, insert, select, update
 from sqlalchemy.exc import IntegrityError
 
+from cappuccino import Plugin
 from cappuccino.util.channel import is_chanop
 from cappuccino.util.database import Database
 from cappuccino.util.formatting import unstyle
@@ -51,10 +52,9 @@ def _should_ignore_message(line):
 
 
 @irc3.plugin
-class Ai(object):
+class Ai(Plugin):
     def __init__(self, bot):
-        self.bot = bot
-        self.config = self.bot.config.get(__name__, {})
+        super().__init__(bot)
         self.ignore_nicks = self.config.get("ignore_nicks", "").split()
         self.max_loaded_lines = self.config.get("max_loaded_lines", 25000)
         self.max_reply_length = self.config.get("max_reply_length", 100)
