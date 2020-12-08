@@ -19,7 +19,7 @@ import irc3
 import pylast
 from irc3.plugins.command import command
 
-from cappuccino.util.formatting import style, truncate_with_elipsis
+from cappuccino.util.formatting import style, truncate_with_ellipsis
 
 log = logging.getLogger(__name__)
 
@@ -107,8 +107,8 @@ class LastFM(object):
 
             artist = current_track.get_artist().get_name().strip()
             title = current_track.get_title().strip()
-            artist = truncate_with_elipsis(artist, _MAX_TRACK_ARTIST_LEN)
-            title = truncate_with_elipsis(title, _MAX_TRACK_TITLE_LEN)
+            artist = truncate_with_ellipsis(artist, _MAX_TRACK_ARTIST_LEN)
+            title = truncate_with_ellipsis(title, _MAX_TRACK_TITLE_LEN)
             artist = style(artist, bold=True)
             title = style(title, bold=True)
             track_info = f"{title} by {artist}"
