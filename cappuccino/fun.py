@@ -56,7 +56,6 @@ _EIGHTBALL_RESPONSES = [
 class Fun(object):
     def __init__(self, bot):
         self.bot = bot
-        self._cat_cache = []
 
     def reply(self, target: str, message: str):
         # Only reply a certain percentage of the time. AKA rate-limiting. Sort of.
@@ -174,7 +173,7 @@ class Fun(object):
         r":TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#(?i)DontJoinItsATrap) :.*PART THE CHANNEL.*"  # noqa: E501
     )
     def antitrap(self, target):
-        log.info("Parting {0}".format(target))
+        log.info(f"Parting {target}")
         self.bot.part(target)
 
     @irc3.event(
@@ -203,22 +202,3 @@ class Fun(object):
                 yield f'git commit -m "{response.text.strip()}"'
         except RequestException as ex:
             yield ex.strerror
-
-    def _get_cat_fact(self, limit=1000, max_length=200):
-        if not self._cat_cache:
-            log.debug("Fetching cat facts.")
-            url = f"https://catfact.ninja/facts?limit={limit}&max_length={max_length}"
-            with self.bot.requests.get(url) as response:
-                self._cat_cache = [fact["fact"] for fact in response.json()["data"]]
-                random.shuffle(self._cat_cache)
-
-        return self._cat_cache.pop()
-
-    @command(permission="view")
-    def catfact(self, mask, target, args):
-        """Grab a random cat fact.
-
-        %%catfact
-        """
-
-        yield self._get_cat_fact()

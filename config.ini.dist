@@ -23,6 +23,7 @@ includes =
     cappuccino.rice
     cappuccino.lastfm
     cappuccino.fun
+    cappuccino.catfacts
     cappuccino.sed
     cappuccino.ai
     cappuccino.seen
