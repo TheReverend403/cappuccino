@@ -64,6 +64,15 @@ _setup_logging()
 
 class Plugin(object):
     def __init__(self, bot):
+        plugin_module = self.__class__.__module__
         self.bot = bot
-        self.config: dict = self.bot.config.get(self.__class__.__module__, {})
-        self.logger = logging.getLogger(self.__class__.__module__)
+        self.config: dict = self.bot.config.get(plugin_module, {})
+        self.logger = logging.getLogger(plugin_module)
+        if self.config:
+            # I have no idea where these are coming from but whatever.
+            weird_keys = ["#", "hash"]
+            for key in weird_keys:
+                if key in self.config.keys():
+                    self.config.pop(key)
+
+            self.logger.debug(f"Configuration for {plugin_module}: {self.config}")
