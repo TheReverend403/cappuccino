@@ -36,7 +36,7 @@ class CatFacts(Plugin):
         self._api_url = self.config.get("api_url", "https://catfact.ninja/facts")
 
     def _get_cat_fact(self):
-        if not self._cat_cache:
+        if not self._cache:
             log.debug("Fetching cat facts.")
             request_parameters = {"limit": self._limit}
             if self._max_length > 0:
@@ -45,10 +45,10 @@ class CatFacts(Plugin):
             with self.bot.requests.get(
                 self._api_url, params=request_parameters
             ) as response:
-                self._cat_cache = [fact["fact"] for fact in response.json()["data"]]
-                random.shuffle(self._cat_cache)
+                self._cache = [fact["fact"] for fact in response.json()["data"]]
+                random.shuffle(self._cache)
 
-        return self._cat_cache.pop()
+        return self._cache.pop()
 
     @command(permission="view")
     def catfact(self, mask, target, args):
