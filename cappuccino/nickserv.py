@@ -28,7 +28,7 @@ class NickServ(Plugin):
         r":(?P<nickserv>NickServ)!\S+@\S+ NOTICE .* :This nickname is registered.*"
     )
     def login_attempt(self, nickserv):
-        password = self.config.get("password")
+        password = self.config.get("password", None)
         if not password:
             log.warning(
                 "This nick is registered but no nickserv password is set in config.ini"

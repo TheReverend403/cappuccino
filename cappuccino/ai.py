@@ -53,15 +53,18 @@ def _should_ignore_message(line):
 
 @irc3.plugin
 class Ai(Plugin):
+    requires = ["irc3.plugins.command", "irc3.plugins.userlist"]
+
     def __init__(self, bot):
         super().__init__(bot)
-        self.ignore_nicks = self.config.get("ignore_nicks", "").split()
-        self.max_loaded_lines = self.config.get("max_loaded_lines", 25000)
-        self.max_reply_length = self.config.get("max_reply_length", 100)
-        self.db = Database(self)
-        self.corpus = self.db.meta.tables["ai_corpus"]
-        self.channels = self.db.meta.tables["ai_channels"]
-        self.text_model = self._get_text_model()
+        self._ignore_nicks = self.config.get("ignore_nicks", "").split()
+        self._max_loaded_lines = self.config.get("max_loaded_lines", 25000)
+        self._max_reply_length = self.config.get("max_reply_length", 100)
+
+        self._db = Database(self)
+        self._corpus = self._db.meta.tables["ai_corpus"]
+        self._channels = self._db.meta.tables["ai_channels"]
+        self._text_model = self._get_text_model()
 
     def _get_text_model(self):
         log.info("Creating text model...")
@@ -88,50 +91,50 @@ class Ai(Plugin):
 
     def _add_line(self, line: str, channel: str):
         try:
-            insert_stmt = insert(self.corpus).values(
+            insert_stmt = insert(self._corpus).values(
                 line=unstyle(line), channel=channel
             )
-            self.db.execute(insert_stmt)
+            self._db.execute(insert_stmt)
         except IntegrityError:
             pass
 
     def _get_lines(self, channel: str = None) -> list:
-        select_stmt = select([self.corpus.c.line])
+        select_stmt = select([self._corpus.c.line])
         if channel:
             select_stmt = (
-                select_stmt.where(func.lower(self.corpus.c.channel) == channel.lower())
+                select_stmt.where(func.lower(self._corpus.c.channel) == channel.lower())
                 .order_by(func.random())
-                .limit(self.max_loaded_lines)
+                .limit(self._max_loaded_lines)
             )
         else:
             select_stmt = select_stmt.order_by(func.random()).limit(
-                self.max_loaded_lines
+                self._max_loaded_lines
             )
 
-        lines = [result.line for result in self.db.execute(select_stmt)]
+        lines = [result.line for result in self._db.execute(select_stmt)]
         return lines if len(lines) > 0 else None
 
     def _line_count(self, channel: str = None) -> int:
-        select_stmt = select([func.count(self.corpus.c.line)])
+        select_stmt = select([func.count(self._corpus.c.line)])
         if channel:
             select_stmt = select_stmt.where(
-                func.lower(self.corpus.c.channel) == channel.lower()
+                func.lower(self._corpus.c.channel) == channel.lower()
             )
 
-        return self.db.execute(select_stmt).scalar()
+        return self._db.execute(select_stmt).scalar()
 
     def _is_active(self, channel: str) -> bool:
         if not IrcString(channel).is_channel:
             return False
 
-        select_stmt = select([self.channels.c.status]).where(
-            func.lower(self.corpus.c.channel) == channel.lower()
+        select_stmt = select([self._channels.c.status]).where(
+            func.lower(self._corpus.c.channel) == channel.lower()
         )
-        result = self.db.execute(select_stmt).scalar()
+        result = self._db.execute(select_stmt).scalar()
 
         if result is None:
-            insert_stmt = insert(self.channels).values(name=channel, status=0)
-            self.db.execute(insert_stmt)
+            insert_stmt = insert(self._channels).values(name=channel, status=0)
+            self._db.execute(insert_stmt)
             return False
 
         return result
@@ -139,12 +142,12 @@ class Ai(Plugin):
     def _toggle(self, channel: str):
         new_status = int(not self._is_active(channel))
         update_stmt = (
-            update(self.channels)
-            .where(func.lower(self.corpus.c.channel) == channel.lower())
+            update(self._channels)
+            .where(func.lower(self._corpus.c.channel) == channel.lower())
             .values(status=new_status)
         )
 
-        self.db.execute(update_stmt)
+        self._db.execute(update_stmt)
 
     @command()
     def ai(self, mask, target, args):
@@ -194,7 +197,7 @@ class Ai(Plugin):
         if not target.is_channel or not mask.is_user:
             return
 
-        if mask.nick in self.ignore_nicks or mask.nick == self.bot.nick:
+        if mask.nick in self._ignore_nicks or mask.nick == self.bot.nick:
             return
 
         data = data.strip()
@@ -211,7 +214,7 @@ class Ai(Plugin):
             return
 
         start = timer()
-        generated_reply = self.text_model.make_short_sentence(self.max_reply_length)
+        generated_reply = self._text_model.make_short_sentence(self._max_reply_length)
         end = timer()
         log.debug(f"Generating sentence took {(end - start) * 1000} milliseconds.")
 

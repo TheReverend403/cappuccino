@@ -41,16 +41,18 @@ class Sentry(Plugin):
 
     def __init__(self, bot):
         super().__init__(bot)
+
         dsn = self.config.get("dsn", None)
         if not dsn:
             log.warning("Missing Sentry DSN")
-        else:
-            sentry_sdk.init(
-                dsn,
-                before_send=_before_send,
-                release=self.bot.version,
-                integrations=[SqlalchemyIntegration()],
-            )
+            return
+
+        sentry_sdk.init(
+            dsn,
+            before_send=_before_send,
+            release=self.bot.version,
+            integrations=[SqlalchemyIntegration()],
+        )
 
     @command(name="testsentry", permission="admin", show_in_help_list=False)
     def testsentry(self, mask, target, args):

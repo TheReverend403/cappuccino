@@ -55,7 +55,9 @@ _EIGHTBALL_RESPONSES = [
 
 @irc3.plugin
 class Fun(Plugin):
-    def reply(self, target: str, message: str):
+    requires = ["irc3.plugins.command"]
+
+    def _reply(self, target: str, message: str):
         # Only reply a certain percentage of the time. AKA rate-limiting. Sort of.
         if random.random() <= _RANDOM_CHANCE:
             self.bot.privmsg(target, message)
@@ -123,25 +125,25 @@ class Fun(Plugin):
 
     @irc3.event(r".*PRIVMSG (?P<target>#\S+) :(?i)\s*wew$")
     def wew(self, target):
-        self.reply(target, style("w e w l a d", bold=True))
+        self._reply(target, style("w e w l a d", bold=True))
 
     @irc3.event(r".*PRIVMSG (?P<target>#\S+) :(?i)\s*ayy+$")
     def ayy(self, target):
-        self.reply(target, "lmao")
+        self._reply(target, "lmao")
 
     @irc3.event(r".*PRIVMSG (?P<target>#\S+) :(?i)\s*same$")
     def same(self, target):
-        self.reply(target, style("same", bold=True))
+        self._reply(target, style("same", bold=True))
 
     @irc3.event(r".*PRIVMSG (?P<target>\S+) :(?i)\s*benis$")
     def benis(self, target):
-        self.reply(target, style("3===D", bold=True))
+        self._reply(target, style("3===D", bold=True))
 
     @irc3.event(
         r"^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*homo.*"  # noqa: E501
     )
     def homo(self, target, mask):
-        self.reply(target, f"hahahaha {mask.nick} said homo xDDD")
+        self._reply(target, f"hahahaha {mask.nick} said homo xDDD")
 
     @irc3.event(
         r"^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*loli.*"  # noqa: E501
@@ -150,7 +152,7 @@ class Fun(Plugin):
         link = style("https://pedo.help", fg=Color.BLUE)
         reply = style("[NONCE DETECTED] ", fg=Color.RED)
         reply += f"{mask.nick}, please click for your own good: {link}"
-        self.reply(target, reply)
+        self._reply(target, reply)
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def not_the_only_one(self, target, event, mask, data):
@@ -178,7 +180,7 @@ class Fun(Plugin):
         r":(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b"  # noqa: E501
     )
     def gravity(self, mask, target):
-        self.reply(
+        self._reply(
             target,
             (
                 f"{mask.nick}:"

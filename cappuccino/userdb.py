@@ -40,8 +40,8 @@ def _strip_path():
 class UserDB(Plugin):
     def __init__(self, bot):
         super().__init__(bot)
-        self.db = Database(self)
-        self.ricedb = self.db.meta.tables["ricedb"]
+        self._db = Database(self)
+        self._ricedb = self._db.meta.tables["ricedb"]
 
         if self.config.get("enable_http_server", False):
             host = self.config.get("http_host", "127.0.0.1")
@@ -58,38 +58,38 @@ class UserDB(Plugin):
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
-        return self.db.execute(
-            select([self.ricedb.c[key]]).where(
-                func.lower(self.ricedb.c.nick) == username.lower()
+        return self._db.execute(
+            select([self._ricedb.c[key]]).where(
+                func.lower(self._ricedb.c.nick) == username.lower()
             )
         ).scalar()
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
-        self.db.execute(
-            update(self.ricedb)
-            .where(func.lower(self.ricedb.c.nick) == username.lower())
+        self._db.execute(
+            update(self._ricedb)
+            .where(func.lower(self._ricedb.c.nick) == username.lower())
             .values(**{key: None})
         )
 
     @irc3.extend
     def set_user_value(self, username: str, key, value=None):
         user_exists = (
-            self.db.execute(
-                select([self.ricedb.c.nick]).where(
-                    func.lower(self.ricedb.c.nick) == username.lower()
+            self._db.execute(
+                select([self._ricedb.c.nick]).where(
+                    func.lower(self._ricedb.c.nick) == username.lower()
                 )
             ).scalar()
             or None
         )
 
         if user_exists is None:
-            self.db.execute(insert(self.ricedb).values(nick=username, **{key: value}))
+            self._db.execute(insert(self._ricedb).values(nick=username, **{key: value}))
             return
 
-        self.db.execute(
-            update(self.ricedb)
-            .where(func.lower(self.ricedb.c.nick) == username.lower())
+        self._db.execute(
+            update(self._ricedb)
+            .where(func.lower(self._ricedb.c.nick) == username.lower())
             .values(nick=username, **{key: value})
         )
 
@@ -97,8 +97,8 @@ class UserDB(Plugin):
         bottle.response.content_type = "application/json"
 
         data = []
-        all_users = self.db.execute(
-            select([self.ricedb]).order_by(nullslast(desc(self.ricedb.c.last_seen)))
+        all_users = self._db.execute(
+            select([self._ricedb]).order_by(nullslast(desc(self._ricedb.c.last_seen)))
         )
         for row in all_users:
             user = {}

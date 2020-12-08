@@ -31,39 +31,39 @@ class Triggers(Plugin):
 
     def __init__(self, bot):
         super().__init__(bot)
-        self.db = Database(self)
-        self.triggers = self.db.meta.tables["triggers"]
+        self._db = Database(self)
+        self._triggers = self._db.meta.tables["triggers"]
 
     def _get_trigger(self, channel: str, trigger: str):
-        return self.db.execute(
-            select([self.triggers.c.response])
-            .where(func.lower(self.triggers.c.trigger) == trigger.lower())
-            .where(func.lower(self.triggers.c.channel) == channel.lower())
+        return self._db.execute(
+            select([self._triggers.c.response])
+            .where(func.lower(self._triggers.c.trigger) == trigger.lower())
+            .where(func.lower(self._triggers.c.channel) == channel.lower())
         ).scalar()
 
     def _set_trigger(self, channel: str, trigger: str, text: str):
         if self._get_trigger(channel, trigger):
-            self.db.execute(
-                update(self.triggers)
-                .where(func.lower(self.triggers.c.trigger) == trigger.lower())
-                .where(func.lower(self.triggers.c.channel) == channel.lower())
+            self._db.execute(
+                update(self._triggers)
+                .where(func.lower(self._triggers.c.trigger) == trigger.lower())
+                .where(func.lower(self._triggers.c.channel) == channel.lower())
                 .values(response=text)
             )
             return
 
-        self.db.execute(
-            insert(self.triggers).values(
+        self._db.execute(
+            insert(self._triggers).values(
                 channel=channel, trigger=trigger, response=text
             )
         )
 
     def _delete_trigger(self, channel: str, trigger: str) -> bool:
         return (
-            self.db.execute(
-                delete(self.triggers)
-                .where(func.lower(self.triggers.c.trigger) == trigger.lower())
-                .where(func.lower(self.triggers.c.channel) == channel.lower())
-                .returning(self.triggers.c.trigger)
+            self._db.execute(
+                delete(self._triggers)
+                .where(func.lower(self._triggers.c.trigger) == trigger.lower())
+                .where(func.lower(self._triggers.c.channel) == channel.lower())
+                .returning(self._triggers.c.trigger)
             ).scalar()
             is not None
         )
@@ -71,9 +71,9 @@ class Triggers(Plugin):
     def _get_triggers_list(self, channel: str) -> list:
         return [
             row[0]
-            for row in self.db.execute(
-                select([self.triggers.c.trigger]).where(
-                    func.lower(self.triggers.c.channel) == channel.lower()
+            for row in self._db.execute(
+                select([self._triggers.c.trigger]).where(
+                    func.lower(self._triggers.c.channel) == channel.lower()
                 )
             )
         ]

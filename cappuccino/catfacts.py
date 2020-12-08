@@ -26,6 +26,8 @@ log = getLogger(__name__)
 
 @irc3.plugin
 class CatFacts(Plugin):
+    requires = ["irc3.plugins.command"]
+
     def __init__(self, bot):
         super().__init__(bot)
         self._cache = []

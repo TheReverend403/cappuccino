@@ -77,13 +77,13 @@ class UrlInfo(Plugin):
 
     def __init__(self, bot):
         super().__init__(bot)
-        self.ignore_nicks = self.config.get("ignore_nicks", "").split()
-        self.ignore_hostnames = self.config.get("ignore_hostnames", "").split()
-        self.real_user_agent = self.bot.requests.headers.get("User-Agent")
-        self.fake_user_agent = self.config.get(
+        self._ignore_nicks = self.config.get("ignore_nicks", "").split()
+        self._ignore_hostnames = self.config.get("ignore_hostnames", "").split()
+        self._real_user_agent = self.bot.requests.headers.get("User-Agent")
+        self._fake_user_agent = self.config.get(
             "fake_useragent", "Googlebot/2.1 (+http://www.google.com/bot.html)"
         )
-        self.fake_useragent_hostnames = self.config.get(
+        self._fake_useragent_hostnames = self.config.get(
             "fake_useragent_hostnames", ""
         ).split()
 
@@ -92,7 +92,7 @@ class UrlInfo(Plugin):
     )
     def on_url(self, mask, target, data):
         if (
-            mask.nick in self.ignore_nicks
+            mask.nick in self._ignore_nicks
             or data.startswith(self.bot.config.cmd)
             or data.startswith(f"{self.bot.nick}: ")
         ):
@@ -100,7 +100,7 @@ class UrlInfo(Plugin):
 
         urls = [_clean_url(url) for url in set(self._url_regex.findall(data))] or []
         for url in urls:
-            if urlparse(url).hostname in self.ignore_hostnames:
+            if urlparse(url).hostname in self._ignore_hostnames:
                 urls.remove(url)
 
         if not urls:
@@ -191,12 +191,12 @@ class UrlInfo(Plugin):
         hostname = self._hostname_cleanup_regex.sub("", hostname)
 
         # Spoof user agent for certain sites so they give up their secrets.
-        if any(host.endswith(hostname) for host in self.fake_useragent_hostnames):
-            self.bot.requests.headers.update({"User-Agent": self.fake_user_agent})
+        if any(host.endswith(hostname) for host in self._fake_useragent_hostnames):
+            self.bot.requests.headers.update({"User-Agent": self._fake_user_agent})
 
         with self.bot.requests.get(url, stream=True) as response:
             # Reset to the real user agent after the request.
-            self.bot.requests.headers.update({"User-Agent": self.real_user_agent})
+            self.bot.requests.headers.update({"User-Agent": self._real_user_agent})
 
             if response.status_code != requests.codes.ok:
                 response.raise_for_status()

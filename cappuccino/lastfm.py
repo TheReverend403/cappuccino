@@ -45,17 +45,18 @@ class LastFM(Plugin):
 
     def __init__(self, bot):
         super().__init__(bot)
+
         api_key = self.config.get("api_key", None)
         if not api_key:
             log.error("Missing last.fm API key")
             return
 
-        self.lastfm = pylast.LastFMNetwork(api_key=api_key)
+        self._lastfm = pylast.LastFMNetwork(api_key=api_key)
 
     def _set_lastfm_username(self, irc_username: str, lastfm_username: str) -> str:
         """Verify and set a user's last.fm username."""
         try:
-            lastfm_username = self.lastfm.get_user(lastfm_username).get_name(
+            lastfm_username = self._lastfm.get_user(lastfm_username).get_name(
                 properly_capitalized=True
             )
         except pylast.WSError:
@@ -92,7 +93,7 @@ class LastFM(Plugin):
                 )
 
             try:
-                lastfm_user = self.lastfm.get_user(lastfm_username)
+                lastfm_user = self._lastfm.get_user(lastfm_username)
             except pylast.WSError:
                 return (
                     f"Your currently set last.fm user appears to no longer exist."

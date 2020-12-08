@@ -58,7 +58,7 @@ class EditorException(Exception):
 class Sed(Plugin):
     def __init__(self, bot):
         super().__init__(bot)
-        self.history_buffer = {}
+        self._history_buffer = {}
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def update_chat_history(self, target, event, mask, data):
@@ -73,22 +73,22 @@ class Sed(Plugin):
         data = data.replace("\x01ACTION ", "").replace("\x01", "")
         line = (mask.nick, data)
 
-        if target in self.history_buffer:
-            self.history_buffer[target].append(line)
+        if target in self._history_buffer:
+            self._history_buffer[target].append(line)
             return
 
         queue = collections.deque(maxlen=25)
         queue.append(line)
-        self.history_buffer.update({target: queue})
+        self._history_buffer.update({target: queue})
 
     @irc3.event(
         rf":(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?P<command>{_SED_PRIVMSG})"
     )
     def sed(self, mask, target, command):
-        if target not in self.history_buffer:
+        if target not in self._history_buffer:
             return
 
-        for target_user, message in reversed(self.history_buffer[target]):
+        for target_user, message in reversed(self._history_buffer[target]):
             message = message.strip()
             try:
                 new_message = _edit(message, command)

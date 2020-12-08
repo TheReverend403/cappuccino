@@ -28,10 +28,10 @@ _DB_KEY = "last_seen"
 class Seen(Plugin):
     requires = ["irc3.plugins.command", "cappuccino.userdb"]
 
-    def get_last_seen(self, nick: str):
+    def _get_last_seen(self, nick: str):
         return self.bot.get_user_value(nick, _DB_KEY)
 
-    def set_last_seen(self, nick: str, timestamp: datetime):
+    def _set_last_seen(self, nick: str, timestamp: datetime):
         self.bot.set_user_value(nick, _DB_KEY, timestamp)
 
     @command(permission="view", aliases=["died"])
@@ -52,7 +52,7 @@ class Seen(Plugin):
         if not self.bot.get_user_value(nick, _DB_KEY):
             return f"I haven't seen any activity from {nick} yet."
 
-        last_seen = self.get_last_seen(nick)
+        last_seen = self._get_last_seen(nick)
         time_now = datetime.utcnow()
         duration = naturaltime(time_now - last_seen)
         full_date = last_seen.strftime("%b %d %Y %H:%M UTC")
@@ -72,4 +72,4 @@ class Seen(Plugin):
         ):
             return
 
-        self.set_last_seen(mask.nick, datetime.utcnow())
+        self._set_last_seen(mask.nick, datetime.utcnow())

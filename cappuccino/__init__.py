@@ -18,7 +18,7 @@ from logging.config import dictConfig
 
 import yaml
 
-DEFAULT_CONFIG = {
+DEFAULT_LOG_CONFIG = {
     "version": 1,
     "formatters": {
         "standard": {"format": "%(asctime)s [%(levelname)-5s] %(name)s: %(message)s"},
@@ -43,23 +43,23 @@ DEFAULT_CONFIG = {
 }
 
 
-def setup_logging():
+def _setup_logging():
     try:
         with open("logging.yml", "r") as fd:
             dictConfig(yaml.safe_load(fd))
             logging.getLogger(__name__).info("Using logging.yml for logging config.")
 
     except FileNotFoundError:
-        dictConfig(DEFAULT_CONFIG)
+        dictConfig(DEFAULT_LOG_CONFIG)
         logging.getLogger(__name__).info(
             "logging.yml not found, using default logging config."
         )
     except yaml.YAMLError as exc:
-        dictConfig(DEFAULT_CONFIG)
+        dictConfig(DEFAULT_LOG_CONFIG)
         logging.getLogger(__name__).exception(exc)
 
 
-setup_logging()
+_setup_logging()
 
 
 class Plugin(object):
