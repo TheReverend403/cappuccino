@@ -22,8 +22,6 @@ from irc3.plugins.command import command
 from cappuccino import Plugin
 from cappuccino.util.formatting import Color, style
 
-MAX_USER_VALUES = 6
-
 
 def _to_user_index(index: int):
     """Converts a zero-indexed value to a user-friendly value starting from 1"""
@@ -40,6 +38,10 @@ def _from_user_index(index: int):
 class Rice(Plugin):
     requires = ["irc3.plugins.command", "cappuccino.userdb"]
 
+    def __init__(self, bot):
+        super().__init__(bot)
+        self._max_user_entries = self.config.get("max_user_entries", 6)
+
     def _generic_db(self, mask, target, args):
         # Get name of command _generic_db is being called from.
         category = inspect.stack()[1][3]
@@ -53,9 +55,9 @@ class Rice(Plugin):
 
         if args["--add"] or args["-a"]:
             values = self.bot.get_user_value(mask.nick, category) or []
-            if len(values) + len(args["<values>"]) > MAX_USER_VALUES:
+            if len(values) + len(args["<values>"]) > self._max_user_entries:
                 return (
-                    f"You can only set {MAX_USER_VALUES} {category}! "
+                    f"You can only set {self._max_user_entries} {category}! "
                     f"Consider deleting or replacing some."
                 )
 
@@ -68,9 +70,9 @@ class Rice(Plugin):
         if args["--set"] or args["-s"]:
             values = args["<values>"]
 
-            if len(values) > MAX_USER_VALUES:
+            if len(values) > self._max_user_entries:
                 return (
-                    f"You can only set {MAX_USER_VALUES} {category}! "
+                    f"You can only set {self._max_user_entries} {category}! "
                     f"Consider deleting or replacing some."
                 )
 

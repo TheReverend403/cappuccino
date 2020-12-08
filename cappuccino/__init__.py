@@ -65,5 +65,5 @@ _setup_logging()
 class Plugin(object):
     def __init__(self, bot):
         self.bot = bot
-        self.config = self.bot.config.get(self.__class__.__module__, {})
+        self.config: dict = self.bot.config.get(self.__class__.__module__, {})
         self.logger = logging.getLogger(self.__class__.__module__)
