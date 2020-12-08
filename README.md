@@ -24,8 +24,8 @@ Requirements:
 poetry install # Optionally install plugin dependencies with: --extras 'sentry ai lastfm web'
 cp config.ini.dist config.ini
 $EDITOR config.ini
-poetry run irc3 config.ini
 poetry run alembic upgrade head
+poetry run irc3 config.ini
 ```
 
 ## Developers
