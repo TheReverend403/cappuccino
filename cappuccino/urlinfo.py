@@ -31,7 +31,7 @@ import requests
 from humanize import naturalsize
 
 from cappuccino import Plugin
-from cappuccino.util.formatting import Color, style, unstyle
+from cappuccino.util.formatting import Color, style, truncate_with_ellipsis, unstyle
 
 log = logging.getLogger(__name__)
 
@@ -261,6 +261,6 @@ class UrlInfo(Plugin):
             if title:
                 title = unstyle(html.unescape(title).strip())
                 if len(title) > self._max_title_length:
-                    title = "".join(title[: self._max_title_length - 3]) + "..."
+                    title = truncate_with_ellipsis(title, self._max_title_length)
 
         return hostname, title, content_type, size
