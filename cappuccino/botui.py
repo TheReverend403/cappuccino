@@ -100,7 +100,9 @@ class BotUI(Plugin):
         %%nick <nick>
         """
 
-        self.bot.set_nick(args["<nick>"])
+        nick = args["<nick>"]
+        self.bot.set_nick(nick)
+        self.logger.info(f"Changed nick to {nick}")
 
     @command(permission="admin", show_in_help_list=False)
     def mode(self, mask, target, args):
