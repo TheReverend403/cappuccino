@@ -19,7 +19,7 @@ from timeit import default_timer as timer
 
 import irc3
 import markovify
-from humanize import intcomma
+from humanize import intcomma, precisedelta
 from irc3.plugins.command import command
 from irc3.utils import IrcString
 from sqlalchemy import func, insert, select, update
@@ -76,7 +76,7 @@ class Ai(Plugin):
             return
 
         self.logger.debug(
-            f"Queried {len(corpus)} rows in {(end - start) * 100} seconds."
+            f"Queried {len(corpus)} rows in {precisedelta((end - start))}."
         )
 
         start = timer()
@@ -84,7 +84,7 @@ class Ai(Plugin):
             "\n".join(corpus), retain_original=False
         ).compile()
         end = timer()
-        self.logger.info(f"Created text model in {(end - start) * 100} seconds.")
+        self.logger.info(f"Created text model in {precisedelta((end - start))}.")
 
         return model
 
