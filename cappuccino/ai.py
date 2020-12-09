@@ -61,9 +61,9 @@ class Ai(Plugin):
         self._db = Database(self)
         self._corpus = self._db.meta.tables["ai_corpus"]
         self._channels = self._db.meta.tables["ai_channels"]
-        self._text_model = self._get_text_model()
+        self._text_model = self._create_text_model()
 
-    def _get_text_model(self):
+    def _create_text_model(self):
         self.logger.info("Creating text model...")
         start = timer()
         corpus = self._get_lines()
@@ -76,7 +76,7 @@ class Ai(Plugin):
             return
 
         self.logger.debug(
-            f"Queried {len(corpus)} rows in {(end - start) * 1000} milliseconds."
+            f"Queried {len(corpus)} rows in {(end - start) * 100} seconds."
         )
 
         start = timer()
@@ -84,7 +84,7 @@ class Ai(Plugin):
             "\n".join(corpus), retain_original=False
         ).compile()
         end = timer()
-        self.logger.info(f"Created text model in {(end - start) * 1000} milliseconds.")
+        self.logger.info(f"Created text model in {(end - start) * 100} seconds.")
 
         return model
 
