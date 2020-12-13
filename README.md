@@ -21,7 +21,7 @@ Requirements:
 * [Poetry](https://python-poetry.org)
 
 ```sh
-poetry install # Optionally install plugin dependencies with: --extras 'sentry ai lastfm web'
+poetry install
 cp config.ini.dist config.ini
 $EDITOR config.ini
 poetry run alembic upgrade head
