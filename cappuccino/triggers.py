@@ -27,7 +27,7 @@ from cappuccino.util.formatting import Color, style
 
 @irc3.plugin
 class Triggers(Plugin):
-    requires = ["irc3.plugins.command", "cappuccino.botui"]
+    requires = ["irc3.plugins.command", "cappuccino.botui", "irc3.plugins.userlist"]
 
     def __init__(self, bot):
         super().__init__(bot)
