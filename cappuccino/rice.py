@@ -57,8 +57,8 @@ class Rice(Plugin):
             values = self.bot.get_user_value(mask.nick, category) or []
             if len(values) + len(args["<values>"]) > self._max_user_entries:
                 return (
-                    f"You can only set {self._max_user_entries} {category}! "
-                    f"Consider deleting or replacing some."
+                    f"You can only set {self._max_user_entries} {category}!"
+                    f" Consider deleting or replacing some."
                 )
 
             for value in args["<values>"]:
@@ -72,8 +72,8 @@ class Rice(Plugin):
 
             if len(values) > self._max_user_entries:
                 return (
-                    f"You can only set {self._max_user_entries} {category}! "
-                    f"Consider deleting or replacing some."
+                    f"You can only set {self._max_user_entries} {category}!"
+                    f" Consider deleting or replacing some."
                 )
 
             self.bot.set_user_value(mask.nick, category, values)
