@@ -161,7 +161,7 @@ class Rice(Plugin):
                 return "Invalid ID."
 
             value = style(value, reset=True)
-            return f"{value} {user_tag}"
+            return f"{user_tag} {value}"
 
         values = self.bot.get_user_value(user, category)
         if values:
