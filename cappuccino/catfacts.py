@@ -28,12 +28,12 @@ class CatFacts(Plugin):
 
     def __init__(self, bot):
         super().__init__(bot)
-        self._cache = []
-        self._limit = self.config.get("limit", 1000)
-        self._max_length = self.config.get("max_length", 200)
-        self._api_url = self.config.get("api_url", "https://catfact.ninja/facts")
+        self._cache: list[str] = []
+        self._limit: int = self.config.get("limit", 1000)
+        self._max_length: int = self.config.get("max_length", 200)
+        self._api_url: str = self.config.get("api_url", "https://catfact.ninja/facts")
 
-    def _get_cat_fact(self):
+    def _get_cat_fact(self) -> str:
         if not self._cache:
             self.logger.debug("Fetching cat facts.")
             request_parameters = {"limit": self._limit}

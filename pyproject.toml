@@ -6,7 +6,7 @@ authors = ["Lee Watson <rev@revthefox.co.uk>"]
 license = "GPL-3.0"
 
 [tool.poetry.dependencies]
-python = ">=3.8, <4"
+python = ">=3.9, <4"
 irc3 = "^1.1.0"
 markovify = "^0.8.0"
 pylast = "^4.0.0"
