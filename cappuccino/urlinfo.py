@@ -235,7 +235,7 @@ class UrlInfo(Plugin):
 
                 if site_name and len(site_name) < (site_name_max_size := 15):
                     if len(site_name) > site_name_max_size:
-                        site_name = "".join(title[: site_name_max_size - 3]) + "..."
+                        site_name = truncate_with_ellipsis(title, site_name_max_size)
                     hostname = site_name
 
                 if description_tag := soup.find(
