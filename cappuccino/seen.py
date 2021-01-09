@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 import irc3
 from humanize import naturaltime
@@ -53,9 +53,9 @@ class Seen(Plugin):
             return f"I haven't seen any activity from {nick} yet."
 
         last_seen = self._get_last_seen(nick)
-        time_now = datetime.now(timezone.utc)
+        time_now = datetime.utcnow()
         duration = naturaltime(time_now - last_seen)
-        full_date = last_seen.strftime("%b %d %Y %H:%M %Z")
+        full_date = last_seen.strftime("%b %d %Y %H:%M UTC")
 
         if nick == "kori":
             return f"{nick} was right there {duration}. ({full_date})"
@@ -72,4 +72,4 @@ class Seen(Plugin):
         ):
             return
 
-        self._set_last_seen(mask.nick, datetime.now(timezone.utc))
+        self._set_last_seen(mask.nick, datetime.utcnow())
