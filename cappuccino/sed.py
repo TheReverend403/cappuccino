@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import collections
+from collections import deque
 import re
 import subprocess
 
@@ -58,7 +58,7 @@ class EditorException(Exception):
 class Sed(Plugin):
     def __init__(self, bot):
         super().__init__(bot)
-        self._history_buffer = {}
+        self._history_buffer: dict[str, deque[tuple[str, str]]] = {}
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def update_chat_history(self, target, event, mask, data):
@@ -77,7 +77,7 @@ class Sed(Plugin):
             self._history_buffer[target].append(line)
             return
 
-        queue = collections.deque(maxlen=25)
+        queue = deque(maxlen=25)
         queue.append(line)
         self._history_buffer.update({target: queue})
 
