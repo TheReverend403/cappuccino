@@ -40,7 +40,7 @@ class Rice(Plugin):
 
     def __init__(self, bot):
         super().__init__(bot)
-        self._max_user_entries = self.config.get("max_user_entries", 6)
+        self._max_user_entries: int = self.config.get("max_user_entries", 6)
 
     def _generic_db(self, mask, target, args):
         # Get name of command _generic_db is being called from.
