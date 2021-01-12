@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cappuccino"
-version = "0.1.0"
+version = "1.7.0"
 description = ""
 authors = ["Lee Watson <rev@revthefox.co.uk>"]
 license = "GPL-3.0"
