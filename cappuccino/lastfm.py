@@ -114,4 +114,4 @@ class LastFM(Plugin):
             pylast.MalformedResponseError,
         ) as err:
             error = style(err, bold=True)
-            return f"{mask.nick}: A last.fm error occurred: {error}"
+            return error
