@@ -73,7 +73,7 @@ class UserDB(Plugin):
         )
 
     @irc3.extend
-    def set_user_value(self, username: str, key, value=None):
+    def set_user_value(self, username: str, key: str, value: bool = None):
         user_exists = (
             self._db.execute(
                 select([self._ricedb.c.nick]).where(
@@ -93,7 +93,7 @@ class UserDB(Plugin):
             .values(nick=username, **{key: value})
         )
 
-    def _json_dump(self):
+    def _json_dump(self) -> str:
         bottle.response.content_type = "application/json"
 
         data = []
