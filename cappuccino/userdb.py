@@ -73,7 +73,7 @@ class UserDB(Plugin):
         )
 
     @irc3.extend
-    def set_user_value(self, username: str, key: str, value: bool = None):
+    def set_user_value(self, username: str, key: str, value=None):
         user_exists = (
             self._db.execute(
                 select([self._ricedb.c.nick]).where(
