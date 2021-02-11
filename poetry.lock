@@ -223,7 +223,7 @@ lingua = ["lingua"]
 
 [[package]]
 name = "markovify"
-version = "0.8.3"
+version = "0.9.0"
 description = "A simple, extensible Markov chain generator. Uses include generating random semi-plausible sentences based on an existing text."
 category = "main"
 optional = false
@@ -537,7 +537,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9, <4"
-content-hash = "82386dd80854d2f10d779d2a336918d66a13c3cc8e73df17a92027cca9611328"
+content-hash = "57a13954835f2c3cb9969fa3bb61c78b83c4b72f54e477394fb00024995864d6"
 
 [metadata.files]
 alembic = [
@@ -619,7 +619,7 @@ mako = [
     {file = "Mako-1.1.4.tar.gz", hash = "sha256:17831f0b7087c313c0ffae2bcbbd3c1d5ba9eeac9c38f2eb7b50e8c99fe9d5ab"},
 ]
 markovify = [
-    {file = "markovify-0.8.3.tar.gz", hash = "sha256:254405c5b2f819ae388c39a53e6bc038bfbc24713441869ce90a1cd67e4a89ce"},
+    {file = "markovify-0.9.0.tar.gz", hash = "sha256:6bed379c6143741d6f7344f8d88526b0387ede23cf798f1e5ab99f525d6dba4d"},
 ]
 markupsafe = [
     {file = "MarkupSafe-1.1.1-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:09027a7803a62ca78792ad89403b1b7a73a01c8cb65909cd876f7fcebd79b161"},
