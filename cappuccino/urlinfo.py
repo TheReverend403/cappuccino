@@ -67,7 +67,6 @@ class UrlInfo(Plugin):
     _url_regex = re.compile(
         r"(?:https?://[a-zA-Z0-9_.+-/#~?=&%]+)", re.IGNORECASE | re.UNICODE
     )
-    _hostname_cleanup_regex = re.compile(r"^www\.", re.IGNORECASE | re.UNICODE)
     _max_title_length = 128
     _request_timeout = 5
     _html_mimetypes = ["text/html", "application/xhtml+xml"]
@@ -189,7 +188,7 @@ class UrlInfo(Plugin):
                     f"{hostname} is not a publicly routable address."
                 )
 
-        hostname = self._hostname_cleanup_regex.sub("", hostname)
+        hostname = hostname.removeprefix("www.")
 
         # Spoof user agent for certain sites so they give up their secrets.
         if any(host.endswith(hostname) for host in self._fake_useragent_hostnames):
