@@ -67,7 +67,7 @@ class UrlInfo(Plugin):
     _url_regex = re.compile(
         r"(?:https?://[a-zA-Z0-9_.+-/#~?=&%]+)", re.IGNORECASE | re.UNICODE
     )
-    _max_title_length = 256
+    _max_title_length = 300
     _request_timeout = 5
     _html_mimetypes = ["text/html", "application/xhtml+xml"]
     _request_chunk_size = 1024  # Bytes
