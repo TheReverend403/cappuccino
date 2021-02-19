@@ -65,9 +65,9 @@ class UrlInfo(Plugin):
 
     _max_bytes = 10 * 1000 * 1000  # 10M
     _url_regex = re.compile(
-        r"(?:https?://[a-zA-Z0-9_.+-/#~?=&%:]+)", re.IGNORECASE | re.UNICODE
+        r"(?:https?://[a-zA-Z0-9_.+-/#~?=&%]+)", re.IGNORECASE | re.UNICODE
     )
-    _max_title_length = 128
+    _max_title_length = 256
     _request_timeout = 5
     _html_mimetypes = ["text/html", "application/xhtml+xml"]
     _request_chunk_size = 1024  # Bytes
@@ -236,7 +236,7 @@ class UrlInfo(Plugin):
                 ):
                     site_name = site_name_tag.get("content")
 
-                if site_name and len(site_name) < (site_name_max_size := 15):
+                if site_name and len(site_name) < (site_name_max_size := 16):
                     if len(site_name) > site_name_max_size:
                         site_name = truncate_with_ellipsis(title, site_name_max_size)
                     hostname = site_name
