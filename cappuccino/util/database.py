@@ -30,7 +30,8 @@ class Database(object):
             Database.instance = self.__Singleton(
                 create_engine(plugin.bot.config.get("database", {}).get("uri"))
             )
-            Database.meta = MetaData(bind=Database.instance.engine, reflect=True)
+            Database.meta = MetaData(bind=Database.instance.engine)
+            Database.meta.reflect()
 
     def __getattr__(self, name):
         return getattr(self.instance.engine, name) or getattr(self.instance, name)
