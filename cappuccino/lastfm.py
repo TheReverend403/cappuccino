@@ -56,10 +56,10 @@ class LastFM(Plugin):
                 properly_capitalized=True
             )
         except pylast.WSError:
-            return "No such last.fm user. Are you trying to trick me? :^)"
+            return "That user doesn't appear to exist. Are you trying to trick me? :^)"
         else:
             self.bot.set_user_value(irc_username, _DB_KEY, lastfm_username)
-            return "last.fm username set."
+            return "Last.fm account linked successully."
 
     @command(name="np", permission="view", aliases=["lastfm"])
     def now_playing(self, mask, target, args):
@@ -79,21 +79,33 @@ class LastFM(Plugin):
             if not lastfm_username:
                 if irc_target_username == mask.nick:
                     return (
-                        f"You have no last.fm username set."
-                        f" Please set one with {base_command} --set <username>"
+                        f"You have not linked a Last.fm account."
+                        f" Please do so with {base_command} --set <username>"
                     )
 
                 return (
-                    f"{irc_target_username} has no last.fm username set."
-                    f" Ask them to set one with {base_command} --set <username>"
+                    f"{irc_target_username} has not linked a Last.fm account."
+                    f" Ask them to link one with {base_command} --set <username>"
                 )
 
             try:
                 lastfm_user = self._lastfm.get_user(lastfm_username)
+                lastfm_username = lastfm_user.get_name(properly_capitalized=True)
             except pylast.WSError:
+                if irc_target_username == mask.nick:
+                    return (
+                        f"Your Last.fm account appears to no longer exist."
+                        f" Please link a new one with {base_command} --set <username>"
+                    )
+
+                possessive_nick = (
+                    f"{irc_target_username}'"
+                    if irc_target_username.endswith("s")
+                    else f"{irc_target_username}'s"
+                )
                 return (
-                    f"Your currently set last.fm user appears to no longer exist."
-                    f" Please set a valid user with {base_command} --set <username>"
+                    f"{possessive_nick} last.fm account appears to no longer exist."
+                    f" Ask them to link a new one with {base_command} --set <username>"
                 )
 
             name_tag = _add_lastfm_suffix(irc_target_username, lastfm_username)
@@ -112,6 +124,7 @@ class LastFM(Plugin):
         except (
             pylast.NetworkError,
             pylast.MalformedResponseError,
+            pylast.WSError,
         ) as err:
             error = style(err, bold=True)
             return error
