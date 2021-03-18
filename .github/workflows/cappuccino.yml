@@ -1,10 +1,7 @@
 name: ci
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  [pull_request, push]
 
 jobs:
   quality:
