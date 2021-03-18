@@ -6,7 +6,6 @@
 
 <p align="center">
 <a href="LICENSE"><img src="https://img.shields.io/github/license/FoxDev/cappuccino?style=flat-square" alt="GitHub"></a>
-<a href="https://requires.io/github/FoxDev/cappuccino/requirements"><img src="https://img.shields.io/requires/github/FoxDev/cappuccino?style=flat-square" alt="Requires.io"></a>
 </p>
 
 <p align="center">
