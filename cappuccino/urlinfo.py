@@ -65,7 +65,7 @@ class UrlInfo(Plugin):
 
     _max_bytes = 10 * 1000 * 1000  # 10M
     _url_regex = re.compile(
-        r"(?:https?://[a-zA-Z0-9_.+-/#~?=&%]+)", re.IGNORECASE | re.UNICODE
+        r"(?:https?://[a-zA-Z0-9_.+-/#~?=&%:]+)", re.IGNORECASE | re.UNICODE
     )
     _max_title_length = 300
     _request_timeout = 5
