@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: '20.8b1'
+    rev: '21.5b2'
     hooks:
       - id: black
         exclude: |
@@ -10,7 +10,7 @@ repos:
         args:
           - '--check'
   - repo: https://gitlab.com/pycqa/flake8
-    rev: '3.9.0'
+    rev: '3.9.2'
     hooks:
       - id: flake8
         exclude: |
