@@ -45,7 +45,6 @@ class Core(Plugin):
         # Accept youtube consent cookies automatically
         cookiejar = RequestsCookieJar()
         cookievalue = f"YES+srp.gws-20210512-0-RC3.en+FX+{randint(1, 1000)}"
-        for domain in ["youtube.com", "ytimg.com", "youtu.be", "googlevideo.com"]:
-            cookiejar.set("CONSENT", cookievalue, domain=domain)
+        cookiejar.set("CONSENT", cookievalue)
 
         self.bot.requests.cookies.update(cookiejar)
