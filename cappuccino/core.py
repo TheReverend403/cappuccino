@@ -48,5 +48,3 @@ class Core(Plugin):
                 "allow_redirects": "true",
             }
         )
-
-        self.bot.requests.cookies.update(cookiejar)
