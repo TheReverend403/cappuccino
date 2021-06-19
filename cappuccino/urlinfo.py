@@ -21,6 +21,7 @@ import random
 import re
 import socket
 import time
+from copy import copy
 from io import StringIO
 from urllib.parse import urlparse
 
@@ -191,13 +192,11 @@ class UrlInfo(Plugin):
         hostname = hostname.removeprefix("www.")
 
         # Spoof user agent for certain sites so they give up their secrets.
+        request = copy(self.bot.requests)
         if any(host.endswith(hostname) for host in self._fake_useragent_hostnames):
-            self.bot.requests.headers.update({"User-Agent": self._fake_user_agent})
+            request.headers.update({"User-Agent": self._fake_user_agent})
 
-        with self.bot.requests.get(url, stream=True) as response:
-            # Reset to the real user agent after the request.
-            self.bot.requests.headers.update({"User-Agent": self._real_user_agent})
-
+        with request.get(url, stream=True) as response:
             if response.status_code != requests.codes.ok:
                 response.raise_for_status()
 
