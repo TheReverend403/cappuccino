@@ -32,7 +32,14 @@ class Core(Plugin):
             subprocess.check_output(["git", "describe"]).decode("UTF-8").strip()
         )
         requests.packages.urllib3.disable_warnings()
+
+        # Accept youtube consent cookies automatically
+        cookiejar = RequestsCookieJar()
+        cookievalue = f"YES+srp.gws-20210512-0-RC3.en+FX+{randint(1, 1000)}"
+        cookiejar.set("CONSENT", cookievalue)
+
         self.bot.requests = Session()
+        self.bot.requests.cookies = cookiejar
         self.bot.requests.headers.update(
             {
                 "User-Agent": "cappuccino (https://github.com/FoxDev/cappuccino)",
@@ -41,10 +48,5 @@ class Core(Plugin):
                 "allow_redirects": "true",
             }
         )
-
-        # Accept youtube consent cookies automatically
-        cookiejar = RequestsCookieJar()
-        cookievalue = f"YES+srp.gws-20210512-0-RC3.en+FX+{randint(1, 1000)}"
-        cookiejar.set("CONSENT", cookievalue)
 
         self.bot.requests.cookies.update(cookiejar)
