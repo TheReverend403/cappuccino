@@ -14,35 +14,16 @@
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
 import platform
-import subprocess
 
 import irc3
-import requests
 from irc3.plugins.command import command
-from requests import Session
 
 from cappuccino import Plugin
 
 
 @irc3.plugin
 class BotUI(Plugin):
-    requires = ["irc3.plugins.command", "irc3.plugins.userlist"]
-
-    def __init__(self, bot):
-        super().__init__(bot)
-        self.bot.version = (
-            subprocess.check_output(["git", "describe"]).decode("UTF-8").strip()
-        )
-        requests.packages.urllib3.disable_warnings()
-        self.bot.requests = Session()
-        self.bot.requests.headers.update(
-            {
-                "User-Agent": "cappuccino (https://github.com/FoxDev/cappuccino)",
-                "Accept-Language": "en-GB,en-US,en;q=0.5",
-                "timeout": "5",
-                "allow_redirects": "true",
-            }
-        )
+    requires = ["irc3.plugins.command", "irc3.plugins.userlist", "cappuccino.core"]
 
     @command(permission="view", aliases=["source", "version"])
     def bots(self, mask, target, args):

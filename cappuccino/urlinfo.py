@@ -61,7 +61,7 @@ def _clean_url(url: str):
 
 @irc3.plugin
 class UrlInfo(Plugin):
-    requires = ["cappuccino.botui"]
+    requires = ["cappuccino.core"]
 
     _max_bytes = 10 * 1000 * 1000  # 10M
     _url_regex = re.compile(

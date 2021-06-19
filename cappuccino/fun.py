@@ -52,7 +52,7 @@ _EIGHTBALL_RESPONSES = [
 
 @irc3.plugin
 class Fun(Plugin):
-    requires = ["irc3.plugins.command"]
+    requires = ["irc3.plugins.command", "cappuccino.core"]
 
     def _reply(self, target: str, message: str):
         # Only reply a certain percentage of the time. AKA rate-limiting. Sort of.

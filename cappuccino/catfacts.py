@@ -24,7 +24,7 @@ from cappuccino import Plugin
 
 @irc3.plugin
 class CatFacts(Plugin):
-    requires = ["irc3.plugins.command"]
+    requires = ["irc3.plugins.command", "cappuccino.core"]
 
     def __init__(self, bot):
         super().__init__(bot)

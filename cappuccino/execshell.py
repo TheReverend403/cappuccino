@@ -43,7 +43,7 @@ def _exec_wrapper(cmd: dict, input_data: str = None) -> str:
 
 @irc3.plugin
 class ExecShell(Plugin):
-    requires = ["irc3.plugins.command", "cappuccino.botui"]
+    requires = ["irc3.plugins.command", "cappuccino.core"]
 
     @command(
         permission="admin", show_in_help_list=False, options_first=True, use_shlex=True
