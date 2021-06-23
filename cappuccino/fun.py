@@ -181,7 +181,7 @@ class Fun(Plugin):
             target,
             (
                 f"{mask.nick}:"
-                f" A direction away from the center of gravity of a celestial object."
+                f' "Up" is a direction away from the center of gravity of a celestial object.'  # noqa: E501
             ),
         )
 
