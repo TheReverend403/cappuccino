@@ -54,7 +54,7 @@ class Ai(Plugin):
 
     def __init__(self, bot):
         super().__init__(bot)
-        self._ignore_nicks: list[str] = self.config.get("ignore_nicks", "").split()
+        self._ignore_nicks: list[str] = self.config.get("ignore_nicks", [])
         self._max_loaded_lines: int = self.config.get("max_loaded_lines", 25000)
         self._max_reply_length: int = self.config.get("max_reply_length", 100)
 

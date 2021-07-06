@@ -75,16 +75,14 @@ class UrlInfo(Plugin):
     def __init__(self, bot):
         super().__init__(bot)
         self._ignore_nicks: list[str] = self.config.get("ignore_nicks", "").split()
-        self._ignore_hostnames: list[str] = self.config.get(
-            "ignore_hostnames", ""
-        ).split()
+        self._ignore_hostnames: list[str] = self.config.get("ignore_hostnames", "")
         self._real_user_agent: str = self.bot.requests.headers.get("User-Agent")
         self._fake_user_agent: str = self.config.get(
             "fake_useragent", "Googlebot/2.1 (+http://www.google.com/bot.html)"
         )
         self._fake_useragent_hostnames: list[str] = self.config.get(
-            "fake_useragent_hostnames", ""
-        ).split()
+            "fake_useragent_hostnames", []
+        )
 
     @irc3.event(
         rf":(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{_url_regex.pattern}).*"  # noqa: E501
