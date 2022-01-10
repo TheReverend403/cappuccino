@@ -5,4 +5,5 @@ usermod -u "$PUID" cappuccino
 echo "Changing GID of cappuccino to $PGID"
 groupmod -g "$PGID" cappuccino
 
+echo "Changing ownership of /config, /data, /app"
 chown -R cappuccino:cappuccino /config /data /app
