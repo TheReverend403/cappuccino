@@ -51,7 +51,7 @@ RUN apk add --update-cache \
     sed \
     shadow \
     gettext \
-    sudo
+    runuser
 
 RUN rm -rf /var/cache/apk/*
 

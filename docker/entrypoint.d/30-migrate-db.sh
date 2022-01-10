@@ -1,2 +1,2 @@
 #!/bin/sh
-sudo -E -u cappuccino sh -c "cd '$PWD'; alembic upgrade head"
+exec runuser -u cappuccino -- alembic upgrade head
