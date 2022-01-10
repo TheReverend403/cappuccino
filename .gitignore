@@ -89,10 +89,10 @@ ENV/
 # Rope project settings
 .ropeproject
 
-config.ini
+config/config.ini
 data/
 .vscode/
 .idea/
 
-docker-compose.*.yml
+docker-compose.*
 logging.yml

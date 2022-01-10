@@ -1,4 +1,5 @@
 import configparser
+import os
 from logging.config import fileConfig
 
 from alembic import context
@@ -57,7 +58,7 @@ def run_migrations_online():
 
     """
     bot_config = configparser.ConfigParser()
-    bot_config.read('config.ini')
+    bot_config.read(os.getenv("SETTINGS_FILE", "config.ini"))
     alembic_config = config.get_section(config.config_ini_section)
     alembic_config['sqlalchemy.url'] = bot_config['database']['uri']
     connectable = engine_from_config(

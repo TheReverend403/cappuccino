@@ -28,9 +28,14 @@ from cappuccino import Plugin
 class Core(Plugin):
     def __init__(self, bot):
         super().__init__(bot)
-        self.bot.version = (
-            subprocess.check_output(["git", "describe"]).decode("UTF-8").strip()
-        )
+
+        try:
+            self.bot.version = (
+                subprocess.check_output(["git", "describe"]).decode("UTF-8").strip()
+            )
+        except FileNotFoundError:
+            self.bot.version = "cappuccino"
+
         requests.packages.urllib3.disable_warnings()
 
         # Accept youtube consent cookies automatically
@@ -42,7 +47,7 @@ class Core(Plugin):
         self.bot.requests.cookies = cookiejar
         self.bot.requests.headers.update(
             {
-                "User-Agent": "cappuccino (https://github.com/FoxDev/cappuccino)",
+                "User-Agent": "cappuccino (https://github.com/TheReverend403/cappuccino)",  # noqa: E501
                 "Accept-Language": "en-GB,en-US,en;q=0.5",
                 "timeout": "5",
                 "allow_redirects": "true",
