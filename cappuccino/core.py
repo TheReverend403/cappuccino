@@ -34,7 +34,7 @@ class Core(Plugin):
                 subprocess.check_output(["git", "describe"]).decode("UTF-8").strip()
             )
         except FileNotFoundError:
-            self.bot.version = "cappuccino"
+            self.bot.version = "v???"
 
         requests.packages.urllib3.disable_warnings()
 
