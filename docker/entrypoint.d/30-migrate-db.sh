@@ -1,2 +1,3 @@
 #!/bin/sh
-exec runuser -u cappuccino -- alembic upgrade head
+echo "Running database migrations"
+runuser -u cappuccino -- alembic upgrade head
