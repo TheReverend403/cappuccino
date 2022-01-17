@@ -326,7 +326,7 @@ python-versions = ">=3.7"
 name = "isort"
 version = "5.10.1"
 description = "A Python utility / library to sort Python imports."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.1,<4.0"
 
@@ -691,7 +691,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9, <4"
-content-hash = "725b98626bfbd905f0101c6c3007075c33fa9adc5650a10e4bb554c8290e8a71"
+content-hash = "70ede2a0502132fca2749bfdccc5f83857107566652a196e7ce2fd3e86aa82e6"
 
 [metadata.files]
 alembic = [

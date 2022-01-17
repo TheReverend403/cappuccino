@@ -22,7 +22,6 @@ humanize = "^3.13.0"
 html5lib = "^1.1"
 ircstyle = "^0.1.1"
 pyyaml = "^6.0.0"
-isort = "^5.10.1"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
