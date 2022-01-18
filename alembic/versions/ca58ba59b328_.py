@@ -1,7 +1,7 @@
 """empty messageTrue
 
 Revision ID: ca58ba59b328
-Revises: 
+Revises:
 Create Date: 2020-01-24 02:44:22.085585
 
 """
