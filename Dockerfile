@@ -67,10 +67,10 @@ COPY --chown=${APP_USER}:${APP_USER} ./alembic.ini /app
 
 WORKDIR /app
 
-ENV PYTHONPATH="."
-ENV SETTINGS_FILE="/data/config.ini"
-ENV SETTINGS_SOURCE_FILE="/config/config.ini"
-ENV APP_USER=${APP_USER}
+ENV PYTHONPATH="." \
+    SETTINGS_FILE="/data/config.ini" \
+    SETTINGS_SOURCE_FILE="/config/config.ini" \
+    APP_USER=${APP_USER}
 
 VOLUME ["/config", "/data"]
 EXPOSE 1337
