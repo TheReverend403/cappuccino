@@ -1,4 +1,2 @@
 #!/bin/sh
-
-echo "Starting cappuccino"
-exec runuser -u cappuccino -- "$@"
+exec runuser -u "$APP_USER" -- "$@"

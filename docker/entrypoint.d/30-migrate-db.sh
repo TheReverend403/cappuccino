@@ -1,4 +1,2 @@
 #!/bin/sh
-
-echo "Running database migrations"
-runuser -u cappuccino -- alembic upgrade head
+runuser -u "$APP_USER" -- alembic upgrade head

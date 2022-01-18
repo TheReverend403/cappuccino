@@ -56,23 +56,24 @@ RUN rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
-RUN addgroup --gid 1000 --system cappuccino && \
-    adduser --uid 1000 --system --gid 1000 --no-create-home cappuccino
+ARG APP_USER=app
 
-COPY --chown=cappuccino:cappuccino ./cappuccino /app/cappuccino
-COPY --chown=cappuccino:cappuccino ./alembic /app/alembic
-COPY --chown=cappuccino:cappuccino ./alembic.ini /app
+RUN addgroup --gid 1000 --system ${APP_USER} && \
+    adduser --uid 1000 --system --gid 1000 --no-create-home ${APP_USER}
 
-VOLUME ["/config"]
-VOLUME ["/data"]
-
-EXPOSE 1337
+COPY --chown=${APP_USER}:${APP_USER} ./cappuccino /app/cappuccino
+COPY --chown=${APP_USER}:${APP_USER} ./alembic /app/alembic
+COPY --chown=${APP_USER}:${APP_USER} ./alembic.ini /app
 
 WORKDIR /app
 
 ENV PYTHONPATH="."
 ENV SETTINGS_FILE="/data/config.ini"
-ENV SETTINGS_SOURCE_FILE="/config/config.ini.j2"
+ENV SETTINGS_SOURCE_FILE="/config/config.ini"
+ENV APP_USER=${APP_USER}
+
+VOLUME ["/config", "/data"]
+EXPOSE 1337
 
 ENTRYPOINT ["/usr/bin/entrypointd.sh"]
 CMD ["sh", "-c", "irc3 $SETTINGS_FILE"]
