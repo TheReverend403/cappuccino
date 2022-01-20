@@ -180,6 +180,7 @@ class UrlInfo(Plugin):
         urlp = urlparse(url)
         if urlp.netloc.lower().removeprefix("www.") == "twitter.com":
             urlp = urlp._replace(netloc="nitter.net")
+        url = urlp.geturl()
 
         hostname = urlp.hostname
         for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
