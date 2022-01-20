@@ -177,7 +177,11 @@ class UrlInfo(Plugin):
         return content.getvalue()
 
     def _process_url(self, url: str):
-        hostname = urlparse(url).hostname
+        urlp = urlparse(url)
+        if urlp.netloc.lower().removeprefix("www.") == "twitter.com":
+            urlp = urlp._replace(netloc="nitter.net")
+
+        hostname = urlp.hostname
         for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
             ip = ipaddress.ip_address(sockaddr[0])
             if not ip.is_global:
@@ -189,7 +193,10 @@ class UrlInfo(Plugin):
 
         # Spoof user agent for certain sites so they give up their secrets.
         request = copy(self.bot.requests)
-        if any(host.endswith(hostname) for host in self._fake_useragent_hostnames):
+        if any(
+            f".{hostname}".endswith(f".{host}")
+            for host in self._fake_useragent_hostnames
+        ):
             request.headers.update({"User-Agent": self._fake_user_agent})
 
         with request.get(url, stream=True) as response:
@@ -231,11 +238,6 @@ class UrlInfo(Plugin):
                 ):
                     site_name = site_name_tag.get("content")
 
-                if site_name and len(site_name) < (site_name_max_size := 16):
-                    if len(site_name) > site_name_max_size:
-                        site_name = truncate_with_ellipsis(title, site_name_max_size)
-                    hostname = site_name
-
                 if description_tag := soup.find(
                     "meta", property="og:description", content=True
                 ):
@@ -247,8 +249,14 @@ class UrlInfo(Plugin):
                     if site_name == "GitHub" and title in description:
                         title = soup.title.string.replace("GitHub - ", "", 1)
 
-                    if site_name == "Twitter" and description:
+                    if site_name == "Nitter" and description:
+                        site_name = "Twitter"
                         title = f"{title}: {description}"
+
+                if site_name and len(site_name) < (site_name_max_size := 16):
+                    if len(site_name) > site_name_max_size:
+                        site_name = truncate_with_ellipsis(title, site_name_max_size)
+                    hostname = site_name
 
                 if not title and (content and content_type not in self._html_mimetypes):
                     title = re.sub(r"\s+", " ", " ".join(content.split("\n")))
