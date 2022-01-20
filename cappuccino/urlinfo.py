@@ -247,7 +247,7 @@ class UrlInfo(Plugin):
                     if site_name == "GitHub" and title in description:
                         title = soup.title.string.replace("GitHub - ", "", 1)
 
-                    if site_name == "Twitter" and description:
+                    if site_name == "Nitter" and description:
                         title = f"{title}: {description}"
 
                 if not title and (content and content_type not in self._html_mimetypes):
