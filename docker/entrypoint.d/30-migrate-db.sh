@@ -1,2 +1,2 @@
 #!/bin/sh
-runuser -u "$APP_USER" -- alembic upgrade head
+gosu "$APP_USER" alembic upgrade head
