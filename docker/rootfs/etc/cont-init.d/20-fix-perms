@@ -11,7 +11,7 @@ if test -n "$PUID"; then
 fi
 
 if test -n "$PGID"; then
-    /usr/sbin/groupmod -g "$PGID" "$APP_USER"
+    /usr/sbin/groupmod -g "$PGID" "$APP_USER" > /dev/null
 fi
 
 chown -R "$APP_USER:$APP_USER" /config /data /app
