@@ -14,46 +14,56 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_NO_INTERACTION=1 \
     PYSETUP_PATH="/opt/pysetup" \
+    S6_DOWNLOAD_PATH="/opt/s6" \
     VENV_PATH="/opt/pysetup/.venv"
 
 # prepend poetry and venv to path
-ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
+ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:/command:$PATH"
 
+FROM python-base as s6-base
+
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+    xz-utils
+
+ARG S6_OVERLAY_VERSION="3.0.0.0-1"
+
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz /tmp
+RUN mkdir -p "$S6_DOWNLOAD_PATH" && \
+    tar -C "$S6_DOWNLOAD_PATH/" -Jxpf /tmp/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz && \
+    tar -C "$S6_DOWNLOAD_PATH/" -Jxpf /tmp/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz
 
 ## Python builder
 FROM python-base as builder-base
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y \
-        curl \
-        build-essential \
-        libpq-dev
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+    curl \
+    build-essential \
+    libpq-dev
 
-# install poetry - respects $POETRY_VERSION & $POETRY_HOME
 RUN curl -sSL https://install.python-poetry.org | python -
 
-# copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH
 COPY poetry.lock pyproject.toml ./
 
-# install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
-RUN poetry install --no-dev
-RUN pip install jinja-cli
+RUN poetry install --no-dev && \
+    pip install jinja-cli
 
 
 ## Production image
 FROM python-base as production
 
-COPY --from=sudobmitch/base:scratch / /
-COPY docker/entrypoint.d/ /etc/entrypoint.d/
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+    libpq5
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y \
-        libpq5
-
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+COPY --from=s6-base $S6_DOWNLOAD_PATH /
+COPY docker/rootfs /
 
 ARG APP_USER=app
 
@@ -69,10 +79,10 @@ WORKDIR /app
 ENV PYTHONPATH="." \
     SETTINGS_FILE="/data/config.ini" \
     SETTINGS_SOURCE_FILE="/config/config.ini" \
+    S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     APP_USER=${APP_USER}
 
 VOLUME ["/config", "/data"]
 EXPOSE 1337
 
-ENTRYPOINT ["/usr/bin/entrypointd.sh"]
-CMD ["sh", "-c", "irc3 $SETTINGS_FILE"]
+ENTRYPOINT ["/init"]
