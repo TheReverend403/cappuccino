@@ -3,4 +3,4 @@ set -e
 cd /app || exit 1
 . "$VENV_PATH/bin/activate"
 
-s6-envuidgid "$APP_USER" alembic upgrade head
+s6-setuidgid "$APP_USER" alembic upgrade head
