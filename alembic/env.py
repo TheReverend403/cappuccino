@@ -59,7 +59,7 @@ def run_migrations_online():
     bot_config = configparser.ConfigParser()
     bot_config.read(os.getenv("SETTINGS_FILE", "config.ini"))
     alembic_config = config.get_section(config.config_ini_section)
-    alembic_config['sqlalchemy.url'] = bot_config['database']['uri']
+    alembic_config["sqlalchemy.url"] = bot_config["database"]["uri"]
     connectable = engine_from_config(
         alembic_config,
         prefix="sqlalchemy.",
@@ -67,9 +67,7 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
