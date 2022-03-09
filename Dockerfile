@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION=3.9
-ARG POETRY_VERSION=1.1.12
+ARG POETRY_VERSION=1.1.13
 
 ## Base
 FROM python:${PYTHON_VERSION}-slim as python-base
@@ -17,7 +17,6 @@ ENV PYTHONUNBUFFERED=1 \
     S6_DOWNLOAD_PATH="/opt/s6" \
     VENV_PATH="/opt/pysetup/.venv"
 
-# prepend poetry and venv to path
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:/command:$PATH"
 
 FROM python-base as s6-base
@@ -26,13 +25,13 @@ RUN apt-get update && \
     apt-get install --no-install-recommends -y \
     xz-utils
 
-ARG S6_OVERLAY_VERSION="3.0.0.2"
+ARG S6_OVERLAY_VERSION="3.1.0.1"
 
-ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz /tmp
-ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
 RUN mkdir -p "$S6_DOWNLOAD_PATH" && \
-    tar -C "$S6_DOWNLOAD_PATH/" -Jxpf /tmp/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz && \
-    tar -C "$S6_DOWNLOAD_PATH/" -Jxpf /tmp/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz
+    tar -C "$S6_DOWNLOAD_PATH/" -Jxpf /tmp/s6-overlay-x86_64.tar.xz && \
+    tar -C "$S6_DOWNLOAD_PATH/" -Jxpf /tmp/s6-overlay-noarch.tar.xz
 
 ## Python builder
 FROM python-base as builder-base
