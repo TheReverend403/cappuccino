@@ -17,7 +17,7 @@ ENV PYTHONUNBUFFERED=1 \
     S6_DOWNLOAD_PATH="/opt/s6" \
     VENV_PATH="/opt/pysetup/.venv"
 
-ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:/command:$PATH"
+ENV PATH="$VENV_PATH/bin:$POETRY_HOME/bin:$PATH"
 
 FROM python-base as s6-base
 

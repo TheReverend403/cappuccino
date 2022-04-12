@@ -7,11 +7,11 @@ if test -z "$PUID" && test -z "$PGID"; then
 fi
 
 if test -n "$PUID"; then
-    /usr/sbin/usermod -u "$PUID" "$APP_USER" > /dev/null
+    usermod -u "$PUID" "$APP_USER" > /dev/null
 fi
 
 if test -n "$PGID"; then
-    /usr/sbin/groupmod -g "$PGID" "$APP_USER" > /dev/null
+    groupmod -g "$PGID" "$APP_USER" > /dev/null
 fi
 
 chown -R "$APP_USER:$APP_USER" /config /data /app

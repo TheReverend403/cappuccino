@@ -1,6 +1,5 @@
 #!/command/with-contenv sh
 set -e
-cd /app || exit 1
-. "$VENV_PATH/bin/activate"
 
+cd /app || exit 1
 s6-setuidgid "$APP_USER" irc3 "$SETTINGS_FILE"

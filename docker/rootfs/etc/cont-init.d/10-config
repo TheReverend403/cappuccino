@@ -1,5 +1,4 @@
 #!/command/with-contenv sh
 set -e
-. "$VENV_PATH/bin/activate"
 
 jinja -X "^CFG_.*" "$SETTINGS_SOURCE_FILE" > "$SETTINGS_FILE"
