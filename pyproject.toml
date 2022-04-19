@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cappuccino"
-version = "1.8.12"
+version = "1.8.13"
 description = "Just another IRC bot."
 authors = ["Lee Watson <me@lwatson.dev>"]
 license = "GPL-3.0"
