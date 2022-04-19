@@ -91,7 +91,7 @@ WORKDIR /app
 
 COPY --chown=${ARG_APP_USER}:${ARG_APP_USER} ./cappuccino ./cappuccino
 COPY --chown=${ARG_APP_USER}:${ARG_APP_USER} ./alembic ./alembic
-COPY --chown=${ARG_APP_USER}:${ARG_APP_USER} ./alembic.ini ./app
+COPY --chown=${ARG_APP_USER}:${ARG_APP_USER} ./alembic.ini ./
 
 ENV PYTHONPATH="." \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
