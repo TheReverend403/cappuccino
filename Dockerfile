@@ -2,22 +2,26 @@ ARG ARG_PYTHON_VERSION=3.9
 ARG ARG_POETRY_VERSION=1.1.13
 ARG ARG_S6_OVERLAY_VERSION=3.1.0.1
 ARG ARG_S6_DOWNLOAD_PATH="/opt/s6"
-ARG ARG_APP_USER=app
+ARG ARG_POETRY_HOME="/opt/poetry"
+ARG ARG_PYSETUP_PATH="/opt/pysetup"
+ARG ARG_VENV_PATH="/opt/pysetup/.venv"
+ARG ARG_APP_USER="app"
 
 
 ## Base
 FROM python:${ARG_PYTHON_VERSION}-slim as python-base
+
+ARG ARG_POETRY_HOME
+ARG ARG_VENV_PATH
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_HOME="/opt/poetry" \
-    PYSETUP_PATH="/opt/pysetup" \
-    VENV_PATH="/opt/pysetup/.venv"
+    POETRY_HOME=${ARG_POETRY_HOME}
 
-ENV PATH="$VENV_PATH/bin:$POETRY_HOME/bin:$PATH"
+ENV PATH="${ARG_VENV_PATH}/bin:${ARG_POETRY_HOME}/bin:$PATH"
 
 
 FROM python-base as s6-base
@@ -48,6 +52,7 @@ RUN apt-get update && \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ARG ARG_POETRY_VERSION
+ARG ARG_PYSETUP_PATH
 
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_NO_INTERACTION=1 \
@@ -56,7 +61,7 @@ ENV POETRY_VIRTUALENVS_IN_PROJECT=true \
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -sSL https://install.python-poetry.org | python -
 
-WORKDIR $PYSETUP_PATH
+WORKDIR ${ARG_PYSETUP_PATH}
 COPY poetry.lock pyproject.toml ./
 
 RUN poetry install --no-dev && \
@@ -66,15 +71,16 @@ RUN poetry install --no-dev && \
 ## Production image
 FROM python-base as production
 
-ARG ARG_S6_DOWNLOAD_PATH
-ARG ARG_APP_USER
-
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
     libpq5 \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+ARG ARG_S6_DOWNLOAD_PATH
+ARG ARG_PYSETUP_PATH
+ARG ARG_APP_USER
+
+COPY --from=builder-base ${ARG_VENV_PATH} ${ARG_VENV_PATH}
 COPY --from=s6-base ${ARG_S6_DOWNLOAD_PATH} /
 COPY docker/rootfs /
 
