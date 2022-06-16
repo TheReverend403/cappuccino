@@ -104,7 +104,7 @@ class Triggers(Plugin):
             )
 
         if args["list"]:
-            trigger_list = self._list_triggers()
+            trigger_list = self._get_triggers_list(target)
             if trigger_list:
                 trigger_list = ", ".join(trigger_list)
                 return f"Available triggers for {target}: {trigger_list}"
