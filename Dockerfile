@@ -5,7 +5,6 @@ ARG ARG_S6_DOWNLOAD_PATH="/opt/s6"
 ARG ARG_POETRY_HOME="/opt/poetry"
 ARG ARG_PYSETUP_PATH="/opt/pysetup"
 ARG ARG_VENV_PATH="/opt/pysetup/.venv"
-ARG ARG_APP_USER="app"
 
 
 ## Base
@@ -78,28 +77,24 @@ RUN apt-get update && \
 
 ARG ARG_S6_DOWNLOAD_PATH
 ARG ARG_PYSETUP_PATH
-ARG ARG_APP_USER
 
 COPY --from=builder-base ${ARG_VENV_PATH} ${ARG_VENV_PATH}
 COPY --from=s6-base ${ARG_S6_DOWNLOAD_PATH} /
 COPY docker/rootfs /
 
-RUN addgroup --gid 1000 --system ${ARG_APP_USER} && \
-    adduser --uid 1000 --system --gid 1000 --no-create-home ${ARG_APP_USER}
-
 WORKDIR /app
 
-COPY --chown=${ARG_APP_USER}:${ARG_APP_USER} ./cappuccino ./cappuccino
-COPY --chown=${ARG_APP_USER}:${ARG_APP_USER} ./alembic ./alembic
-COPY --chown=${ARG_APP_USER}:${ARG_APP_USER} ./alembic.ini ./
+COPY ./cappuccino ./cappuccino
+COPY ./alembic ./alembic
+COPY ./alembic.ini ./
 
 ENV PYTHONPATH="." \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
-    SETTINGS_FILE="/data/config.ini" \
-    SETTINGS_SOURCE_FILE="/config/config.ini" \
-    APP_USER=${ARG_APP_USER}
+    S6_READ_ONLY_ROOT=1 \
+    SETTINGS_FILE="/run/config.ini" \
+    SETTINGS_SOURCE_FILE="/config/config.ini"
 
-VOLUME ["/config", "/data"]
+VOLUME ["/config"]
 EXPOSE 1337
 
 ENTRYPOINT ["/init"]

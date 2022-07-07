@@ -2,4 +2,4 @@
 set -e
 
 cd /app || exit 1
-s6-setuidgid "$APP_USER" irc3 "$SETTINGS_FILE"
+s6-setuidgid "$PUID:$PGID" irc3 "$SETTINGS_FILE"
