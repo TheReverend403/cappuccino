@@ -49,12 +49,12 @@ def main():
     env = Environment(
         loader=FileSystemLoader(source_file.parent), autoescape=select_autoescape()
     )
-    template = env.get_template(source_file.name)
-    rendered = template.render(
-        **{key: val for (key, val) in os.environ.items() if key.startswith("CFG_")}
-    )
 
     try:
+        template = env.get_template(source_file.name)
+        rendered = template.render(
+            **{key: val for (key, val) in os.environ.items() if key.startswith("CFG_")}
+        )
         destination_file.write_text(rendered)
         log.info("Done.")
     except FileNotFoundError as exc:
