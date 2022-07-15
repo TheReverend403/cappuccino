@@ -1,5 +1,5 @@
 #!/command/with-contenv sh
-set -e
+set -eu
 
 cd /app || exit 1
 s6-setuidgid "$PUID:$PGID" alembic upgrade head
