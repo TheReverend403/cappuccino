@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cappuccino"
-version = "1.9.0"
+version = "1.9.1"
 description = "Just another IRC bot."
 authors = ["Lee Watson <me@lwatson.dev>"]
 license = "GPL-3.0"
@@ -23,12 +23,16 @@ html5lib = "^1.1"
 ircstyle = "^0.1.1"
 pyyaml = "^6.0.0"
 influxdb-client = "^1.26.0"
+Jinja2 = { version = "^3.1.0", optional = true }
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
 pre-commit = "^2.16.0"
 flake8 = "^4.0.1"
 isort = "^5.9.1"
+
+[tool.poetry.extras]
+docker = ["jinja2"]
 
 [tool.isort]
 profile = "black"

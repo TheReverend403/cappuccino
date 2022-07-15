@@ -63,8 +63,7 @@ RUN curl -sSL https://install.python-poetry.org | python -
 WORKDIR ${ARG_PYSETUP_PATH}
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry install --no-dev && \
-    pip install jinja-cli
+RUN poetry install --no-dev -E docker
 
 
 ## Production image
@@ -76,10 +75,10 @@ RUN apt-get update && \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ARG ARG_S6_DOWNLOAD_PATH
-ARG ARG_PYSETUP_PATH
+ARG ARG_VENV_PATH
 
-COPY --from=builder-base ${ARG_VENV_PATH} ${ARG_VENV_PATH}
 COPY --from=s6-base ${ARG_S6_DOWNLOAD_PATH} /
+COPY --from=builder-base ${ARG_VENV_PATH} ${ARG_VENV_PATH}
 COPY docker/rootfs /
 
 WORKDIR /app
