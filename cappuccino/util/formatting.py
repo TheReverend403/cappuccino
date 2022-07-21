@@ -12,7 +12,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Optional
 
 import ircstyle
 
@@ -39,8 +38,8 @@ class Color:
 
 def style(
     text,
-    fg: Optional[Color] = None,
-    bg: Optional[Color] = None,
+    fg: Color | None = None,
+    bg: Color | None = None,
     bold=False,
     italics=False,
     underline=False,

@@ -51,7 +51,7 @@ class UserDB(Plugin):
             bottle_thread = threading.Thread(
                 target=bottle.run,
                 kwargs={"quiet": True, "host": host, "port": port},
-                name="{0} HTTP server".format(__name__),
+                name=f"{__name__} HTTP server",
                 daemon=True,
             )
             bottle_thread.start()

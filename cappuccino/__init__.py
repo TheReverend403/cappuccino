@@ -45,7 +45,7 @@ DEFAULT_LOG_CONFIG = {
 
 def _setup_logging():
     try:
-        with open("logging.yml", "r") as fd:
+        with open("logging.yml") as fd:
             dictConfig(yaml.safe_load(fd))
             logging.getLogger(__name__).info("Using logging.yml for logging config.")
 
@@ -62,7 +62,7 @@ def _setup_logging():
 _setup_logging()
 
 
-class Plugin(object):
+class Plugin:
     def __init__(self, bot):
         plugin_module = self.__class__.__module__
         self.bot = bot

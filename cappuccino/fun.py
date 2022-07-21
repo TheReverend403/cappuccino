@@ -73,12 +73,12 @@ class Fun(Plugin):
         options = list(
             filter(
                 None,
-                set(
+                {
                     option.replace(delimiter, "").strip()
                     for delimiter in _DECIDE_DELIMITERS
                     for option in options
                     if option not in _DECIDE_DELIMITERS
-                ),
+                },
             )
         )
 

@@ -20,7 +20,7 @@ from sqlalchemy import MetaData, create_engine
 logger = logging.getLogger(__name__)
 
 
-class Database(object):
+class Database:
     instance = None
     meta = None
 
