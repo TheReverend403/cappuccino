@@ -4,7 +4,7 @@ ARG ARG_S6_OVERLAY_VERSION=3.1.1.2
 ARG ARG_S6_DOWNLOAD_PATH="/opt/s6"
 ARG ARG_POETRY_HOME="/opt/poetry"
 ARG ARG_PYSETUP_PATH="/opt/pysetup"
-ARG ARG_VENV_PATH="/opt/pysetup/.venv"
+ARG ARG_VENV_PATH="${ARG_PYSETUP_PATH}/.venv"
 
 
 ## Base
