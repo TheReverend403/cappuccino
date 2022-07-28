@@ -37,7 +37,7 @@ docker = ["jinja2"]
 
 [tool.isort]
 profile = "black"
-src_paths = ["cappuccino"]
+src_paths = ["cappuccino", "docker"]
 
 [build-system]
 requires = ["poetry>=1.0"]
