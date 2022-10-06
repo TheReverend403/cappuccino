@@ -1,5 +1,5 @@
 ARG ARG_PYTHON_VERSION=3.10
-ARG ARG_POETRY_VERSION=1.1.14
+ARG ARG_POETRY_VERSION=1.2.1
 ARG ARG_S6_OVERLAY_VERSION=3.1.1.2
 ARG ARG_S6_DOWNLOAD_PATH="/opt/s6"
 ARG ARG_POETRY_HOME="/opt/poetry"
@@ -62,7 +62,7 @@ RUN curl -sSL https://install.python-poetry.org | python -
 WORKDIR ${ARG_PYSETUP_PATH}
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry install --no-dev -E docker
+RUN poetry install --only main,docker
 
 
 ## Production image

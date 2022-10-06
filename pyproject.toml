@@ -23,22 +23,24 @@ html5lib = "^1.1"
 ircstyle = "^0.1.1"
 pyyaml = "^6.0.0"
 influxdb-client = "^1.26.0"
-Jinja2 = { version = "^3.1.0", optional = true }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^22.1.0"
 pre-commit = "^2.16.0"
 flake8 = "^4.0.1"
 isort = "^5.9.1"
 pyupgrade = "^2.37.2"
 
-[tool.poetry.extras]
-docker = ["jinja2"]
+[tool.poetry.group.docker]
+optional = true
+
+[tool.poetry.group.docker.dependencies]
+Jinja2 = "^3.1.0"
 
 [tool.isort]
 profile = "black"
 src_paths = ["cappuccino", "docker"]
 
 [build-system]
-requires = ["poetry>=1.0"]
+requires = ["poetry-core>=1.2.0"]
 build-backend = "poetry.masonry.api"
