@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "cappuccino"
-version = "1.11.0"
+version = "1.11.1"
 description = "Just another IRC bot."
 authors = ["Lee Watson <me@lwatson.dev>"]
 license = "GPL-3.0"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 irc3 = "^1.1.0"
 markovify = "^0.9.0"
 pylast = "^5.0.0"
