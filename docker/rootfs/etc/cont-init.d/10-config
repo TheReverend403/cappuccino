@@ -1,4 +1,0 @@
-#!/command/with-contenv sh
-set -eu
-
-conftemplate "$SETTINGS_SOURCE_FILE" "$SETTINGS_FILE"

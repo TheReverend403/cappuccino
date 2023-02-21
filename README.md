@@ -15,6 +15,7 @@ A set of <a href="https://github.com/gawel/irc3">irc3</a> plugins providing vari
 ## Installation
 
 Requirements:
+
 * PostgreSQL
 * Python 3.10
 * [Poetry](https://python-poetry.org)
@@ -28,6 +29,7 @@ poetry run irc3 config.ini
 ```
 
 ## Developers
+
 [pre-commit](https://pre-commit.com/) is used for formatting and PEP 8 compliance checks.
 
 These checks must pass in order to make a commit to `main`. To install and use the hooks, run the following commands:
