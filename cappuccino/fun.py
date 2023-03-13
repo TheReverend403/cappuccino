@@ -110,7 +110,7 @@ class Fun(Plugin):
         return f"{mask.nick}: {random.choice(_EIGHTBALL_RESPONSES)}"
 
     @irc3.event(
-        r'.*PRIVMSG (?P<target>#\S+) :(?i)\s*\[+(?P<data>[A-Za-z0-9-_ \'"!]+)\]+$'
+        r'(?i).*PRIVMSG (?P<target>#\S+) :\s*\[+(?P<data>[A-Za-z0-9-_ \'"!]+)\]+$'
     )
     def intensify(self, target, data):
         data = data.strip().upper()
@@ -120,30 +120,30 @@ class Fun(Plugin):
         if data and len(data) <= 32:
             self.bot.privmsg(target, style(f"[{data}]", bold=True))
 
-    @irc3.event(r".*PRIVMSG (?P<target>#\S+) :(?i)\s*wew$")
+    @irc3.event(r"(?i).*PRIVMSG (?P<target>#\S+) :\s*wew$")
     def wew(self, target):
         self._reply(target, style("w e w l a d", bold=True))
 
-    @irc3.event(r".*PRIVMSG (?P<target>#\S+) :(?i)\s*ayy+$")
+    @irc3.event(r"(?i).*PRIVMSG (?P<target>#\S+) :\s*ayy+$")
     def ayy(self, target):
         self._reply(target, "lmao")
 
-    @irc3.event(r".*PRIVMSG (?P<target>#\S+) :(?i)\s*same$")
+    @irc3.event(r"(?i).*PRIVMSG (?P<target>#\S+) :\s*same$")
     def same(self, target):
         self._reply(target, style("same", bold=True))
 
-    @irc3.event(r".*PRIVMSG (?P<target>\S+) :(?i)\s*benis$")
+    @irc3.event(r"(?i).*PRIVMSG (?P<target>\S+) :\s*benis$")
     def benis(self, target):
         self._reply(target, style("3===D", bold=True))
 
     @irc3.event(
-        r"^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*homo.*"  # noqa: E501
+        r"(?i)^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :.*homo.*"  # noqa: E501
     )
     def homo(self, target, mask):
         self._reply(target, f"hahahaha {mask.nick} said homo xDDD")
 
     @irc3.event(
-        r"^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :(?i).*loli.*"  # noqa: E501
+        r"(?i)^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :.*loli.*"  # noqa: E501
     )
     def loli(self, target, mask):
         link = style("https://pedo.help", fg=Color.BLUE)
@@ -167,14 +167,14 @@ class Fun(Plugin):
             return
 
     @irc3.event(
-        r":TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#(?i)DontJoinItsATrap) :.*PART THE CHANNEL.*"  # noqa: E501
+        r"(?i):TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#DontJoinItsATrap) :.*PART THE CHANNEL.*"  # noqa: E501
     )
     def antitrap(self, target):
         self.bot.part(target)
         self.logger.info(f"Parted {target} (antitrap)")
 
     @irc3.event(
-        r":(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(?i)(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b"  # noqa: E501
+        r"(?i):(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b"  # noqa: E501
     )
     def gravity(self, mask, target):
         self._reply(

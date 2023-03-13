@@ -85,7 +85,7 @@ class UrlInfo(Plugin):
         )
 
     @irc3.event(
-        rf":(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?iu)(?P<data>.*{_url_regex.pattern}).*"  # noqa: E501
+        rf"(?iu):(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?P<data>.*{_url_regex.pattern}).*"  # noqa: E501
     )
     def on_url(self, mask, target, data):
         if (
