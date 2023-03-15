@@ -125,10 +125,8 @@ class Ai(Plugin):
         if not IrcString(channel).is_channel:
             return False
 
-        select_stmt = (
-            select([self._channels.c.status])
-            .join(self._corpus)
-            .where(func.lower(self._corpus.c.channel) == channel.lower())
+        select_stmt = select([self._channels.c.status]).where(
+            func.lower(self._corpus.c.channel) == channel.lower()
         )
         result = self._db.execute(select_stmt).scalar()
 
