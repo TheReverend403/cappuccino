@@ -17,7 +17,7 @@ A set of <a href="https://github.com/gawel/irc3">irc3</a> plugins providing vari
 Requirements:
 
 * PostgreSQL
-* Python 3.10
+* Python 3.11
 * [Poetry](https://python-poetry.org)
 
 ```sh
