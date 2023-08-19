@@ -132,7 +132,7 @@ class UrlInfo(Plugin):
                         pass
 
                     error = style(ex, bold=True)
-                    if type(ex) == requests.RequestException:
+                    if isinstance(ex, requests.RequestException):
                         if ex.response is not None and ex.response.reason is not None:
                             status_code = style(ex.response.status_code, bold=True)
                             error = style(ex.response.reason, bold=True)
