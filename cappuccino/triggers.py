@@ -116,7 +116,7 @@ class Triggers(Plugin):
         if mask.nick == self.bot.nick or event == "NOTICE":
             return
 
-        captured_triggers = re.findall(r"\?([A-Za-z]+)", data)
+        captured_triggers = re.findall(r"\?([A-Za-z0-9]+)", data)
         if not captured_triggers:
             return
 
