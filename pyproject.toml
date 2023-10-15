@@ -40,7 +40,7 @@ target-version = "py311"
 force-exclude = true
 
 extend-select = [
-    "B", "I", "U", "C90", "W",
+    "B", "I", "UP", "C90", "W",
     "YTT", "PTH", "A", "RET", "SIM",
     "FIX", "ARG", "ERA", "Q", "T20",
     "RUF", "S", "RSE", "BLE", "N"
