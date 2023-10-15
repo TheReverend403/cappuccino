@@ -110,6 +110,7 @@ class Triggers(Plugin):
                 return f"Available triggers for {target}: {trigger_list}"
 
             return f"No triggers available for {target}"
+        return None
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def on_privmsg(self, target, event, mask, data):

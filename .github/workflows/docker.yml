@@ -3,20 +3,23 @@ name: Create and publish a Docker image
 on:
   push:
     branches:
-      - 'main'
+      - "main"
     tags:
-      - '*'
+      - "*"
   pull_request:
     branches:
-      - 'main'
+      - "main"
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
   build-and-push-image:
     runs-on: ubuntu-latest
+    needs: [lint]
     permissions:
       contents: read
       packages: write

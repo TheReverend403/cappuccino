@@ -1,13 +1,11 @@
 name: Lint with pre-commit
-
-on: [pull_request, push]
-
+on: [workflow_call]
 jobs:
-  quality:
+  lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ["3.11"]
     steps:
       - uses: actions/checkout@v3
 

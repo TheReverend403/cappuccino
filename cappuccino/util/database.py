@@ -36,6 +36,6 @@ class Database:
     def __getattr__(self, name):
         return getattr(self.instance.engine, name) or getattr(self.instance, name)
 
-    class __Singleton:
+    class __Singleton:  # noqa: N801
         def __init__(self, engine):
             self.engine = engine

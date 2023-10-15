@@ -25,7 +25,7 @@ from cappuccino import Plugin
 def _before_send(event, hint):
     if "exc_info" in hint:
         exc_type, exc_value, tb = hint["exc_info"]
-        if isinstance(exc_value, (RequestException, TimeoutError)):
+        if isinstance(exc_value, RequestException | TimeoutError):
             return None
 
     return event

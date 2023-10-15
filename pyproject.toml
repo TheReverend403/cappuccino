@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cappuccino"
-version = "1.11.1"
+version = "1.12.0"
 description = "Just another IRC bot."
 authors = ["Lee Watson <me@lwatson.dev>"]
 license = "GPL-3.0"
@@ -25,11 +25,9 @@ pyyaml = "^6.0.0"
 influxdb-client = "^1.26.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.1.0"
-pre-commit = "^2.16.0"
-flake8 = "^6.0.0"
-isort = "^5.9.1"
-pyupgrade = "^3.3.1"
+black = "^23.0.0"
+pre-commit = "^3.0.0"
+ruff = "^0.0.292"
 
 [tool.poetry.group.docker]
 optional = true
@@ -37,9 +35,30 @@ optional = true
 [tool.poetry.group.docker.dependencies]
 Jinja2 = "^3.1.0"
 
-[tool.isort]
-profile = "black"
-src_paths = ["cappuccino", "docker"]
+[tool.ruff]
+target-version = "py311"
+force-exclude = true
+
+extend-select = [
+    "B", "I", "U", "C90", "W",
+    "YTT", "PTH", "A", "RET", "SIM",
+    "FIX", "ARG", "ERA", "Q", "T20",
+    "RUF", "S", "RSE", "BLE", "N"
+]
+
+ignore = [
+    "RUF012",
+    "ARG002",
+    "RET502",
+    "N818",
+]
+
+extend-exclude = [
+    "alembic/",
+]
+
+[tool.ruff.extend-per-file-ignores]
+"cappuccino/fun.py" = ["S311"]
 
 [build-system]
 requires = ["poetry-core>=1.3.0"]

@@ -31,7 +31,9 @@ class Core(Plugin):
 
         try:
             self.bot.version = (
-                subprocess.check_output(["git", "describe"]).decode("UTF-8").strip()
+                subprocess.check_output(["/usr/bin/git", "describe"])  # noqa: S603
+                .decode("UTF-8")
+                .strip()
             )
         except FileNotFoundError:
             self.bot.version = "v???"
@@ -40,14 +42,16 @@ class Core(Plugin):
 
         # Accept youtube consent cookies automatically
         cookiejar = RequestsCookieJar()
-        cookievalue = f"YES+srp.gws-20210512-0-RC3.en+FX+{randint(1, 1000)}"
+        cookievalue = (
+            f"YES+srp.gws-20210512-0-RC3.en+FX+{randint(1, 1000)}"  # noqa: S311
+        )
         cookiejar.set("CONSENT", cookievalue)
 
         self.bot.requests = Session()
         self.bot.requests.cookies = cookiejar
         self.bot.requests.headers.update(
             {
-                "User-Agent": "cappuccino (https://github.com/TheReverend403/cappuccino)",  # noqa: E501
+                "User-Agent": "cappuccino (https://github.com/TheReverend403/cappuccino)",
                 "Accept-Language": "en-GB,en-US,en;q=0.5",
                 "timeout": "5",
                 "allow_redirects": "true",

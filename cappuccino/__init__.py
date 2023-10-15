@@ -15,6 +15,7 @@
 
 import logging
 from logging.config import dictConfig
+from pathlib import Path
 
 import yaml
 
@@ -45,7 +46,7 @@ DEFAULT_LOG_CONFIG = {
 
 def _setup_logging():
     try:
-        with open("logging.yml") as fd:
+        with Path("logging.yml").open() as fd:
             dictConfig(yaml.safe_load(fd))
             logging.getLogger(__name__).info("Using logging.yml for logging config.")
 
@@ -72,7 +73,7 @@ class Plugin:
             # I have no idea where these are coming from but whatever.
             weird_keys = ["#", "hash"]
             for key in weird_keys:
-                if key in self.config.keys():
+                if key in self.config:
                     self.config.pop(key)
 
             self.logger.debug(f"Configuration for {plugin_module}: {self.config}")

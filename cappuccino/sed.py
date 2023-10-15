@@ -31,7 +31,10 @@ def _sed_wrapper(text: str, command: str) -> str:
     arguments = ["sed", "--sandbox", "--regexp-extended", command]
     sed_input = text.strip().encode("UTF-8")
     sed = subprocess.run(
-        arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, input=sed_input
+        arguments,  # noqa: S603
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        input=sed_input,
     )
     stream = sed.stdout.decode("UTF-8").strip()
 

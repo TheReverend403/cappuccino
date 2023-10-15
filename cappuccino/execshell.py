@@ -27,12 +27,12 @@ def _is_multiline_string(text: str):
     return text.count("\n") > 1
 
 
-def _exec_wrapper(cmd: dict, input_data: str = None) -> str:
+def _exec_wrapper(cmd: dict, input_data: str | None = None) -> str:
     if input_data:
         input_data = input_data.encode("UTF-8")
 
     proc = subprocess.run(
-        cmd,
+        cmd,  # noqa: S603
         input=input_data,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -48,7 +48,7 @@ class ExecShell(Plugin):
     @command(
         permission="admin", show_in_help_list=False, options_first=True, use_shlex=True
     )
-    def exec(self, mask, target, args):
+    def exec(self, mask, target, args):  # noqa: A003
         """Run a system command and upload the output to ix.io.
 
         %%exec <command>...

@@ -27,6 +27,8 @@ try:
 except ImportError:
     import json
 
+import contextlib
+
 import irc3
 
 
@@ -109,14 +111,12 @@ class UserDB(Plugin):
                 if column == "last_seen":
                     value = value.timestamp()
 
-                try:
+                with contextlib.suppress(TypeError, AttributeError):
                     value = (
                         [unstyle(val) for val in value]
-                        if type(value) is list
+                        if isinstance(value, list)
                         else unstyle(value)
                     )
-                except (TypeError, AttributeError):
-                    pass
 
                 user[column] = value
             data.append(user)

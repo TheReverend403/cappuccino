@@ -43,10 +43,10 @@ class Influx(Plugin):
     def _record_event(
         self,
         event: str,
-        data: str = None,
+        data: str | None = None,
         user: IrcString = None,
         channel: IrcString = None,
-        target: str = None,
+        target: str | None = None,
     ):
         if not channel or not channel.is_channel or not user or user.is_server:
             return

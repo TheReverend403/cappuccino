@@ -15,6 +15,7 @@
 
 import cgi
 import concurrent
+import contextlib
 import html
 import ipaddress
 import random
@@ -87,7 +88,7 @@ class UrlInfo(Plugin):
     @irc3.event(
         rf"(?iu):(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?P<data>.*{_url_regex.pattern}).*"  # noqa: E501
     )
-    def on_url(self, mask, target, data):
+    def on_url(self, mask, target, data):  # noqa: C901
         if (
             mask.nick in self._ignore_nicks
             or data.startswith(self.bot.config.cmd)
@@ -126,10 +127,8 @@ class UrlInfo(Plugin):
                 except (socket.gaierror, ValueError, requests.RequestException) as ex:
                     hostname = style(hostname, fg=Color.RED)
 
-                    try:
+                    with contextlib.suppress(AttributeError, IndexError):
                         ex = ex.args[0].reason
-                    except (AttributeError, IndexError):
-                        pass
 
                     error = style(ex, bold=True)
                     if isinstance(ex, requests.RequestException):
@@ -138,8 +137,7 @@ class UrlInfo(Plugin):
                             error = style(ex.response.reason, bold=True)
                             messages.append(f"[ {hostname} ] {status_code} {error}")
                         return
-                    else:
-                        messages.append(f"[ {hostname} ] {error}")
+                    messages.append(f"[ {hostname} ] {error}")
                 # no exception
                 else:
                     hostname = style(hostname, fg=Color.GREEN)
@@ -176,14 +174,14 @@ class UrlInfo(Plugin):
 
         return content.getvalue()
 
-    def _process_url(self, url: str):
+    def _process_url(self, url: str):  # noqa: C901
         urlp = urlparse(url)
         if urlp.netloc.lower().removeprefix("www.") == "twitter.com":
             urlp = urlp._replace(netloc="nitter.net")
         url = urlp.geturl()
 
         hostname = urlp.hostname
-        for (_, _, _, _, sockaddr) in socket.getaddrinfo(hostname, None):
+        for _, _, _, _, sockaddr in socket.getaddrinfo(hostname, None):
             ip = ipaddress.ip_address(sockaddr[0])
             if not ip.is_global:
                 raise InvalidIPAddress(
@@ -228,10 +226,8 @@ class UrlInfo(Plugin):
                 if title_tag := soup.find("meta", property="og:title", content=True):
                     title = title_tag.get("content")
                 else:
-                    try:
+                    with contextlib.suppress(AttributeError):
                         title = soup.title.string
-                    except AttributeError:
-                        pass
 
                 site_name = None
                 if site_name_tag := soup.find(

@@ -126,5 +126,4 @@ class LastFM(Plugin):
             pylast.MalformedResponseError,
             pylast.WSError,
         ) as err:
-            error = style(err, bold=True)
-            return error
+            return style(err, bold=True)

@@ -35,8 +35,7 @@ def parse_args() -> Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
     parser.add_argument("destination", type=Path)
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main():

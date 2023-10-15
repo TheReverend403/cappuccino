@@ -96,7 +96,7 @@ class Ai(Plugin):
         except IntegrityError:
             pass
 
-    def _get_lines(self, channel: str = None) -> list:
+    def _get_lines(self, channel: str | None = None) -> list:
         select_stmt = select([self._corpus.c.line])
         if channel:
             select_stmt = (
@@ -112,7 +112,7 @@ class Ai(Plugin):
         lines = [result.line for result in self._db.execute(select_stmt)]
         return lines if len(lines) > 0 else None
 
-    def _line_count(self, channel: str = None) -> int:
+    def _line_count(self, channel: str | None = None) -> int:
         select_stmt = select([func.count(self._corpus.c.line)])
         if channel:
             select_stmt = select_stmt.where(
@@ -220,7 +220,10 @@ class Ai(Plugin):
 
         if not generated_reply:
             self.bot.privmsg(
-                target, random.choice(["What?", "Hmm?", "Yes?", "What do you want?"])
+                target,
+                random.choice(  # noqa: S311
+                    ["What?", "Hmm?", "Yes?", "What do you want?"]
+                ),
             )
             return
 

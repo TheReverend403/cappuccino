@@ -42,7 +42,7 @@ class Rice(Plugin):
         super().__init__(bot)
         self._max_user_entries: int = self.config.get("max_user_entries", 6)
 
-    def _generic_db(self, mask, target, args):
+    def _generic_db(self, mask, target, args):  # noqa: C901
         # Get name of command _generic_db is being called from.
         category = inspect.stack()[1][3]
         category = category if category.endswith("s") else category + "s"
