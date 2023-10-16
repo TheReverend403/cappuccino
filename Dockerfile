@@ -38,7 +38,7 @@ ARG PYSETUP_PATH
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN --mount=type=cache,target=/root/.cache \
-    curl -sSL https://install.python-poetry.org | python -
+    curl -sSL https://install.python-poetry.org | python3 -
 
 WORKDIR ${PYSETUP_PATH}
 COPY poetry.lock pyproject.toml ./
