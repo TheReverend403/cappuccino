@@ -1,26 +1,26 @@
-ARG ARG_PYTHON_VERSION=3.11
-ARG ARG_POETRY_VERSION=1.5.1
-ARG ARG_POETRY_HOME="/opt/poetry"
-ARG ARG_PYSETUP_PATH="/opt/pysetup"
-ARG ARG_VENV_PATH="${ARG_PYSETUP_PATH}/.venv"
+ARG PYTHON_VERSION=3.11
+ARG POETRY_VERSION=""
+ARG POETRY_HOME="/opt/poetry"
+ARG PYSETUP_PATH="/opt/pysetup"
+ARG VENV_PATH="${PYSETUP_PATH}/.venv"
 
 
 ## Base
-FROM python:${ARG_PYTHON_VERSION}-slim as python-base
+FROM python:${PYTHON_VERSION}-slim as python-base
 
-ARG ARG_POETRY_HOME
-ARG ARG_VENV_PATH
+ARG POETRY_HOME
+ARG VENV_PATH
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_HOME=${ARG_POETRY_HOME} \
+    POETRY_HOME=${POETRY_HOME} \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_NO_INTERACTION=1 \
-    POETRY_VERSION=${ARG_POETRY_VERSION} \
-    PATH="${ARG_VENV_PATH}/bin:${ARG_POETRY_HOME}/bin:$PATH"
+    POETRY_VERSION=${POETRY_VERSION} \
+    PATH="${VENV_PATH}/bin:${POETRY_HOME}/bin:$PATH"
 
 
 ## Python builder
@@ -31,18 +31,20 @@ RUN apt-get update && \
     curl \
     build-essential \
     libpq-dev \
-  && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ARG ARG_POETRY_VERSION
-ARG ARG_PYSETUP_PATH
+ARG POETRY_VERSION
+ARG PYSETUP_PATH
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN curl -sSL https://install.python-poetry.org | python -
+RUN --mount=type=cache,target=/root/.cache \
+    curl -sSL https://install.python-poetry.org | python -
 
-WORKDIR ${ARG_PYSETUP_PATH}
+WORKDIR ${PYSETUP_PATH}
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry install --only main,docker
+RUN --mount=type=cache,target=/root/.cache \
+    poetry install --only main,docker
 
 
 ## Production image
@@ -51,11 +53,11 @@ FROM python-base as production
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
     libpq5 \
-  && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ARG ARG_VENV_PATH
+ARG VENV_PATH
 
-COPY --from=builder-base ${ARG_VENV_PATH} ${ARG_VENV_PATH}
+COPY --from=builder-base ${VENV_PATH} ${VENV_PATH}
 COPY docker/rootfs /
 
 WORKDIR /app
