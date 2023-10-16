@@ -40,11 +40,12 @@ Jinja2 = "^3.1.0"
 target-version = "py311"
 force-exclude = true
 
-extend-select = [
+select = [
     "B", "I", "UP", "C90", "W",
     "YTT", "PTH", "A", "RET", "SIM",
     "FIX", "ARG", "ERA", "Q", "T20",
-    "RUF", "S", "RSE", "BLE", "N"
+    "RUF", "S", "RSE", "BLE", "N",
+    "E", "F",
 ]
 
 ignore = [
