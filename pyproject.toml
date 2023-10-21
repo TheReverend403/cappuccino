@@ -43,14 +43,13 @@ force-exclude = true
 select = [
     "B", "I", "UP", "C90", "W",
     "YTT", "PTH", "A", "RET", "SIM",
-    "FIX", "ARG", "ERA", "Q", "T20",
-    "RUF", "S", "RSE", "BLE", "N",
-    "E", "F",
+    "FIX", "ERA", "Q", "T20", "RUF",
+    "S", "RSE", "BLE", "N", "E",
+    "F",
 ]
 
 ignore = [
     "RUF012",
-    "ARG002",
     "RET502",
     "N818",
 ]
