@@ -1,5 +1,7 @@
 name: Lint with pre-commit
 on: [workflow_call]
+env:
+  RUFF_OUTPUT_FORMAT: "github"
 jobs:
   lint:
     runs-on: ubuntu-latest
