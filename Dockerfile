@@ -26,7 +26,8 @@ ENV PYTHONUNBUFFERED=1 \
 ## Python builder
 FROM python-base as builder-base
 
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && \
     apt-get install --no-install-recommends -y \
     curl \
     build-essential \
@@ -50,7 +51,8 @@ RUN --mount=type=cache,target=/root/.cache \
 ## Production image
 FROM python-base as production
 
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && \
     apt-get install --no-install-recommends -y \
     libpq5 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
