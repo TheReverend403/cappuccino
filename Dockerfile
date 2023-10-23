@@ -32,7 +32,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     curl \
     build-essential \
     libpq-dev \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
 ARG POETRY_VERSION
 ARG PYSETUP_PATH
@@ -55,7 +55,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && \
     apt-get install --no-install-recommends -y \
     libpq5 \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
 ARG VENV_PATH
 
