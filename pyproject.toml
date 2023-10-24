@@ -78,7 +78,6 @@ extend-ignore = [
 ]
 
 [tool.ruff.extend-per-file-ignores]
-"cappuccino/fun.py" = ["S311"]
 "alembic/*" = ["ERA001"]
 
 [build-system]

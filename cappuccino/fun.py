@@ -56,7 +56,7 @@ class Fun(Plugin):
 
     def _reply(self, target: str, message: str):
         # Only reply a certain percentage of the time. AKA rate-limiting. Sort of.
-        if random.random() <= _RANDOM_CHANCE:
+        if random.random() <= _RANDOM_CHANCE:  # noqa: S311
             self.bot.privmsg(target, message)
 
     @command(permission="view", use_shlex=False)
@@ -98,7 +98,7 @@ class Fun(Plugin):
         if options_length == 1:
             options = ["Yes.", "Maybe.", "No."]
 
-        return f"{mask.nick}: {random.choice(options)}"
+        return f"{mask.nick}: {random.choice(options)}"  # noqa: S311
 
     @command(permission="view", name="8ball")
     def eightball(self, mask, target, args):
@@ -107,7 +107,7 @@ class Fun(Plugin):
         %%8ball <query>...
         """
 
-        return f"{mask.nick}: {random.choice(_EIGHTBALL_RESPONSES)}"
+        return f"{mask.nick}: {random.choice(_EIGHTBALL_RESPONSES)}"  # noqa: S311
 
     @irc3.event(
         r'(?i).*PRIVMSG (?P<target>#\S+) :\s*\[+(?P<data>[A-Za-z0-9-_ \'"!]+)\]+$'
