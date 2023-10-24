@@ -1,3 +1,4 @@
+ARG DEBIAN_VERSION=bookworm
 ARG PYTHON_VERSION=3.11
 ARG POETRY_VERSION=""
 ARG POETRY_HOME="/opt/poetry"
@@ -6,7 +7,7 @@ ARG VENV_PATH="${PYSETUP_PATH}/.venv"
 
 
 ## Base
-FROM python:${PYTHON_VERSION}-slim as python-base
+FROM python:${PYTHON_VERSION}-slim-${DEBIAN_VERSION} as python-base
 
 ARG POETRY_HOME
 ARG VENV_PATH
