@@ -113,11 +113,12 @@ class Fun(Plugin):
         r'(?i).*PRIVMSG (?P<target>#\S+) :\s*\[+(?P<data>[A-Za-z0-9-_ \'"!]+)\]+$'
     )
     def intensify(self, target, data):
+        max_length = 32
         data = data.strip().upper()
         if not data.endswith("INTENSIFIES"):
             data += " INTENSIFIES"
 
-        if data and len(data) <= 32:
+        if data and len(data) <= max_length:
             self.bot.privmsg(target, style(f"[{data}]", bold=True))
 
     @irc3.event(r"(?i).*PRIVMSG (?P<target>#\S+) :\s*wew$")
@@ -137,13 +138,13 @@ class Fun(Plugin):
         self._reply(target, style("3===D", bold=True))
 
     @irc3.event(
-        r"(?i)^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :.*homo.*"  # noqa: E501
+        r"(?i)^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :.*homo.*"
     )
     def homo(self, target, mask):
         self._reply(target, f"hahahaha {mask.nick} said homo xDDD")
 
     @irc3.event(
-        r"(?i)^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :.*loli.*"  # noqa: E501
+        r"(?i)^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :.*loli.*"
     )
     def loli(self, target, mask):
         link = style("https://pedo.help", fg=Color.BLUE)
@@ -167,22 +168,19 @@ class Fun(Plugin):
             return
 
     @irc3.event(
-        r"(?i):TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#DontJoinItsATrap) :.*PART THE CHANNEL.*"  # noqa: E501
+        r"(?i):TrapBot!\S+@\S+ .*PRIVMSG (?P<target>#DontJoinItsATrap) :.*PART THE CHANNEL.*"
     )
     def antitrap(self, target):
         self.bot.part(target)
         self.logger.info(f"Parted {target} (antitrap)")
 
     @irc3.event(
-        r"(?i):(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b"  # noqa: E501
+        r"(?i):(?P<mask>\S+!\S+@\S+) .*PRIVMSG (?P<target>#\S+) :.*(wh?(aa*(z|d)*|u)t?(\'?| i)s? ?up|\'?sup)\b"
     )
     def gravity(self, mask, target):
         self._reply(
             target,
-            (
-                f"{mask.nick}:"
-                f' "Up" is a direction away from the center of gravity of a celestial object.'  # noqa: E501
-            ),
+            f'{mask.nick}: "Up" is a direction away from the center of gravity of a celestial object.',
         )
 
     @command(permission="view", aliases=["whatthecommit"])

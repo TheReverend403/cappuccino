@@ -37,6 +37,7 @@ def _exec_wrapper(cmd: dict, input_data: str | None = None) -> str:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         timeout=5,
+        check=False,
     )
     return proc.stdout.decode("UTF-8").strip()
 

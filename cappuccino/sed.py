@@ -35,6 +35,7 @@ def _sed_wrapper(text: str, command: str) -> str:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         input=sed_input,
+        check=False,
     )
     stream = sed.stdout.decode("UTF-8").strip()
 
@@ -106,6 +107,7 @@ class Sed(Plugin):
             # Prevent spam.
             max_extra_chars = 32
             max_len = len(message) + max_extra_chars
+            max_len_hard = 256
             error_msg = (
                 "Replacement would be too long."
                 " I won't post it to prevent potential spam."
@@ -113,7 +115,7 @@ class Sed(Plugin):
             if (
                 len(new_message) > len(error_msg)
                 and len(new_message) > max_len
-                or len(new_message) > 256
+                or len(new_message) > max_len_hard
             ):
                 self.bot.notice(mask.nick, style(error_msg, fg=Color.RED))
                 return

@@ -38,7 +38,7 @@ _URL_CHECKER = re.compile(r".*https?://.*", re.IGNORECASE | re.UNICODE)
 
 def _should_ignore_message(line):
     if not line:
-        return
+        return None
 
     return (
         _CMD_PATTERN.match(line)
@@ -74,7 +74,7 @@ class Ai(Plugin):
             self.logger.warning(
                 "Not enough lines in corpus for markovify to generate a decent reply."
             )
-            return
+            return None
 
         self.logger.debug(f"Queried {len(corpus)} rows in {precisedelta(end - start)}.")
 
