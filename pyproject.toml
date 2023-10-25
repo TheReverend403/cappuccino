@@ -79,6 +79,9 @@ extend-ignore = [
 [tool.ruff.extend-per-file-ignores]
 "alembic/*" = ["ERA001"]
 
+[tool.ruff.format]
+line-ending = "lf"
+
 [build-system]
 requires = ["poetry-core>=1.3.0"]
 build-backend = "poetry.masonry.api"
