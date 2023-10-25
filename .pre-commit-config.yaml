@@ -31,14 +31,14 @@ repos:
         language: system
         types: [shell]
 
-      - id: ruff
-        name: ruff
-        entry: poetry run ruff check --fix --exit-non-zero-on-fix
-        language: system
-        types: [python]
-
       - id: ruff-format
         name: ruff-format
         entry: poetry run ruff format --force-exclude --check
+        language: system
+        types: [python]
+
+      - id: ruff-check
+        name: ruff-check
+        entry: poetry run ruff check --fix --exit-non-zero-on-fix
         language: system
         types: [python]
