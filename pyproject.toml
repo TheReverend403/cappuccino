@@ -71,7 +71,6 @@ ignore = [
 
 extend-ignore = [
     "RUF012",
-    "RET502",
     "N818",
     "PLR09",
     "PLW2901",
