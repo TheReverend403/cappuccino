@@ -192,7 +192,7 @@ class Fun(Plugin):
 
         try:
             with self.bot.requests.get(
-                "http://whatthecommit.com/index.txt"
+                "https://whatthecommit.com/index.txt"
             ) as response:
                 yield f'git commit -m "{response.text.strip()}"'
         except RequestException:
