@@ -39,11 +39,11 @@ class ResponseBodyTooLarge(requests.RequestException):
     pass
 
 
-class InvalidIPAddress(Exception):
+class InvalidIPAddressError(Exception):
     pass
 
 
-class ContentTypeNotAllowed(Exception):
+class ContentTypeNotAllowedError(Exception):
     pass
 
 
@@ -120,9 +120,9 @@ class UrlInfo(Plugin):
 
                 try:
                     hostname, title, mimetype, size = future.result()
-                except InvalidIPAddress:
+                except InvalidIPAddressError:
                     return
-                except ContentTypeNotAllowed as ex:
+                except ContentTypeNotAllowedError as ex:
                     self.logger.debug(ex)
                 except (socket.gaierror, ValueError, requests.RequestException) as ex:
                     hostname = style(hostname, fg=Color.RED)
@@ -184,7 +184,7 @@ class UrlInfo(Plugin):
         for _, _, _, _, sockaddr in socket.getaddrinfo(hostname, None):
             ip = ipaddress.ip_address(sockaddr[0])
             if not ip.is_global:
-                raise InvalidIPAddress(
+                raise InvalidIPAddressError(
                     f"{hostname} is not a publicly routable address."
                 )
 
@@ -207,7 +207,7 @@ class UrlInfo(Plugin):
                 content_type, _ = cgi.parse_header(content_type)
                 main_type = content_type.split("/")[0]
                 if main_type not in self._allowed_content_types:
-                    raise ContentTypeNotAllowed(
+                    raise ContentTypeNotAllowedError(
                         f"{main_type} not in {self._allowed_content_types}"
                     )
 

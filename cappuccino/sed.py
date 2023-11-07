@@ -42,7 +42,7 @@ def _sed_wrapper(text: str, command: str) -> str:
     if sed.returncode != 0:
         if not stream:
             return "Unknown sed error."
-        raise EditorException(stream.replace("sed: -e ", ""))
+        raise EditorError(stream.replace("sed: -e ", ""))
 
     return stream
 
@@ -54,7 +54,7 @@ def _edit(text: str, command: str) -> str:
     return output
 
 
-class EditorException(Exception):
+class EditorError(Exception):
     """An error occurred while processing the editor command."""
 
 
@@ -96,7 +96,7 @@ class Sed(Plugin):
             message = message.strip()
             try:
                 new_message = _edit(message, command)
-            except EditorException as error:
+            except EditorError as error:
                 self.bot.notice(mask.nick, str(error))
                 # Don't even check the rest if the sed command is invalid.
                 return
