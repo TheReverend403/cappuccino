@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 import irc3
 from influxdb_client import InfluxDBClient, Point
@@ -64,7 +64,7 @@ class Influx(Plugin):
                 .tag("user", user)
                 .tag("event", event)
                 .field("data", data or "")
-                .time(datetime.utcnow())
+                .time(datetime.now(UTC))
             )
             write_api.write(bucket=self._bucket, org=self._org, record=point)
 
@@ -74,7 +74,7 @@ class Influx(Plugin):
                 Point("channel_members")
                 .tag("channel", channel)
                 .field("user_count", len(self.bot.channels.get(channel)))
-                .time(datetime.utcnow())
+                .time(datetime.now(UTC))
             )
             write_api.write(bucket=self._bucket, org=self._org, record=point)
 

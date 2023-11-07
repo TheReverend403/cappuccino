@@ -15,7 +15,7 @@
 
 import random
 import re
-from datetime import datetime
+from datetime import UTC, datetime
 from timeit import default_timer as timer
 
 import irc3
@@ -66,9 +66,9 @@ class Ai(Plugin):
 
     def _create_text_model(self):
         self.logger.info("Creating text model...")
-        start = datetime.now()
+        start = datetime.now(UTC)
         corpus = self._get_lines()
-        end = datetime.now()
+        end = datetime.now(UTC)
 
         if not corpus:
             self.logger.warning(
@@ -78,11 +78,11 @@ class Ai(Plugin):
 
         self.logger.debug(f"Queried {len(corpus)} rows in {precisedelta(end - start)}.")
 
-        start = datetime.now()
+        start = datetime.now(UTC)
         model = markovify.NewlineText(
             "\n".join(corpus), retain_original=False
         ).compile()
-        end = datetime.now()
+        end = datetime.now(UTC)
         self.logger.info(f"Created text model in {precisedelta(start - end)}.")
 
         return model

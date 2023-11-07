@@ -5,7 +5,7 @@ Revises: ca58ba59b328
 Create Date: 2020-02-02 20:34:18.585110
 
 """
-import datetime
+from datetime import UTC, datetime
 
 import sqlalchemy as sa
 
@@ -43,7 +43,7 @@ def copy_json_to_columns():
         json_data = result[1]
         last_seen = json_data.get("last_seen")
         if last_seen:
-            last_seen = datetime.datetime.utcfromtimestamp(last_seen)
+            last_seen = datetime.fromtimestamp(last_seen, tz=UTC)
 
         values = dict(
             # or None because empty lists aren't considered SQL NULL

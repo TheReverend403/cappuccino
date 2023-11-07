@@ -42,9 +42,7 @@ class Core(Plugin):
 
         # Accept youtube consent cookies automatically
         cookiejar = RequestsCookieJar()
-        cookievalue = (
-            f"YES+srp.gws-20210512-0-RC3.en+FX+{randint(1, 1000)}"  # noqa: S311
-        )
+        cookievalue = f"YES+srp.gws-20210512-0-RC3.en+FX+{randint(1, 1000)}"  # noqa: S311
         cookiejar.set("CONSENT", cookievalue)
 
         self.bot.requests = Session()
