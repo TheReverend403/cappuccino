@@ -5,7 +5,7 @@
 <p align="center">
 <a href="LICENSE"><img src="https://img.shields.io/github/license/TheReverend403/cappuccino?style=flat-square" alt="GitHub"></a>
 <a href="https://github.com/TheReverend403/cappuccino/actions"><img src="https://img.shields.io/github/actions/workflow/status/TheReverend403/cappuccino/docker.yml?branch=main&style=flat-square" alt="GitHub Workflow Status"></a>
-<a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square" alt="Code style: black"></a>
+<a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/badge/code%20style-ruff-000000.svg?style=flat-square" alt="Code style: ruff"></a>
 </p>
 
 <p align="center">
@@ -17,7 +17,7 @@ A set of <a href="https://github.com/gawel/irc3">irc3</a> plugins providing vari
 Requirements:
 
 * PostgreSQL
-* Python 3.11
+* Python 3.12
 * [Poetry](https://python-poetry.org)
 
 ```sh
