@@ -1,8 +1,11 @@
-name: Lint with pre-commit
+name: Lint
+
 on: [workflow_call]
+
 env:
   RUFF_OUTPUT_FORMAT: "github"
   RUFF_NO_CACHE: true
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -28,7 +31,7 @@ jobs:
           key: poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
           restore-keys: poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: poetry install
         if: steps.cache.outputs.cache-hit != 'true'
 
