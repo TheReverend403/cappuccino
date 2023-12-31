@@ -39,14 +39,14 @@ ARG POETRY_VERSION
 ARG PYSETUP_PATH
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN --mount=type=cache,target=/root/.cache \
+RUN --mount=type=cache,target=/root/.cache/pypoetry \
     curl -sSL https://install.python-poetry.org | python3 -
 
 WORKDIR ${PYSETUP_PATH}
 COPY poetry.lock pyproject.toml ./
 
-RUN --mount=type=cache,target=/root/.cache \
-    poetry install --only main,docker
+RUN --mount=type=cache,target=/root/.cache/pypoetry \
+    poetry install --no-root --only main,docker
 
 
 ## Production image
