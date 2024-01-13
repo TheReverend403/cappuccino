@@ -14,6 +14,7 @@
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
+import os
 
 from sqlalchemy import MetaData, create_engine
 
@@ -27,8 +28,13 @@ class Database:
     def __init__(self, plugin):
         logger.debug(f"Initialising database for {plugin.__module__}")
         if not Database.instance:
+            db_config = plugin.bot.config.get("database", {})
             Database.instance = self.__Singleton(
-                create_engine(plugin.bot.config.get("database", {}).get("uri"))
+                create_engine(
+                    db_config.get("uri"),
+                    pool_size=db_config.get("pool_size", os.cpu_count()),
+                    max_overflow=db_config.get("max_overflow", os.cpu_count()),
+                )
             )
             Database.meta = MetaData(bind=Database.instance.engine)
             Database.meta.reflect()
