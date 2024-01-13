@@ -49,7 +49,7 @@ class ExecShell(Plugin):
     @command(
         permission="admin", show_in_help_list=False, options_first=True, use_shlex=True
     )
-    def exec(self, mask, target, args):  # noqa: A003
+    def exec(self, mask, target, args):
         """Run a system command and upload the output to ix.io.
 
         %%exec <command>...

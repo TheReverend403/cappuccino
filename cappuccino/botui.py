@@ -65,7 +65,7 @@ class BotUI(Plugin):
         self.logger.info(f"Parted {target}")
 
     @command(permission="admin", show_in_help_list=False)
-    def quit(self, mask, target, args):  # noqa: A003
+    def quit(self, mask, target, args):
         """Shut the bot down.
 
         %%quit
