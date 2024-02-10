@@ -78,7 +78,6 @@ extend-ignore = [
     "PLW2901",
 ]
 
-
 [tool.ruff.lint.extend-per-file-ignores]
 "alembic/*" = ["ERA001"]
 

@@ -19,6 +19,12 @@ repos:
         language: system
         types: [yaml]
 
+      - id: check-toml
+        name: check-toml
+        entry: poetry run check-toml
+        language: system
+        types: [toml]
+
       - id: check-shebang-scripts-are-executable
         name: check-shebang-scripts-are-executable
         entry: poetry run check-shebang-scripts-are-executable
