@@ -78,4 +78,4 @@ ENV PYTHONPATH="." \
 VOLUME ["/config"]
 EXPOSE 1337
 
-ENTRYPOINT ["/docker-init.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
