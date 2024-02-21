@@ -2,32 +2,32 @@
 
 ARG DEBIAN_VERSION=bookworm
 ARG PYTHON_VERSION=3.12
-ARG POETRY_VERSION=""
-ARG POETRY_HOME="/opt/poetry"
-ARG PYSETUP_PATH="/opt/pysetup"
-ARG VENV_PATH="${PYSETUP_PATH}/.venv"
-
 
 ## Base
 FROM python:${PYTHON_VERSION}-slim-${DEBIAN_VERSION} as python-base
-
-ARG POETRY_HOME
-ARG VENV_PATH
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_HOME=${POETRY_HOME} \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_CREATE=false \
     POETRY_NO_INTERACTION=1 \
-    POETRY_VERSION=${POETRY_VERSION} \
-    PATH="${VENV_PATH}/bin:${POETRY_HOME}/bin:$PATH"
+    # Latest
+    POETRY_VERSION="" \
+    VIRTUAL_ENV="/venv"
+
+ENV PATH="${POETRY_HOME}/bin:${VIRTUAL_ENV}/bin:${PATH}" \
+    PYTHONPATH="/app:${PYTHONPATH}"
+
+RUN python -m venv "${VIRTUAL_ENV}"
+
+WORKDIR /app
 
 
 ## Python builder
-FROM python-base as builder-base
+FROM python-base as python-builder-base
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
     apt-get update && \
@@ -37,17 +37,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
     libpq-dev \
     && apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
-ARG POETRY_VERSION
-ARG PYSETUP_PATH
-
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN --mount=type=cache,target=/root/.cache/pypoetry \
+RUN --mount=type=cache,target=/root/.cache \
     curl -sSL https://install.python-poetry.org | python3 -
 
-WORKDIR ${PYSETUP_PATH}
 COPY poetry.lock pyproject.toml ./
-
-RUN --mount=type=cache,target=/root/.cache/pypoetry \
+RUN --mount=type=cache,target=/root/.cache \
     poetry install --no-root --only main,docker
 
 
@@ -60,19 +55,13 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
     libpq5 \
     && apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
-ARG VENV_PATH
-
-COPY --from=builder-base ${VENV_PATH} ${VENV_PATH}
+COPY --from=python-builder-base ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY docker/rootfs /
+COPY cappuccino ./cappuccino
+COPY alembic ./alembic
+COPY alembic.ini ./
 
-WORKDIR /app
-
-COPY ./cappuccino ./cappuccino
-COPY ./alembic ./alembic
-COPY ./alembic.ini ./
-
-ENV PYTHONPATH="." \
-    SETTINGS_FILE="/tmp/config.ini" \
+ENV SETTINGS_FILE="/tmp/config.ini" \
     SETTINGS_SOURCE_FILE="/config/config.ini"
 
 VOLUME ["/config"]
