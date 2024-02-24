@@ -45,20 +45,20 @@ def copy_json_to_columns():
         if last_seen:
             last_seen = datetime.fromtimestamp(last_seen, tz=UTC)
 
-        values = dict(
+        values = {
             # or None because empty lists aren't considered SQL NULL
-            dtops=json_data.get("dtops") or None,
-            homescreens=json_data.get("homescreens") or None,
-            stations=json_data.get("stations") or None,
-            pets=json_data.get("pets") or None,
-            dotfiles=json_data.get("dotfiles") or None,
-            handwritings=json_data.get("handwritings") or None,
-            distros=json_data.get("distros") or None,
-            websites=json_data.get("websites") or None,
-            selfies=json_data.get("selfies") or None,
-            lastfm=json_data.get("lastfm") or None,
-            last_seen=last_seen or None,
-        )
+            "dtops": json_data.get("dtops") or None,
+            "homescreens": json_data.get("homescreens") or None,
+            "stations": json_data.get("stations") or None,
+            "pets": json_data.get("pets") or None,
+            "dotfiles": json_data.get("dotfiles") or None,
+            "handwritings": json_data.get("handwritings") or None,
+            "distros": json_data.get("distros") or None,
+            "websites": json_data.get("websites") or None,
+            "selfies": json_data.get("selfies") or None,
+            "lastfm": json_data.get("lastfm") or None,
+            "last_seen": last_seen or None,
+        }
 
         ricedb_table.update().values(values).where(
             ricedb_table.c.nick == user
