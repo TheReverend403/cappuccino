@@ -20,6 +20,7 @@ from requests import RequestException
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
 from cappuccino import Plugin
+from cappuccino.util import meta
 
 
 def _before_send(event, hint):
@@ -46,7 +47,7 @@ class Sentry(Plugin):
         sentry_sdk.init(
             dsn,
             before_send=_before_send,
-            release=self.bot.version,
+            release=meta.VERSION,
             integrations=[SqlalchemyIntegration()],
         )
 

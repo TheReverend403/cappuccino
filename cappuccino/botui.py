@@ -13,12 +13,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import platform
 
 import irc3
 from irc3.plugins.command import command
 
 from cappuccino import Plugin
+from cappuccino.util import meta
 
 
 @irc3.plugin
@@ -31,11 +31,7 @@ class BotUI(Plugin):
 
         %%bots
         """
-        pyver = platform.python_version()
-        yield (
-            f"Reporting in! [cappuccino {self.bot.version}, Python {pyver}]"
-            f" https://github.com/TheReverend403/cappuccino"
-        )
+        yield f"Reporting in! [cappuccino {meta.VERSION}] - {meta.SOURCE}"
 
     @command(permission="admin", show_in_help_list=False)
     def join(self, mask, target, args):
