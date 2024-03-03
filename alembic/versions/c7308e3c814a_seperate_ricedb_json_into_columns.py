@@ -5,6 +5,7 @@ Revises: ca58ba59b328
 Create Date: 2020-02-02 20:34:18.585110
 
 """
+
 from datetime import UTC, datetime
 
 import sqlalchemy as sa
