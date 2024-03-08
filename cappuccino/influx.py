@@ -25,7 +25,7 @@ from cappuccino import Plugin
 
 @irc3.plugin
 class Influx(Plugin):
-    requires = ["irc3.plugins.userlist", "cappuccino.core"]
+    requires = ["irc3.plugins.userlist"]
 
     def __init__(self, bot):
         super().__init__(bot)

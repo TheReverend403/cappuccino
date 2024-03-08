@@ -23,7 +23,7 @@ from cappuccino.util import meta
 
 @irc3.plugin
 class BotUI(Plugin):
-    requires = ["irc3.plugins.command", "irc3.plugins.userlist", "cappuccino.core"]
+    requires = ["irc3.plugins.command", "irc3.plugins.userlist"]
 
     @command(permission="view", aliases=["source", "version"])
     def bots(self, mask, target, args):

@@ -34,7 +34,7 @@ def _before_send(event, hint):
 
 @irc3.plugin
 class Sentry(Plugin):
-    requires = ["irc3.plugins.command", "cappuccino.core"]
+    requires = ["irc3.plugins.command"]
 
     def __init__(self, bot):
         super().__init__(bot)

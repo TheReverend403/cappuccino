@@ -44,7 +44,7 @@ def _exec_wrapper(cmd: dict, input_data: str | None = None) -> str:
 
 @irc3.plugin
 class ExecShell(Plugin):
-    requires = ["irc3.plugins.command", "cappuccino.core"]
+    requires = ["irc3.plugins.command"]
 
     @command(
         permission="admin", show_in_help_list=False, options_first=True, use_shlex=True
@@ -65,7 +65,7 @@ class ExecShell(Plugin):
                 return f"{mask.nick}: {output}"
 
             # Upload multiline output to ix.io to avoid flooding channels.
-            result = self.bot.requests.post("http://ix.io", data={"f:1": output})
+            result = self.requests.post("http://ix.io", data={"f:1": output})
 
         except (
             FileNotFoundError,

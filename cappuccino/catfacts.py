@@ -24,7 +24,7 @@ from cappuccino import Plugin
 
 @irc3.plugin
 class CatFacts(Plugin):
-    requires = ["irc3.plugins.command", "cappuccino.core"]
+    requires = ["irc3.plugins.command"]
 
     def __init__(self, bot):
         super().__init__(bot)
@@ -40,7 +40,7 @@ class CatFacts(Plugin):
             if self._max_length > 0:
                 request_parameters.update({"max_length": self._max_length})
 
-            with self.bot.requests.get(
+            with self.requests.get(
                 self._api_url, params=request_parameters
             ) as response:
                 self._cache = [fact["fact"] for fact in response.json()["data"]]

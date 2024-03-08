@@ -63,8 +63,6 @@ def _clean_url(url: str):
 
 @irc3.plugin
 class UrlInfo(Plugin):
-    requires = ["cappuccino.core"]
-
     _max_bytes = 10 * 1000 * 1000  # 10M
     _url_regex = re.compile(r"https?://\S+", re.IGNORECASE | re.UNICODE)
     _max_title_length = 300
@@ -77,7 +75,7 @@ class UrlInfo(Plugin):
         super().__init__(bot)
         self._ignore_nicks: list[str] = self.config.get("ignore_nicks", "").split()
         self._ignore_hostnames: list[str] = self.config.get("ignore_hostnames", [])
-        self._real_user_agent: str = self.bot.requests.headers.get("User-Agent")
+        self._real_user_agent: str = self.requests.headers.get("User-Agent")
         self._fake_user_agent: str = self.config.get(
             "fake_useragent", "Googlebot/2.1 (+http://www.google.com/bot.html)"
         )
@@ -191,7 +189,7 @@ class UrlInfo(Plugin):
         hostname = hostname.removeprefix("www.")
 
         # Spoof user agent for certain sites so they give up their secrets.
-        request = copy(self.bot.requests)
+        request = copy(self.requests)
         if any(
             f".{hostname}".endswith(f".{host}")
             for host in self._fake_useragent_hostnames

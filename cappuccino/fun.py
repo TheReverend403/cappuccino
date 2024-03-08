@@ -52,7 +52,7 @@ _EIGHTBALL_RESPONSES = [
 
 @irc3.plugin
 class Fun(Plugin):
-    requires = ["irc3.plugins.command", "cappuccino.core"]
+    requires = ["irc3.plugins.command"]
 
     def _reply(self, target: str, message: str):
         # Only reply a certain percentage of the time. AKA rate-limiting. Sort of.
@@ -191,9 +191,7 @@ class Fun(Plugin):
         """
 
         try:
-            with self.bot.requests.get(
-                "https://whatthecommit.com/index.txt"
-            ) as response:
+            with self.requests.get("https://whatthecommit.com/index.txt") as response:
                 yield f'git commit -m "{response.text.strip()}"'
         except RequestException:
             yield (

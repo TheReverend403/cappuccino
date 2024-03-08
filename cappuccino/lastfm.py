@@ -59,7 +59,7 @@ class LastFM(Plugin):
             return "That user doesn't appear to exist. Are you trying to trick me? :^)"
         else:
             self.bot.set_user_value(irc_username, _DB_KEY, lastfm_username)
-            return "Last.fm account linked successully."
+            return "Last.fm account linked successfully."
 
     @command(name="np", permission="view", aliases=["lastfm"])
     def now_playing(self, mask, target, args):

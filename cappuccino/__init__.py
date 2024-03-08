@@ -16,8 +16,13 @@
 import logging
 from logging.config import dictConfig
 from pathlib import Path
+from random import randint
 
+import meta
+import requests
 import yaml
+from requests import Session
+from requests.cookies import RequestsCookieJar
 
 DEFAULT_LOG_CONFIG = {
     "version": 1,
@@ -63,12 +68,34 @@ def _setup_logging():
 _setup_logging()
 
 
+def _create_requests_session(bot) -> Session:
+    requests.packages.urllib3.disable_warnings()
+
+    # Accept YouTube consent cookies automatically
+    cookie_jar = RequestsCookieJar()
+    cookie_value = f"YES+srp.gws-20210512-0-RC3.en+FX+{randint(1, 1000)}"  # noqa: S311
+    cookie_jar.set("CONSENT", cookie_value)
+
+    session = Session()
+    session.cookies = cookie_jar
+    session.headers.update(
+        {
+            "User-Agent": f"cappuccino {meta.VERSION} - {meta.SOURCE}",
+            "Accept-Language": "en-GB,en-US,en;q=0.5",
+            "timeout": "5",
+            "allow_redirects": "true",
+        }
+    )
+    return session
+
+
 class Plugin:
     def __init__(self, bot):
         plugin_module = self.__class__.__module__
         self.bot = bot
         self.config: dict = self.bot.config.get(plugin_module, {})
         self.logger = logging.getLogger(plugin_module)
+        self.requests = _create_requests_session(bot)
         if self.config:
             # I have no idea where these are coming from but whatever.
             weird_keys = ["#", "hash"]
