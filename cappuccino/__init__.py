@@ -16,13 +16,14 @@
 import logging
 from logging.config import dictConfig
 from pathlib import Path
-from random import randint
+from secrets import randbelow
 
-import meta
 import requests
 import yaml
 from requests import Session
 from requests.cookies import RequestsCookieJar
+
+from cappuccino.util import meta
 
 DEFAULT_LOG_CONFIG = {
     "version": 1,
@@ -73,7 +74,7 @@ def _create_requests_session(bot) -> Session:
 
     # Accept YouTube consent cookies automatically
     cookie_jar = RequestsCookieJar()
-    cookie_value = f"YES+srp.gws-20210512-0-RC3.en+FX+{randint(1, 1000)}"  # noqa: S311
+    cookie_value = f"YES+srp.gws-20210512-0-RC3.en+FX+{randbelow(1000)}"
     cookie_jar.set("CONSENT", cookie_value)
 
     session = Session()
