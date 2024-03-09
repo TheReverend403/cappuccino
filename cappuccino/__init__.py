@@ -74,7 +74,7 @@ def _create_requests_session(bot) -> Session:
 
     # Accept YouTube consent cookies automatically
     cookie_jar = RequestsCookieJar()
-    cookie_value = f"YES+srp.gws-20210512-0-RC3.en+FX+{randbelow(1000)}"
+    cookie_value = f"YES+srp.gws-20210512-0-RC3.en+FX+{1 + randbelow(1000)}"
     cookie_jar.set("CONSENT", cookie_value)
 
     session = Session()
