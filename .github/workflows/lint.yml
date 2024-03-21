@@ -3,7 +3,7 @@ name: Lint
 on: [workflow_call]
 
 env:
-  RUFF_OUTPUT_FORMAT: "github"
+  RUFF_OUTPUT_FORMAT: 'github'
   RUFF_NO_CACHE: true
 
 jobs:
@@ -11,18 +11,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12"]
+        python-version: ['3.12']
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Poetry
+        uses: Gr1N/setup-poetry@v9
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "poetry"
-
-      - name: Install Poetry
-        uses: Gr1N/setup-poetry@v9
+          cache: 'poetry'
 
       - name: Install Python dependencies
         run: poetry install
