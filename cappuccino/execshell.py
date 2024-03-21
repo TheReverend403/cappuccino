@@ -13,6 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
+import secrets
 import subprocess
 
 import irc3
@@ -50,7 +51,7 @@ class ExecShell(Plugin):
         permission="admin", show_in_help_list=False, options_first=True, use_shlex=True
     )
     def exec(self, mask, target, args):
-        """Run a system command and upload the output to ix.io.
+        """Run a system command and upload the output to 0x0.st.
 
         %%exec <command>...
         """
@@ -64,8 +65,12 @@ class ExecShell(Plugin):
             if not _is_multiline_string(output):
                 return f"{mask.nick}: {output}"
 
-            # Upload multiline output to ix.io to avoid flooding channels.
-            result = self.requests.post("http://ix.io", data={"f:1": output})
+            # Upload multiline output to 0x0.st to avoid flooding channels.
+            result = self.requests.post(
+                "https://0x0.st",
+                files={"file": (f"cappuccino-{secrets.token_hex()}.txt", output)},
+                expires=1,
+            )
 
         except (
             FileNotFoundError,
