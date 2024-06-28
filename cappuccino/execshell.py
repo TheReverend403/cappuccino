@@ -32,8 +32,8 @@ def _exec_wrapper(cmd: dict, input_data: str | None = None) -> str:
     if input_data:
         input_data = input_data.encode("UTF-8")
 
-    proc = subprocess.run(
-        cmd,  # noqa: S603
+    proc = subprocess.run(  # noqa: S603
+        cmd,
         input=input_data,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
