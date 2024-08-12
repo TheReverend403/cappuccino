@@ -418,13 +418,13 @@ files = [
 
 [[package]]
 name = "influxdb-client"
-version = "1.44.0"
+version = "1.45.0"
 description = "InfluxDB 2.0 Python client library"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "influxdb_client-1.44.0-py3-none-any.whl", hash = "sha256:e4c1ac9c9925c4693d63e988e22f65d2ddc1867f8910813b7f4721633175f2a0"},
-    {file = "influxdb_client-1.44.0.tar.gz", hash = "sha256:da9bc0cc49de4a0ac844d833c1efa65227ec5a2254e63cdbe07b5d532c0c37f8"},
+    {file = "influxdb_client-1.45.0-py3-none-any.whl", hash = "sha256:8cde8c1e26133c1c686543decc0c3935832eea282c4513db0245772c2fcffeed"},
+    {file = "influxdb_client-1.45.0.tar.gz", hash = "sha256:e24aa0a838f58487b2382c654fa8183fb5ca504af70438a42ca20dd79669a2be"},
 ]
 
 [package.dependencies]
