@@ -50,7 +50,7 @@ RUN --mount=type=cache,target=/root/.cache \
 
 COPY poetry.lock pyproject.toml ./
 RUN --mount=type=cache,target=/root/.cache \
-    poetry install --no-root --only main,docker
+    poetry install --only main,docker
 
 
 ## Production image

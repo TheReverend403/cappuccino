@@ -25,7 +25,7 @@ jobs:
           cache: "poetry"
 
       - name: Install Python dependencies
-        run: poetry install --no-root
+        run: poetry install
 
       - name: Lint
         uses: pre-commit/action@v3.0.0
