@@ -4,7 +4,7 @@ ARG DEBIAN_VERSION=bookworm
 ARG PYTHON_VERSION=3.12
 
 ## Base
-FROM python:${PYTHON_VERSION}-slim-${DEBIAN_VERSION} as python-base
+FROM python:${PYTHON_VERSION}-slim-${DEBIAN_VERSION} AS python-base
 
 ARG META_VERSION
 ARG META_VERSION_HASH
@@ -34,7 +34,7 @@ WORKDIR /app
 
 
 ## Python builder
-FROM python-base as python-builder-base
+FROM python-base AS python-builder-base
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
     apt-get update && \
@@ -54,7 +54,7 @@ RUN --mount=type=cache,target=/root/.cache \
 
 
 ## Production image
-FROM python-base as production
+FROM python-base AS production
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
     apt-get update && \
