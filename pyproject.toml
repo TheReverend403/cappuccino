@@ -53,7 +53,7 @@ select = [
     "ERA",
     "F",
     "FIX",
-    # "FURB",
+    "FURB",
     "I",
     "N",
     "PL",
