@@ -13,7 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import cgi
 import concurrent
 import contextlib
 import html
@@ -23,6 +22,7 @@ import re
 import socket
 import time
 from copy import copy
+from email.message import EmailMessage
 from io import StringIO
 from urllib.parse import urlparse
 
@@ -202,8 +202,10 @@ class UrlInfo(Plugin):
 
             content_type = response.headers.get("Content-Type")
             if content_type:
-                content_type, _ = cgi.parse_header(content_type)
-                main_type = content_type.split("/")[0]
+                headers = EmailMessage()
+                headers["Content-Type"] = content_type
+                content_type = headers.get_content_type()
+                main_type = headers.get_content_maintype()
                 if main_type not in self._allowed_content_types:
                     raise ContentTypeNotAllowedError(
                         f"{main_type} not in {self._allowed_content_types}"
@@ -213,7 +215,9 @@ class UrlInfo(Plugin):
             size = int(response.headers.get("Content-Length", 0))
             content_disposition = response.headers.get("Content-Disposition")
             if content_disposition:
-                _, params = cgi.parse_header(content_disposition)
+                headers = EmailMessage()
+                headers["Content-Disposition"] = content_disposition
+                params = headers["Content-Disposition"].params
                 title = params.get("filename")
             elif content_type in self._html_mimetypes or content_type == "text/plain":
                 content = self._stream_response(response)
