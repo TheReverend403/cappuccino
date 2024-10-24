@@ -27,7 +27,7 @@ influxdb-client = "^1.26.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.5.0"
-ruff = "^0.6.0"
+ruff = "^0.7.0"
 pre-commit-hooks = "^4.5.0"
 shellcheck-py = "^0.10.0.1"
 
@@ -85,5 +85,5 @@ extend-ignore = ["RUF012", "PLR09", "PLW2901"]
 line-ending = "lf"
 
 [build-system]
-requires = ["poetry-core>=1.3.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.masonry.api"
