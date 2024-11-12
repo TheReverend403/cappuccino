@@ -22,7 +22,8 @@ import re
 import socket
 import time
 from copy import copy
-from email.message import EmailMessage
+from email.headerregistry import ContentDispositionHeader, ContentTypeHeader
+from email.policy import EmailPolicy
 from io import StringIO
 from urllib.parse import urlparse
 
@@ -202,10 +203,10 @@ class UrlInfo(Plugin):
 
             content_type = response.headers.get("Content-Type")
             if content_type:
-                headers = EmailMessage()
-                headers["Content-Type"] = content_type
-                content_type = headers.get_content_type()
-                main_type = headers.get_content_maintype()
+                header: ContentTypeHeader = EmailPolicy.header_factory(
+                    "content-type", content_type
+                )
+                main_type = header.maintype
                 if main_type not in self._allowed_content_types:
                     raise ContentTypeNotAllowedError(
                         f"{main_type} not in {self._allowed_content_types}"
@@ -215,10 +216,10 @@ class UrlInfo(Plugin):
             size = int(response.headers.get("Content-Length", 0))
             content_disposition = response.headers.get("Content-Disposition")
             if content_disposition:
-                headers = EmailMessage()
-                headers["Content-Disposition"] = content_disposition
-                params = headers["Content-Disposition"].params
-                title = params.get("filename")
+                header: ContentDispositionHeader = EmailPolicy.header_factory(
+                    "content-disposition", content_disposition
+                )
+                title = header.params.get("filename")
             elif content_type in self._html_mimetypes or content_type == "text/plain":
                 content = self._stream_response(response)
                 if content and not size:
