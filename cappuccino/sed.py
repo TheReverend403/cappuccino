@@ -113,10 +113,8 @@ class Sed(Plugin):
                 " I won't post it to prevent potential spam."
             )
             if (
-                len(new_message) > len(error_msg)
-                and len(new_message) > max_len
-                or len(new_message) > max_len_hard
-            ):
+                len(new_message) > len(error_msg) and len(new_message) > max_len
+            ) or len(new_message) > max_len_hard:
                 self.bot.notice(mask.nick, style(error_msg, fg=Color.RED))
                 return
 
