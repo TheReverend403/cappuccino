@@ -180,12 +180,7 @@ class UrlInfo(Plugin):
         url = urlp.geturl()
 
         hostname = urlp.hostname
-        for _, _, _, _, sockaddr in socket.getaddrinfo(hostname, None):
-            ip = ipaddress.ip_address(sockaddr[0])
-            if not ip.is_global:
-                raise InvalidIPAddressError(
-                    f"{hostname} is not a publicly routable address."
-                )
+        self._validate_ip_address(hostname)
 
         hostname = hostname.removeprefix("www.")
 
@@ -202,68 +197,71 @@ class UrlInfo(Plugin):
                 response.raise_for_status()
 
             content_type = response.headers.get("Content-Type")
-            if content_type:
-                header: ContentTypeHeader = EmailPolicy.header_factory(
-                    "content-type", content_type
-                )
-                main_type = header.maintype
-                if main_type not in self._allowed_content_types:
-                    raise ContentTypeNotAllowedError(
-                        f"{main_type} not in {self._allowed_content_types}"
-                    )
+            self._validate_content_type(content_type)
 
-            title = None
-            size = int(response.headers.get("Content-Length", 0))
-            content_disposition = response.headers.get("Content-Disposition")
-            if content_disposition:
-                header: ContentDispositionHeader = EmailPolicy.header_factory(
-                    "content-disposition", content_disposition
-                )
-                title = header.params.get("filename")
-            elif content_type in self._html_mimetypes or content_type == "text/plain":
-                content = self._stream_response(response)
-                if content and not size:
-                    size = len(content.encode("UTF-8"))
-
-                soup = bs4.BeautifulSoup(content, "html5lib")
-                if title_tag := soup.find("meta", property="og:title", content=True):
-                    title = title_tag.get("content")
-                else:
-                    with contextlib.suppress(AttributeError):
-                        title = soup.title.string
-
-                site_name = None
-                if site_name_tag := soup.find(
-                    "meta", property="og:site_name", content=True
-                ):
-                    site_name = site_name_tag.get("content")
-
-                if description_tag := soup.find(
-                    "meta", property="og:description", content=True
-                ):
-                    description = description_tag.get("content")
-
-                    # GitHub's repo <title> is better than the og:title
-                    # How to check if it's a repo? Simple.
-                    # The description on GitHub ends with the repo name (og:title).
-                    if site_name == "GitHub" and title in description:
-                        title = soup.title.string.replace("GitHub - ", "", 1)
-
-                    if site_name == "Nitter" and description:
-                        site_name = "Twitter"
-                        title = f"{title}: {description}"
-
-                if site_name and len(site_name) < (site_name_max_size := 16):
-                    if len(site_name) > site_name_max_size:
-                        site_name = truncate_with_ellipsis(title, site_name_max_size)
-                    hostname = site_name
-
-                if not title and (content and content_type not in self._html_mimetypes):
-                    title = re.sub(r"\s+", " ", " ".join(content.split("\n")))
-
-            if title:
-                title = unstyle(html.unescape(title).strip())
-                if len(title) > self._max_title_length:
-                    title = truncate_with_ellipsis(title, self._max_title_length)
+            title, size = self._extract_title_and_size(response, content_type)
 
         return hostname, title, content_type, size
+
+    def _validate_ip_address(self, hostname: str):
+        for _, _, _, _, sockaddr in socket.getaddrinfo(hostname, None):
+            ip = ipaddress.ip_address(sockaddr[0])
+            if not ip.is_global:
+                raise InvalidIPAddressError(
+                    f"{hostname} is not a publicly routable address."
+                )
+
+    def _validate_content_type(self, content_type: str):
+        if content_type:
+            header: ContentTypeHeader = EmailPolicy.header_factory(
+                "content-type", content_type
+            )
+            main_type = header.maintype
+            if main_type not in self._allowed_content_types:
+                raise ContentTypeNotAllowedError(
+                    f"{main_type} not in {self._allowed_content_types}"
+                )
+
+    def _extract_title_and_size(self, response: requests.Response, content_type: str):
+        title = None
+        size = int(response.headers.get("Content-Length", 0))
+        content_disposition = response.headers.get("Content-Disposition")
+        if content_disposition:
+            header: ContentDispositionHeader = EmailPolicy.header_factory(
+                "content-disposition", content_disposition
+            )
+            title = header.params.get("filename")
+        elif content_type in self._html_mimetypes or content_type == "text/plain":
+            content = self._stream_response(response)
+            if content and not size:
+                size = len(content.encode("UTF-8"))
+
+            soup = bs4.BeautifulSoup(content, "html5lib")
+            title = self._extract_title_from_soup(soup)
+
+            site_name = self._extract_site_name_from_soup(soup)
+            if site_name and len(site_name) < (site_name_max_size := 16):
+                if len(site_name) > site_name_max_size:
+                    site_name = truncate_with_ellipsis(title, site_name_max_size)
+                hostname = site_name
+
+            if not title and (content and content_type not in self._html_mimetypes):
+                title = re.sub(r"\s+", " ", " ".join(content.split("\n")))
+
+        if title:
+            title = unstyle(html.unescape(title).strip())
+            if len(title) > self._max_title_length:
+                title = truncate_with_ellipsis(title, self._max_title_length)
+
+        return title, size
+
+    def _extract_title_from_soup(self, soup: bs4.BeautifulSoup):
+        if title_tag := soup.find("meta", property="og:title", content=True):
+            return title_tag.get("content")
+        with contextlib.suppress(AttributeError):
+            return soup.title.string
+
+    def _extract_site_name_from_soup(self, soup: bs4.BeautifulSoup):
+        if site_name_tag := soup.find("meta", property="og:site_name", content=True):
+            return site_name_tag.get("content")
+        return None
