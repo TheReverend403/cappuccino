@@ -53,98 +53,98 @@ class Rice(Plugin):
             if len(args["<values>"]) == 0:
                 return f"{category} cannot be empty!"
 
+        response = None
+
         if args["--add"] or args["-a"]:
             values = self.bot.get_user_value(mask.nick, category) or []
             if len(values) + len(args["<values>"]) > self._max_user_entries:
-                return (
+                response = (
                     f"You can only set {self._max_user_entries} {category}!"
                     f" Consider deleting or replacing some."
                 )
+            else:
+                for value in args["<values>"]:
+                    values.append(value)
+                self.bot.set_user_value(mask.nick, category, values)
+                response = f"{category} updated."
 
-            for value in args["<values>"]:
-                values.append(value)
-
-            self.bot.set_user_value(mask.nick, category, values)
-            return f"{category} updated."
-
-        if args["--set"] or args["-s"]:
+        elif args["--set"] or args["-s"]:
             values = args["<values>"]
-
             if len(values) > self._max_user_entries:
-                return (
+                response = (
                     f"You can only set {self._max_user_entries} {category}!"
                     f" Consider deleting or replacing some."
                 )
+            else:
+                self.bot.set_user_value(mask.nick, category, values)
+                response = f"{category} updated."
 
-            self.bot.set_user_value(mask.nick, category, values)
-            return f"{category} updated."
-
-        if args["--delete"] or args["-d"]:
+        elif args["--delete"] or args["-d"]:
             values = self.bot.get_user_value(mask.nick, category)
             if not values:
-                return f"You do not have any {category} to remove."
+                response = f"You do not have any {category} to remove."
+            else:
+                indexes = set(args["<ids>"])
+                if "*" in indexes:
+                    self.bot.del_user_value(mask.nick, category)
+                    response = f"Removed all of your {category}."
+                else:
+                    deleted_list = []
+                    for index in sorted(indexes, reverse=True):
+                        try:
+                            index = _from_user_index(index)
+                            deleted_list.append(values[index])
+                            del values[index]
+                        except IndexError:
+                            pass
+                        except ValueError:
+                            response = "Invalid ID(s)"
+                            break
+                    if not response:
+                        if not deleted_list:
+                            response = f"No {category} were removed. Maybe you supplied the wrong IDs?"
+                        else:
+                            self.bot.set_user_value(mask.nick, category, values)
+                            deleted_list = ", ".join(
+                                [style(deleted, reset=True) for deleted in deleted_list]
+                            )
+                            response = f"Removed {deleted_list}."
 
-            indexes = set(args["<ids>"])
-            if "*" in indexes:
-                self.bot.del_user_value(mask.nick, category)
-                return f"Removed all of your {category}."
-
-            deleted_list = []
-            # Delete values in descending order to prevent
-            # re-ordering of the list while deleting.
-            for index in sorted(indexes, reverse=True):
-                try:
-                    index = _from_user_index(index)
-                    deleted_list.append(values[index])
-                    del values[index]
-                except IndexError:
-                    pass
-                except ValueError:
-                    return "Invalid ID(s)"
-
-            if not deleted_list:
-                return f"No {category} were removed. Maybe you supplied the wrong IDs?"
-
-            self.bot.set_user_value(mask.nick, category, values)
-            deleted_list = ", ".join(
-                [style(deleted, reset=True) for deleted in deleted_list]
-            )
-            return f"Removed {deleted_list}."
-
-        if args["--replace"] or args["-r"]:
+        elif args["--replace"] or args["-r"]:
             try:
                 index = _from_user_index(args["<id>"])
             except ValueError:
-                return "Invalid ID"
+                response = "Invalid ID"
+            else:
+                replacement = args["<value>"].strip()
+                values = self.bot.get_user_value(mask.nick, category)
+                if not values:
+                    response = f"You do not have any {category} to replace."
+                else:
+                    try:
+                        old_value = values[index]
+                        values[index] = replacement
+                        self.bot.set_user_value(mask.nick, category, values)
+                        old_value = style(old_value, reset=True)
+                        replacement = style(replacement, reset=True)
+                        response = f"Replaced {old_value} with {replacement}"
+                    except IndexError:
+                        response = "Invalid ID."
 
-            replacement = args["<value>"].strip()
-
-            values = self.bot.get_user_value(mask.nick, category)
-            if not values:
-                return f"You do not have any {category} to replace."
-
-            try:
-                old_value = values[index]
-                values[index] = replacement
-                self.bot.set_user_value(mask.nick, category, values)
-
-                old_value = style(old_value, reset=True)
-                replacement = style(replacement, reset=True)
-                return f"Replaced {old_value} with {replacement}"
-            except IndexError:
-                return "Invalid ID."
-
-        if args["<user>"] is not None and re.match(
+        elif args["<user>"] is not None and re.match(
             "^https?://.*", args["<user>"], re.IGNORECASE | re.DOTALL
         ):
-            return "Did you mean to use --add (-a) or --set (-s) there?"
+            response = "Did you mean to use --add (-a) or --set (-s) there?"
 
-        if (
+        elif (
             args["<user>"] is not None
             and args["<user>"].isdigit()
             and args["<id>"] is None
         ):
             args["<user>"], args["<id>"] = None, args["<user>"]
+
+        if response:
+            return response
 
         seperator = style(" | ", fg=Color.LIGHT_GRAY)
         user = args["<user>"] or mask.nick
@@ -159,7 +159,6 @@ class Rice(Plugin):
                 value = self.bot.get_user_value(user, category)[index]
             except (ValueError, IndexError, TypeError):
                 return "Invalid ID."
-
             value = style(value, reset=True)
             return f"{user_tag} {value}"
 
@@ -171,17 +170,13 @@ class Rice(Plugin):
                 if len(values) < 2:  # noqa: PLR2004
                     indexed_values.append(item)
                     break
-
                 index = _to_user_index(index)
                 id_prefix = style(f"#{index}", fg=Color.PURPLE)
                 indexed_values.append(f"{id_prefix} {item}")
-
             formatted_values = seperator.join(indexed_values)
-
             return f"{user_tag} {formatted_values}"
 
         return f"{user} has no {category}."
-
     @command(permission="view")
     def station(self, mask, target, args):
         """
