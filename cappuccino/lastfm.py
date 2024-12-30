@@ -68,62 +68,65 @@ class LastFM(Plugin):
         %%np [(-s | --set) <username> | <username>]
         """
 
-        if args["--set"] or args["-s"]:
+        if args["--set"] or args["-s"] :
             return self._set_lastfm_username(mask.nick, args["<username>"])
 
         base_command = f"{self.bot.config.cmd}np"
         irc_target_username = args["<username>"] or mask.nick
         lastfm_username = self.bot.get_user_value(irc_target_username, _DB_KEY)
 
+        response = ""
         try:
             if not lastfm_username:
                 if irc_target_username == mask.nick:
-                    return (
+                    response = (
                         f"You have not linked a Last.fm account."
                         f" Please do so with {base_command} --set <username>"
                     )
-
-                return (
-                    f"{irc_target_username} has not linked a Last.fm account."
-                    f" Ask them to link one with {base_command} --set <username>"
-                )
-
-            try:
-                lastfm_user = self._lastfm.get_user(lastfm_username)
-                lastfm_username = lastfm_user.get_name(properly_capitalized=True)
-            except pylast.WSError:
-                if irc_target_username == mask.nick:
-                    return (
-                        f"Your Last.fm account appears to no longer exist."
-                        f" Please link a new one with {base_command} --set <username>"
+                else:
+                    response = (
+                        f"{irc_target_username} has not linked a Last.fm account."
+                        f" Ask them to link one with {base_command} --set <username>"
                     )
-
-                possessive_nick = (
-                    f"{irc_target_username}'"
-                    if irc_target_username.endswith("s")
-                    else f"{irc_target_username}'s"
-                )
-                return (
-                    f"{possessive_nick} last.fm account appears to no longer exist."
-                    f" Ask them to link a new one with {base_command} --set <username>"
-                )
-
-            name_tag = _add_lastfm_suffix(irc_target_username, lastfm_username)
-            current_track = lastfm_user.get_now_playing()
-            if not current_track:
-                return f"{name_tag} is not listening to anything right now."
-
-            artist = current_track.get_artist().get_name().strip()
-            title = current_track.get_title().strip()
-            artist = truncate_with_ellipsis(artist, _MAX_TRACK_ARTIST_LEN)
-            title = truncate_with_ellipsis(title, _MAX_TRACK_TITLE_LEN)
-            artist = style(artist, bold=True)
-            title = style(title, bold=True)
-            track_info = f"{title} by {artist}"
-            return f"{name_tag} is now playing {track_info}"
+            else:
+                try:
+                    lastfm_user = self._lastfm.get_user(lastfm_username)
+                    lastfm_username = lastfm_user.get_name(properly_capitalized=True)
+                except pylast.WSError:
+                    if irc_target_username == mask.nick:
+                        response = (
+                            f"Your Last.fm account appears to no longer exist."
+                            f" Please link a new one with {base_command} --set <username>"
+                        )
+                    else:
+                        possessive_nick = (
+                            f"{irc_target_username}'"
+                            if irc_target_username.endswith("s")
+                            else f"{irc_target_username}'s"
+                        )
+                        response = (
+                            f"{possessive_nick} last.fm account appears to no longer exist."
+                            f" Ask them to link a new one with {base_command} --set <username>"
+                        )
+                else:
+                    name_tag = _add_lastfm_suffix(irc_target_username, lastfm_username)
+                    current_track = lastfm_user.get_now_playing()
+                    if not current_track:
+                        response = f"{name_tag} is not listening to anything right now."
+                    else:
+                        artist = current_track.get_artist().get_name().strip()
+                        title = current_track.get_title().strip()
+                        artist = truncate_with_ellipsis(artist, _MAX_TRACK_ARTIST_LEN)
+                        title = truncate_with_ellipsis(title, _MAX_TRACK_TITLE_LEN)
+                        artist = style(artist, bold=True)
+                        title = style(title, bold=True)
+                        track_info = f"{title} by {artist}"
+                        response = f"{name_tag} is now playing {track_info}"
         except (
             pylast.NetworkError,
             pylast.MalformedResponseError,
             pylast.WSError,
         ) as err:
-            return style(err, bold=True)
+            response = style(err, bold=True)
+
+        return response

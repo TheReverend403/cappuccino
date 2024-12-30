@@ -91,26 +91,27 @@ class Triggers(Plugin):
         if (args["set"] or args["del"]) and not is_chanop(self.bot, target, mask.nick):
             return "Only channel operators may modify channel triggers."
 
+        response = None
         trigger = args["<trigger>"]
+
         if args["set"]:
             self._set_trigger(target, trigger, " ".join(args["<response>"]))
-            return f"Trigger '{trigger}' set."
-
-        if args["del"]:
-            return (
+            response = f"Trigger '{trigger}' set."
+        elif args["del"]:
+            response = (
                 f"Deleted trigger '{trigger}'."
                 if self._delete_trigger(target, trigger)
                 else "No such trigger."
             )
-
-        if args["list"]:
+        elif args["list"]:
             trigger_list = self._get_triggers_list(target)
             if trigger_list:
                 trigger_list = ", ".join(trigger_list)
-                return f"Available triggers for {target}: {trigger_list}"
+                response = f"Available triggers for {target}: {trigger_list}"
+            else:
+                response = f"No triggers available for {target}"
 
-            return f"No triggers available for {target}"
-        return None
+        return response
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def on_privmsg(self, target, event, mask, data):
