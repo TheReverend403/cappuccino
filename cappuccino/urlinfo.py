@@ -173,7 +173,7 @@ class UrlInfo(Plugin):
 
         return content.getvalue()
 
-    def _process_url(self, url: str):  # noqa: C901
+    def _process_url(self, url: str):
         urlp = urlparse(url)
         if urlp.netloc.lower().removeprefix("www.") == "twitter.com":
             urlp = urlp._replace(netloc="nitter.net")
@@ -240,10 +240,10 @@ class UrlInfo(Plugin):
             title = self._extract_title_from_soup(soup)
 
             site_name = self._extract_site_name_from_soup(soup)
-            if site_name and len(site_name) < (site_name_max_size := 16):
-                if len(site_name) > site_name_max_size:
-                    site_name = truncate_with_ellipsis(title, site_name_max_size)
-                hostname = site_name
+            if (site_name and len(site_name) < (site_name_max_size := 16)) and (
+                len(site_name) > site_name_max_size
+            ):
+                site_name = truncate_with_ellipsis(title, site_name_max_size)
 
             if not title and (content and content_type not in self._html_mimetypes):
                 title = re.sub(r"\s+", " ", " ".join(content.split("\n")))

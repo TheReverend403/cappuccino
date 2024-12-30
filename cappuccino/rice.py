@@ -177,6 +177,7 @@ class Rice(Plugin):
             return f"{user_tag} {formatted_values}"
 
         return f"{user} has no {category}."
+
     @command(permission="view")
     def station(self, mask, target, args):
         """

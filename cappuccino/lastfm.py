@@ -68,7 +68,7 @@ class LastFM(Plugin):
         %%np [(-s | --set) <username> | <username>]
         """
 
-        if args["--set"] or args["-s"] :
+        if args["--set"] or args["-s"]:
             return self._set_lastfm_username(mask.nick, args["<username>"])
 
         base_command = f"{self.bot.config.cmd}np"
