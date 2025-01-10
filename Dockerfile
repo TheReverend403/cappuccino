@@ -48,7 +48,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN --mount=type=cache,target=/root/.cache \
     curl -sSL https://install.python-poetry.org | python3 -
 
-COPY poetry.lock pyproject.toml ./
+COPY poetry.lock pyproject.toml LICENSE README.md ./
 RUN --mount=type=cache,target=/root/.cache \
     poetry install --only main,docker
 
