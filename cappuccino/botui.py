@@ -42,7 +42,7 @@ class BotUI(Plugin):
 
         channel = args["<channel>"]
         if args["<password>"]:
-            channel += f' {args["<password>"]}'
+            channel += f" {args['<password>']}"
 
         self.bot.join(channel)
         self.logger.info(f"Joined {channel}")
