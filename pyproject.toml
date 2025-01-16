@@ -4,7 +4,7 @@ description = "Just another IRC bot."
 authors = [{ name = "Lee Watson", email = "<me@lwatson.dev>" }]
 version = "1.16.0"
 license = "GPL-3.0-only"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.14"
 dependencies = [
     "irc3 (>=1.1.0,<2.0.0)",
     "markovify (>=0.9.0,<1.0.0)",
