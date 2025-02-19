@@ -1,12 +1,12 @@
-.ruff_cache
-
 /config
 /data
 
-/.vscode
-/.idea
+docker-compose.*
 
-/docker-compose.*
+.vscode/
+.idea/
+
+.ruff_cache/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -9,23 +9,21 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.13"]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Poetry
-        uses: Gr1N/setup-poetry@v9
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: "poetry"
+          python-version-file: ".python-version"
 
       - name: Install Python dependencies
-        run: poetry install --extras dev
+        run: uv sync --group dev
 
       - name: Lint
         uses: pre-commit/action@v3.0.0
