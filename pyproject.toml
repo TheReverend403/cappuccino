@@ -36,6 +36,7 @@ docker = ["jinja2 (>=3.1.3,<4.0.0)"]
 
 [tool.ruff]
 force-exclude = true
+extend-exclude = ["docker/data/", "docker/config/"]
 
 [tool.ruff.lint]
 select = [
