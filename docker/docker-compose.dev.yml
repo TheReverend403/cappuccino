@@ -1,3 +1,5 @@
+name: cappuccino
+
 services:
   cappuccino:
     container_name: cappuccino
