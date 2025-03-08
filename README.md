@@ -18,7 +18,7 @@ Requirements:
 
 - PostgreSQL
 
-## Setting up the development environment
+## Setting up the dev environment
 
 First, install [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
@@ -30,7 +30,7 @@ uv sync --group dev
 uv run pre-commit install
 ```
 
-## Running
+## Running in dev mode
 
 ### Docker
 
