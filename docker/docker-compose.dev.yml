@@ -1,0 +1,57 @@
+services:
+  cappuccino:
+    container_name: cappuccino
+    restart: "no"
+    init: true
+    read_only: true
+    user: ${PUID:-1000}:${PGID:-1000}
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      CFG_BOT_NICK: ${CFG_BOT_NICK:?}
+      CFG_BOT_REALNAME: ${CFG_BOT_REALNAME:?}
+      CFG_BOT_USERNAME: ${CFG_BOT_USERNAME:?}
+      CFG_DB_URI: ${CFG_DB_URI:-postgresql://${DB_USER:-cappuccino}:${DB_PASSWORD:-cappuccino}@${DB_HOST:-db}/${DB_NAME:-cappuccino}}
+      CFG_IRC_HOST: ${CFG_IRC_HOST:?}
+      CFG_IRC_PORT: ${CFG_IRC_PORT:-6697}
+      CFG_IRC_SSL: ${CFG_IRC_SSL:-true}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${BASE_DIR:-.}/config/app:/config
+      - ../:/app:ro
+    tmpfs:
+      - /tmp
+    networks:
+      - cappuccino
+    build:
+      context: ../
+
+  db:
+    image: postgres:17-alpine
+    container_name: cappuccino_db
+    restart: "no"
+    user: ${PUID:-1000}:${PGID:-1000}
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${DB_NAME:-cappuccino}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-cappuccino}
+      POSTGRES_USER: ${DB_USER:-cappuccino}
+    volumes:
+      - ${BASE_DIR:-.}/data/postgresql:/var/lib/postgresql/data
+    networks:
+      - cappuccino
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -q --username=$$POSTGRES_USER --host=$$POSTGRES_HOST",
+        ]
+      start_period: 5s
+      start_interval: 1s
+      interval: 10s
+      timeout: 1s
+
+networks:
+  cappuccino:

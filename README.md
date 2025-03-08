@@ -16,7 +16,7 @@ A set of <a href="https://github.com/gawel/irc3">irc3</a> plugins providing vari
 
 Requirements:
 
-* PostgreSQL
+- PostgreSQL
 
 ## Setting up the development environment
 
@@ -31,6 +31,15 @@ uv run pre-commit install
 ```
 
 ## Running
+
+### Docker
+
+```sh
+cp docker/.env.example docker/.env # Open and set any empty variables
+docker compose -f docker/docker-compose.dev.yml up --build --pull always
+```
+
+### Manual
 
 ```sh
 cp config.ini.dist config.ini
