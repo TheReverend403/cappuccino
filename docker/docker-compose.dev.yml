@@ -18,10 +18,9 @@ services:
       CFG_IRC_HOST: ${CFG_IRC_HOST:?}
       CFG_IRC_PORT: 6697
       CFG_IRC_SSL: true
-      CFG_DB_URI: postgresql://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@/${POSTGRES_DB:-cappuccino}?host=${POSTGRES_HOST:-/run/postgresql}
+      CFG_DB_URI: postgresql://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@${POSTGRES_HOST:-db}/${POSTGRES_DB:-cappuccino}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - postgres_socket:/run/postgresql
       - ${BASE_DIR:-.}/config/app:/config
       - ../:/app:ro
     tmpfs:
@@ -30,21 +29,26 @@ services:
       - cappuccino
     build:
       context: ../
+    deploy:
+      resources:
+        limits:
+          cpus: ${CAPPUCCINO_CPU_LIMIT:-${CPU_LIMIT:-0}}
+          memory: ${CAPPUCCINO_MEM_LIMIT:-${MEM_LIMIT:-0}}
 
   db:
     image: postgres:17-alpine
     container_name: cappuccino_db
     restart: "no"
+    init: true
     user: ${PUID:-1000}:${PGID:-1000}
     env_file: .env
     environment:
-      POSTGRES_HOST: /run/postgresql
+      POSTGRES_HOST: db
       POSTGRES_DB: cappuccino
       POSTGRES_PASSWORD: cappuccino
       POSTGRES_USER: cappuccino
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - postgres_socket:/run/postgresql
       - ${BASE_DIR:-.}/data/postgresql:/var/lib/postgresql/data
     networks:
       - cappuccino
@@ -58,9 +62,11 @@ services:
       start_interval: 1s
       interval: 10s
       timeout: 1s
-
-volumes:
-  postgres_socket:
+    deploy:
+      resources:
+        limits:
+          cpus: ${POSTGRES_CPU_LIMIT:-${CPU_LIMIT:-0}}
+          memory: ${POSTGRES_MEM_LIMIT:-${MEM_LIMIT:-0}}
 
 networks:
   cappuccino:
