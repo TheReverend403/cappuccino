@@ -13,14 +13,15 @@ services:
     env_file: .env
     environment:
       CFG_BOT_NICK: ${CFG_BOT_NICK:?}
-      CFG_BOT_REALNAME: ${CFG_BOT_REALNAME:?}
-      CFG_BOT_USERNAME: ${CFG_BOT_USERNAME:?}
-      CFG_DB_URI: ${CFG_DB_URI:-postgresql://${DB_USER:-cappuccino}:${DB_PASSWORD:-cappuccino}@${DB_HOST:-db}/${DB_NAME:-cappuccino}}
+      CFG_BOT_REALNAME: cappuccino_dev
+      CFG_BOT_USERNAME: cappuccino_dev
       CFG_IRC_HOST: ${CFG_IRC_HOST:?}
-      CFG_IRC_PORT: ${CFG_IRC_PORT:-6697}
-      CFG_IRC_SSL: ${CFG_IRC_SSL:-true}
+      CFG_IRC_PORT: 6697
+      CFG_IRC_SSL: true
+      CFG_DB_URI: postgresql://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@/${POSTGRES_DB:-cappuccino}?host=${POSTGRES_HOST:-/run/postgresql}
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - postgres_socket:/run/postgresql
       - ${BASE_DIR:-.}/config/app:/config
       - ../:/app:ro
     tmpfs:
@@ -37,10 +38,13 @@ services:
     user: ${PUID:-1000}:${PGID:-1000}
     env_file: .env
     environment:
-      POSTGRES_DB: ${DB_NAME:-cappuccino}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-cappuccino}
-      POSTGRES_USER: ${DB_USER:-cappuccino}
+      POSTGRES_HOST: /run/postgresql
+      POSTGRES_DB: cappuccino
+      POSTGRES_PASSWORD: cappuccino
+      POSTGRES_USER: cappuccino
     volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - postgres_socket:/run/postgresql
       - ${BASE_DIR:-.}/data/postgresql:/var/lib/postgresql/data
     networks:
       - cappuccino
@@ -48,12 +52,15 @@ services:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -q --username=$$POSTGRES_USER --host=$$POSTGRES_HOST",
+          "pg_isready -q --dbname=$$POSTGRES_DB --username=$$POSTGRES_USER --host=$$POSTGRES_HOST",
         ]
       start_period: 5s
       start_interval: 1s
       interval: 10s
       timeout: 1s
+
+volumes:
+  postgres_socket:
 
 networks:
   cappuccino:
