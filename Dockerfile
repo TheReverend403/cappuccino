@@ -5,8 +5,6 @@ ARG DEBIAN_VERSION=bookworm
 ## Base
 FROM debian:${DEBIAN_VERSION}-slim AS python-base
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
-
 ENV PYTHONUNBUFFERED=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
@@ -16,6 +14,8 @@ ENV PYTHONUNBUFFERED=1 \
 
 ENV PATH="${UV_PROJECT_ENVIRONMENT}/bin:${PATH}" \
     PYTHONPATH="/app:${PYTHONPATH}"
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 
 ## Base image
