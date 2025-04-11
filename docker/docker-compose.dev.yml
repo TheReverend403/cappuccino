@@ -21,7 +21,7 @@ services:
       CFG_DB_URI: postgresql://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@${POSTGRES_HOST:-db}/${POSTGRES_DB:-cappuccino}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${BASE_DIR:-.}/config/app:/config
+      - ./config/app:/config
       - ../cappuccino:/app/cappuccino
     tmpfs:
       - /tmp
@@ -49,7 +49,7 @@ services:
       POSTGRES_USER: cappuccino
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${BASE_DIR:-.}/data/postgresql:/var/lib/postgresql/data
+      - ./data/postgresql:/var/lib/postgresql/data
     networks:
       - cappuccino
     healthcheck:
