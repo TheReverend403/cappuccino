@@ -47,7 +47,7 @@ class Sentry(Plugin):
         sentry_sdk.init(
             dsn,
             before_send=_before_send,
-            release=meta.VERSION,
+            release=meta.FULL_VERSION,
             integrations=[SqlalchemyIntegration()],
         )
 
