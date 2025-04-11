@@ -32,18 +32,7 @@ uv run pre-commit install
 
 ## Running in dev mode
 
-### Docker
-
 ```sh
 cp docker/.env.example docker/.env # Open and set any empty variables
 docker compose -f docker/docker-compose.dev.yml up --build --pull always
-```
-
-### Manual
-
-```sh
-cp config.ini.dist config.ini
-$EDITOR config.ini
-uv run alembic upgrade head
-uv run irc3 config.ini
 ```

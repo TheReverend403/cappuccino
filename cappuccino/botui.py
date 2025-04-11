@@ -31,7 +31,7 @@ class BotUI(Plugin):
 
         %%bots
         """
-        yield f"Reporting in! [cappuccino {meta.VERSION}] - {meta.SOURCE}"
+        yield f"Reporting in! [cappuccino {meta.FULL_VERSION}] - {meta.SOURCE}"
 
     @command(permission="admin", show_in_help_list=False)
     def join(self, mask, target, args):
