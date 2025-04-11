@@ -32,6 +32,12 @@ ARG META_VERSION
 ARG META_COMMIT
 ARG META_SOURCE
 
+RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
+    apt-get update && \
+    apt-get install --no-install-recommends -y \
+    libpq5 \
+    && apt-get autoclean && rm -rf /var/lib/apt/lists/*
+
 ENV META_VERSION="${META_VERSION}" \
     META_COMMIT="${META_COMMIT}" \
     META_SOURCE="${META_SOURCE}" \
@@ -43,12 +49,6 @@ COPY pyproject.toml uv.lock README.md LICENSE ./
 COPY cappuccino ./cappuccino
 COPY alembic ./alembic
 COPY alembic.ini ./
-
-RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
-    apt-get update && \
-    apt-get install --no-install-recommends -y \
-    libpq5 \
-    && apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
 RUN --mount=type=cache,target=${UV_CACHE_DIR} \
     uv sync --no-install-project --no-dev --group docker
