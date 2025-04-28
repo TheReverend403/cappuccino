@@ -22,7 +22,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./config/app:/config
-      - ../cappuccino:/app/cappuccino
+      - ../:/app
     tmpfs:
       - /tmp
     networks:

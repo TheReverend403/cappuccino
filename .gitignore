@@ -1,5 +1,6 @@
-docker/data
-docker/config
+docker/data/*
+docker/config/*
+!.gitkeep
 
 .vscode/
 .idea/
