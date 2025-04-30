@@ -2,7 +2,7 @@
 name = "cappuccino"
 description = "Just another IRC bot."
 authors = [{ name = "Lee Watson", email = "me@lwatson.dev" }]
-version = "1.17.5"
+version = "1.17.6"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.13,<3.14"
