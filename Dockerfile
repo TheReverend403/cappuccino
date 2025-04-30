@@ -14,7 +14,7 @@ ENV PYTHONUNBUFFERED=1 \
     UV_CACHE_DIR="/opt/uv/cache"
 
 ENV PATH="${UV_PROJECT_ENVIRONMENT}/bin:${PATH}" \
-    PYTHONPATH="/app:${PYTHONPATH}"
+    PYTHONPATH="/app"
 
 WORKDIR /app
 
