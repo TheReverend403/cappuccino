@@ -19,7 +19,7 @@ ENV PATH="${UV_PROJECT_ENVIRONMENT}/bin:${PATH}" \
 WORKDIR /app
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
-COPY .python-version ./
+COPY .python-version .
 
 RUN --mount=type=cache,target=${UV_CACHE_DIR} \
     uv python install
@@ -43,11 +43,8 @@ ENV META_VERSION="${META_VERSION}" \
     SETTINGS_FILE="/tmp/config.ini" \
     SETTINGS_SOURCE_FILE="/config/config.ini"
 
-COPY docker/rootfs /
-COPY pyproject.toml uv.lock README.md LICENSE ./
-COPY cappuccino ./cappuccino
-COPY alembic ./alembic
-COPY alembic.ini ./
+ADD . .
+RUN ln -s /app/docker/rootfs/* /
 
 RUN --mount=type=cache,target=${UV_CACHE_DIR} \
     uv sync --no-install-project --no-dev --group docker

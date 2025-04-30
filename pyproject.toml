@@ -2,7 +2,7 @@
 name = "cappuccino"
 description = "Just another IRC bot."
 authors = [{ name = "Lee Watson", email = "me@lwatson.dev" }]
-version = "1.17.3"
+version = "1.17.4"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.13,<3.14"
@@ -75,9 +75,6 @@ select = [
 ignore = ["E501"]
 
 extend-ignore = ["RUF012", "PLR09", "PLW2901"]
-
-[tool.ruff.lint.extend-per-file-ignores]
-"alembic/*" = ["ERA001"]
 
 [tool.ruff.format]
 line-ending = "lf"
