@@ -2,7 +2,7 @@
 name = "cappuccino"
 description = "Just another IRC bot."
 authors = [{ name = "Lee Watson", email = "me@lwatson.dev" }]
-version = "1.18.0"
+version = "1.18.1"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.13,<3.14"
@@ -21,7 +21,7 @@ dependencies = [
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
     "sentry-sdk>=2.27.0",
-    "sqlalchemy >=2.0.0",
+    "sqlalchemy>=2.0.0",
     "ujson>=5.10.0",
     "urllib3>=2.4.0",
 ]

@@ -5,4 +5,4 @@ set -eu
 
 alembic upgrade head
 
-exec irc3 -r "${SETTINGS_FILE}"
+exec irc3 "${SETTINGS_FILE}"

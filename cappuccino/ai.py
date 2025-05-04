@@ -130,7 +130,7 @@ class Ai(Plugin):
         select_stmt = select(func.count(CorpusLine.line))
         if channel:
             select_stmt = select_stmt.where(
-                func.lower(CorpusChannel.name) == channel.lower()
+                func.lower(CorpusLine.channel) == channel.lower()
             )
         return self.db_session.scalar(select_stmt)
 
