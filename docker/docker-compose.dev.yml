@@ -45,12 +45,12 @@ services:
     user: ${PUID:-1000}:${PGID:-1000}
     env_file: .env
     environment:
+      TZ: UTC
       POSTGRES_HOST: db
       POSTGRES_DB: cappuccino
       POSTGRES_PASSWORD: cappuccino
       POSTGRES_USER: cappuccino
     volumes:
-      - /etc/localtime:/etc/localtime:ro
       - ./data/postgresql:/var/lib/postgresql/data
     networks:
       - cappuccino
