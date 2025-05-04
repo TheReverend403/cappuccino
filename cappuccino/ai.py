@@ -114,7 +114,7 @@ class Ai(Plugin):
         select_stmt = select(CorpusLine)
         if channel:
             select_stmt = (
-                select_stmt.where(func.lower(CorpusChannel.name) == channel.lower())
+                select_stmt.where(func.lower(CorpusLine.channel) == channel.lower())
                 .order_by(func.random())
                 .limit(self._max_loaded_lines)
             )
