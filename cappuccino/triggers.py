@@ -17,12 +17,20 @@ import re
 
 import irc3
 from irc3.plugins.command import command
-from sqlalchemy import delete, func, insert, select, update
+from sqlalchemy import String, delete, func, select
+from sqlalchemy.orm import Mapped, mapped_column
 
-from cappuccino import Plugin
+from cappuccino import BaseModel, Plugin
 from cappuccino.util.channel import is_chanop
-from cappuccino.util.database import Database
 from cappuccino.util.formatting import Color, style
+
+
+class Trigger(BaseModel):
+    __tablename__ = "triggers"
+
+    trigger: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
+    channel: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
+    response: Mapped[str] = mapped_column(String(), nullable=False)
 
 
 @irc3.plugin
@@ -31,50 +39,40 @@ class Triggers(Plugin):
 
     def __init__(self, bot):
         super().__init__(bot)
-        self._db = Database(self)
-        self._triggers = self._db.meta.tables["triggers"]
 
     def _get_trigger(self, channel: str, trigger: str):
-        return self._db.execute(
-            select([self._triggers.c.response])
-            .where(func.lower(self._triggers.c.trigger) == trigger.lower())
-            .where(func.lower(self._triggers.c.channel) == channel.lower())
-        ).scalar()
+        return self.db_session.scalar(
+            select(Trigger.response)
+            .where(func.lower(Trigger.response) == trigger.lower())
+            .where(func.lower(Trigger.channel) == channel.lower())
+        )
 
     def _set_trigger(self, channel: str, trigger: str, text: str):
-        if self._get_trigger(channel, trigger):
-            self._db.execute(
-                update(self._triggers)
-                .where(func.lower(self._triggers.c.trigger) == trigger.lower())
-                .where(func.lower(self._triggers.c.channel) == channel.lower())
-                .values(response=text)
-            )
+        if trigger_model := self._get_trigger(channel, trigger):
+            trigger_model.response = text
+            self.db_session.commit()
             return
 
-        self._db.execute(
-            insert(self._triggers).values(
-                channel=channel, trigger=trigger, response=text
-            )
-        )
+        trigger_model = Trigger(trigger=trigger, channel=channel, response=text)
+        self.db_session.add(trigger_model)
+        self.db_session.commit()
 
     def _delete_trigger(self, channel: str, trigger: str) -> bool:
         return (
-            self._db.execute(
-                delete(self._triggers)
-                .where(func.lower(self._triggers.c.trigger) == trigger.lower())
-                .where(func.lower(self._triggers.c.channel) == channel.lower())
-                .returning(self._triggers.c.trigger)
-            ).scalar()
+            self.db_session.scalar(
+                delete(Trigger)
+                .where(func.lower(Trigger.trigger) == trigger.lower())
+                .where(func.lower(Trigger.channel) == channel.lower())
+                .returning(Triggers.trigger)
+            )
             is not None
         )
 
     def _get_triggers_list(self, channel: str) -> list:
         return [
-            row[0]
-            for row in self._db.execute(
-                select([self._triggers.c.trigger]).where(
-                    func.lower(self._triggers.c.channel) == channel.lower()
-                )
+            trigger.trigger
+            for trigger in self.db_session.scalars(
+                select(Trigger).where(func.lower(Trigger.channel) == channel.lower())
             )
         ]
 

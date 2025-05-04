@@ -14,59 +14,17 @@
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-from logging.config import dictConfig
-from pathlib import Path
+import os
 from secrets import randbelow
 
 import requests
-import yaml
+import sqlalchemy.orm
 from requests import Session
 from requests.cookies import RequestsCookieJar
+from sqlalchemy import create_engine
+from sqlalchemy.orm import DeclarativeBase
 
 from cappuccino.util import meta
-
-DEFAULT_LOG_CONFIG = {
-    "version": 1,
-    "formatters": {
-        "standard": {"format": "%(asctime)s [%(levelname)-5s] %(name)s: %(message)s"},
-    },
-    "handlers": {
-        "default": {
-            "level": "INFO",
-            "formatter": "standard",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout",  # Default is stderr
-        },
-    },
-    "root": {
-        "handlers": ["default"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "irc3": {"handlers": ["default"], "propagate": False},
-        "raw": {"handlers": ["default"], "propagate": False},
-        "cappuccino": {"handlers": ["default"], "level": "INFO", "propagate": False},
-    },
-}
-
-
-def _setup_logging():
-    try:
-        with Path("logging.yml").open() as fd:
-            dictConfig(yaml.safe_load(fd))
-            logging.getLogger(__name__).info("Using logging.yml for logging config.")
-
-    except FileNotFoundError:
-        dictConfig(DEFAULT_LOG_CONFIG)
-        logging.getLogger(__name__).info(
-            "logging.yml not found, using default logging config."
-        )
-    except yaml.YAMLError as exc:
-        dictConfig(DEFAULT_LOG_CONFIG)
-        logging.getLogger(__name__).exception(exc)
-
-
-_setup_logging()
 
 
 def _create_requests_session(bot) -> Session:
@@ -90,13 +48,26 @@ def _create_requests_session(bot) -> Session:
     return session
 
 
+class BaseModel(DeclarativeBase):
+    pass
+
+
 class Plugin:
     def __init__(self, bot):
         plugin_module = self.__class__.__module__
         self.bot = bot
         self.config: dict = self.bot.config.get(plugin_module, {})
-        self.logger = logging.getLogger(plugin_module)
+        self.logger = logging.getLogger(f"irc3.{plugin_module}")
         self.requests = _create_requests_session(bot)
+
+        db_config = self.bot.config.get("database", {})
+        db_engine = create_engine(
+            db_config.get("uri"),
+            pool_size=db_config.get("pool_size", os.cpu_count()),
+            max_overflow=db_config.get("max_overflow", os.cpu_count()),
+        )
+        self.db_session = sqlalchemy.orm.Session(db_engine)
+
         if self.config:
             # I have no idea where these are coming from but whatever.
             weird_keys = ["#", "hash"]

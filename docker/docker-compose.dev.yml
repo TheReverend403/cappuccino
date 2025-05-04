@@ -12,6 +12,7 @@ services:
         condition: service_healthy
     env_file: .env
     environment:
+      TZ: UTC
       CFG_BOT_NICK: ${CFG_BOT_NICK:?}
       CFG_BOT_REALNAME: cappuccino_dev
       CFG_BOT_USERNAME: cappuccino_dev
@@ -20,13 +21,14 @@ services:
       CFG_IRC_SSL: true
       CFG_DB_URI: postgresql://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@${POSTGRES_HOST:-db}/${POSTGRES_DB:-cappuccino}
     volumes:
-      - /etc/localtime:/etc/localtime:ro
       - ./config/app:/config
       - ../:/app
     tmpfs:
       - /tmp
     networks:
       - cappuccino
+    ports:
+      - "1337:1337"
     build:
       context: ../
     deploy:

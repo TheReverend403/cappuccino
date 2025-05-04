@@ -14,12 +14,22 @@
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
 import threading
+from datetime import datetime
 
 import bottle
-from sqlalchemy import desc, func, insert, nullslast, select, update
+from sqlalchemy import (
+    JSON,
+    DateTime,
+    String,
+    desc,
+    func,
+    inspect,
+    nullslast,
+    select,
+)
+from sqlalchemy.orm import Mapped, mapped_column
 
-from cappuccino import Plugin
-from cappuccino.util.database import Database
+from cappuccino import BaseModel, Plugin
 from cappuccino.util.formatting import unstyle
 
 try:
@@ -38,12 +48,56 @@ def _strip_path():
     )
 
 
+class RiceDB(BaseModel):
+    __tablename__ = "ricedb"
+
+    nick: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
+    dtops: Mapped[JSON | None] = mapped_column(
+        JSON(),
+        nullable=True,
+    )
+    homescreens: Mapped[JSON | None] = mapped_column(
+        JSON(),
+        nullable=True,
+    )
+    stations: Mapped[JSON | None] = mapped_column(
+        JSON(),
+        nullable=True,
+    )
+    pets: Mapped[JSON | None] = mapped_column(
+        JSON(),
+        nullable=True,
+    )
+    dotfiles: Mapped[JSON | None] = mapped_column(
+        JSON(),
+        nullable=True,
+    )
+    handwritings: Mapped[JSON | None] = mapped_column(
+        JSON(),
+        nullable=True,
+    )
+    distros: Mapped[JSON | None] = mapped_column(
+        JSON(),
+        nullable=True,
+    )
+    websites: Mapped[JSON | None] = mapped_column(
+        JSON(),
+        nullable=True,
+    )
+    selfies: Mapped[JSON | None] = mapped_column(
+        JSON(),
+        nullable=True,
+    )
+    lastfm: Mapped[str] = mapped_column(String(), nullable=True)
+    last_seen: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
 @irc3.plugin
 class UserDB(Plugin):
     def __init__(self, bot):
         super().__init__(bot)
-        self._db = Database(self)
-        self._ricedb = self._db.meta.tables["ricedb"]
 
         if self.config.get("enable_http_server", False):
             host = self.config.get("http_host", "127.0.0.1")
@@ -60,51 +114,51 @@ class UserDB(Plugin):
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
-        return self._db.execute(
-            select([self._ricedb.c[key]]).where(
-                func.lower(self._ricedb.c.nick) == username.lower()
-            )
-        ).scalar()
+        user = self.db_session.scalar(
+            select(RiceDB).where(func.lower(RiceDB.nick) == username.lower())
+        )
+        if not user:
+            return None
+
+        return getattr(user, key)
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
-        self._db.execute(
-            update(self._ricedb)
-            .where(func.lower(self._ricedb.c.nick) == username.lower())
-            .values(**{key: None})
-        )
+        user_select = select(RiceDB).where(func.lower(RiceDB.nick) == username.lower())
+        user = self.db_session.scalar(user_select)
+        setattr(user, key, None)
+        self.db_session.commit()
 
     @irc3.extend
     def set_user_value(self, username: str, key: str, value=None):
-        user_exists = (
-            self._db.execute(
-                select([self._ricedb.c.nick]).where(
-                    func.lower(self._ricedb.c.nick) == username.lower()
-                )
-            ).scalar()
+        existing_user = (
+            self.db_session.scalar(
+                select(RiceDB).where(func.lower(RiceDB.nick) == username.lower())
+            )
             or None
         )
 
-        if user_exists is None:
-            self._db.execute(insert(self._ricedb).values(nick=username, **{key: value}))
+        if existing_user is None:
+            user = RiceDB(nick=username, **{key: value})
+            self.db_session.add(user)
+            self.db_session.commit()
             return
 
-        self._db.execute(
-            update(self._ricedb)
-            .where(func.lower(self._ricedb.c.nick) == username.lower())
-            .values(nick=username, **{key: value})
-        )
+        setattr(existing_user, key, value)
+        self.db_session.commit()
 
-    def _json_dump(self) -> str:
+    def _json_dump(self):
         bottle.response.content_type = "application/json"
 
         data = []
-        all_users = self._db.execute(
-            select([self._ricedb]).order_by(nullslast(desc(self._ricedb.c.last_seen)))
-        )
-        for row in all_users:
-            user = {}
-            for column, value in row.items():
+        all_users = self.db_session.scalars(
+            select(RiceDB).order_by(nullslast(desc(RiceDB.last_seen)))
+        ).all()
+
+        for user in all_users:
+            user_dict = {}
+            for column, value in inspect(user).attrs.items():
+                value = value.value
                 if value is None:
                     continue
 
@@ -118,6 +172,6 @@ class UserDB(Plugin):
                         else unstyle(value)
                     )
 
-                user[column] = value
-            data.append(user)
+                user_dict[column] = value
+            data.append(user_dict)
         return json.dumps(data)

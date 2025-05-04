@@ -30,6 +30,7 @@ FROM python-base AS app
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
     apt-get update && apt-get install --no-install-recommends -y \
+    ca-certificates \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*
 

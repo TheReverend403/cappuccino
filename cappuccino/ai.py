@@ -13,6 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
+import contextlib
 import random
 import re
 from datetime import UTC, datetime
@@ -23,12 +24,12 @@ import markovify
 from humanize import intcomma, precisedelta
 from irc3.plugins.command import command
 from irc3.utils import IrcString
-from sqlalchemy import func, insert, select, update
+from sqlalchemy import Boolean, String, exists, func, select
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Mapped, mapped_column
 
-from cappuccino import Plugin
+from cappuccino import BaseModel, Plugin
 from cappuccino.util.channel import is_chanop
-from cappuccino.util.database import Database
 from cappuccino.util.formatting import unstyle
 
 _CMD_PATTERN = re.compile(r"^\s*([.!~`$])+")
@@ -49,6 +50,20 @@ def _should_ignore_message(line):
     )
 
 
+class CorpusLine(BaseModel):
+    __tablename__ = "ai_corpus"
+
+    line: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
+    channel: Mapped[str] = mapped_column(String(), nullable=False)
+
+
+class CorpusChannel(BaseModel):
+    __tablename__ = "ai_channels"
+
+    name: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
+    status: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+
+
 @irc3.plugin
 class Ai(Plugin):
     requires = ["irc3.plugins.command", "irc3.plugins.userlist"]
@@ -58,10 +73,6 @@ class Ai(Plugin):
         self._ignore_nicks: list[str] = self.config.get("ignore_nicks", [])
         self._max_loaded_lines: int = self.config.get("max_loaded_lines", 25000)
         self._max_reply_length: int = self.config.get("max_reply_length", 100)
-
-        self._db = Database(self)
-        self._corpus = self._db.meta.tables["ai_corpus"]
-        self._channels = self._db.meta.tables["ai_channels"]
         self._text_model = self._create_text_model()
 
     def _create_text_model(self):
@@ -88,19 +99,22 @@ class Ai(Plugin):
         return model
 
     def _add_line(self, line: str, channel: str):
-        try:
-            insert_stmt = insert(self._corpus).values(
-                line=unstyle(line), channel=channel
-            )
-            self._db.execute(insert_stmt)
-        except IntegrityError:
-            pass
+        line = unstyle(line)
+        if self.db_session.scalar(
+            select(exists().where(func.lower(CorpusLine.line) == line.lower()))
+        ):
+            return
 
-    def _get_lines(self, channel: str | None = None) -> list:
-        select_stmt = select([self._corpus.c.line])
+        corpus_line = CorpusLine(line=line, channel=channel)
+        with contextlib.suppress(IntegrityError):
+            self.db_session.add(corpus_line)
+            self.db_session.commit()
+
+    def _get_lines(self, channel: str | None = None) -> list[str]:
+        select_stmt = select(CorpusLine)
         if channel:
             select_stmt = (
-                select_stmt.where(func.lower(self._corpus.c.channel) == channel.lower())
+                select_stmt.where(func.lower(CorpusChannel.name) == channel.lower())
                 .order_by(func.random())
                 .limit(self._max_loaded_lines)
             )
@@ -109,43 +123,40 @@ class Ai(Plugin):
                 self._max_loaded_lines
             )
 
-        lines = [result.line for result in self._db.execute(select_stmt)]
+        lines = [result.line for result in self.db_session.scalars(select_stmt)]
         return lines if len(lines) > 0 else None
 
     def _line_count(self, channel: str | None = None) -> int:
-        select_stmt = select([func.count(self._corpus.c.line)])
+        select_stmt = select(func.count(CorpusLine.line))
         if channel:
             select_stmt = select_stmt.where(
-                func.lower(self._corpus.c.channel) == channel.lower()
+                func.lower(CorpusChannel.name) == channel.lower()
             )
-
-        return self._db.execute(select_stmt).scalar()
+        return self.db_session.scalar(select_stmt)
 
     def _is_active(self, channel: str) -> bool:
         if not IrcString(channel).is_channel:
             return False
 
-        select_stmt = select([self._channels.c.status]).where(
-            func.lower(self._corpus.c.channel) == channel.lower()
+        select_stmt = select(CorpusChannel.status).where(
+            func.lower(CorpusChannel.name) == channel.lower()
         )
-        result = self._db.execute(select_stmt).scalar()
-
+        result = self.db_session.scalar(select_stmt)
         if result is None:
-            insert_stmt = insert(self._channels).values(name=channel, status=0)
-            self._db.execute(insert_stmt)
+            corpus_channel = CorpusChannel(name=channel, status=False)
+            self.db_session.add(corpus_channel)
+            self.db_session.commit()
             return False
 
         return result
 
     def _toggle(self, channel: str):
-        new_status = int(not self._is_active(channel))
-        update_stmt = (
-            update(self._channels)
-            .where(func.lower(self._corpus.c.channel) == channel.lower())
-            .values(status=new_status)
+        new_status = not self._is_active(channel)
+        corpus_channel = select(CorpusChannel).where(
+            func.lower(CorpusChannel.channel) == channel.lower()
         )
-
-        self._db.execute(update_stmt)
+        corpus_channel.status = new_status
+        self.db_session.commit()
 
     @command()
     def ai(self, mask, target, args):

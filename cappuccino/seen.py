@@ -29,7 +29,7 @@ class Seen(Plugin):
     requires = ["irc3.plugins.command", "cappuccino.userdb"]
 
     def _get_last_seen(self, nick: str) -> datetime:
-        return self.bot.get_user_value(nick, _DB_KEY)
+        return self.bot.get_user_value(nick, _DB_KEY).replace(tzinfo=UTC)
 
     def _set_last_seen(self, nick: str, timestamp: datetime):
         self.bot.set_user_value(nick, _DB_KEY, timestamp)
@@ -53,9 +53,9 @@ class Seen(Plugin):
             return f"I haven't seen any activity from {nick} yet."
 
         last_seen = self._get_last_seen(nick)
-        time_now = datetime.now(UTC)
+        time_now = datetime.now(last_seen.tzinfo)
         duration = naturaltime(time_now - last_seen)
-        full_date = last_seen.strftime("%b %d %Y %H:%M UTC")
+        full_date = last_seen.strftime("%b %d %Y %H:%M %Z")
 
         if nick == "kori":
             return f"{nick} was right there {duration}. ({full_date})"
