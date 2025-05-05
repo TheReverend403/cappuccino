@@ -120,7 +120,7 @@ class UserDB(Plugin):
         if not user:
             return None
 
-        return getattr(user, key)
+        return getattr(user, key, None)
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
