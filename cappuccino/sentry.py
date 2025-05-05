@@ -41,7 +41,7 @@ class Sentry(Plugin):
 
         dsn = self.config.get("dsn", None)
         if not dsn:
-            self.logger.warning("Missing Sentry DSN, Sentry will not be used.")
+            self.logger.info("Missing Sentry DSN, Sentry is disabled.")
             return
 
         sentry_sdk.init(
