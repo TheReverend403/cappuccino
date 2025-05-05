@@ -13,7 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-import contextlib
 import random
 import re
 from datetime import UTC, datetime
@@ -106,9 +105,11 @@ class Ai(Plugin):
             return
 
         corpus_line = CorpusLine(line=line, channel=channel)
-        with contextlib.suppress(IntegrityError):
+        try:
             self.db_session.add(corpus_line)
             self.db_session.commit()
+        except IntegrityError:
+            self.db_session.rollback()
 
     def _get_lines(self, channel: str | None = None) -> list[str]:
         select_stmt = select(CorpusLine)
@@ -127,7 +128,7 @@ class Ai(Plugin):
         return lines if len(lines) > 0 else None
 
     def _line_count(self, channel: str | None = None) -> int:
-        select_stmt = select(func.count(CorpusLine.line))
+        select_stmt = select(func.count()).select_from(CorpusLine)
         if channel:
             select_stmt = select_stmt.where(
                 func.lower(CorpusLine.channel) == channel.lower()
