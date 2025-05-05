@@ -5,4 +5,9 @@ set -eu
 
 alembic upgrade head
 
-exec irc3 "${SETTINGS_FILE}"
+RUN_COMMAND="irc3"
+if [ "${DEBUG:-false}" = "true" ]; then
+    RUN_COMMAND="${RUN_COMMAND} -dr"
+fi
+
+exec ${RUN_COMMAND} "${SETTINGS_FILE}"
