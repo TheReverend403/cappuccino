@@ -91,7 +91,7 @@ class RiceDB(BaseModel):
     )
     lastfm: Mapped[str] = mapped_column(String(), nullable=True)
     last_seen: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True), nullable=True, server_default=func.now()
     )
 
 

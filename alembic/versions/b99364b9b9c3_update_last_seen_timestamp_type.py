@@ -25,7 +25,6 @@ def upgrade():
         "last_seen",
         existing_type=postgresql.TIMESTAMP(),
         type_=sa.DateTime(timezone=True),
-        nullable=False,
     )
     op.drop_column("ricedb", "data")
     # ### end Alembic commands ###
@@ -39,7 +38,6 @@ def downgrade():
             "data",
             postgresql.JSON(astext_type=sa.Text()),
             autoincrement=False,
-            nullable=True,
         ),
     )
     op.alter_column(
@@ -47,6 +45,5 @@ def downgrade():
         "last_seen",
         existing_type=sa.DateTime(timezone=True),
         type_=postgresql.TIMESTAMP(),
-        nullable=True,
     )
     # ### end Alembic commands ###
