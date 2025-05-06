@@ -23,7 +23,7 @@ import markovify
 from humanize import intcomma, precisedelta
 from irc3.plugins.command import command
 from irc3.utils import IrcString
-from sqlalchemy import Boolean, String, exists, func, select
+from sqlalchemy import Boolean, String, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -99,11 +99,6 @@ class Ai(Plugin):
 
     def _add_line(self, line: str, channel: str):
         line = unstyle(line)
-        if self.db_session.scalar(
-            select(exists().where(func.lower(CorpusLine.line) == line.lower()))
-        ):
-            return
-
         corpus_line = CorpusLine(line=line, channel=channel)
         try:
             self.db_session.add(corpus_line)
@@ -139,24 +134,25 @@ class Ai(Plugin):
         if not IrcString(channel).is_channel:
             return False
 
-        select_stmt = select(CorpusChannel.status).where(
-            func.lower(CorpusChannel.name) == channel.lower()
+        return self.db_session.scalar(
+            select(CorpusChannel.status).where(
+                func.lower(CorpusChannel.name) == channel.lower()
+            )
         )
-        result = self.db_session.scalar(select_stmt)
-        if result is None:
-            corpus_channel = CorpusChannel(name=channel, status=False)
-            self.db_session.add(corpus_channel)
-            self.db_session.commit()
-            return False
-
-        return result
 
     def _toggle(self, channel: str):
         new_status = not self._is_active(channel)
-        corpus_channel = select(CorpusChannel).where(
-            func.lower(CorpusChannel.channel) == channel.lower()
+        corpus_channel = self.db_session.scalar(
+            update(CorpusChannel)
+            .returning(CorpusChannel)
+            .where(func.lower(CorpusChannel.name) == channel.lower())
+            .values(status=new_status)
         )
-        corpus_channel.status = new_status
+
+        if corpus_channel is None:
+            corpus_channel = CorpusChannel(name=channel, status=new_status)
+            self.db_session.add(corpus_channel)
+
         self.db_session.commit()
 
     @command()

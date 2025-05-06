@@ -17,7 +17,7 @@ import re
 
 import irc3
 from irc3.plugins.command import command
-from sqlalchemy import String, delete, func, select
+from sqlalchemy import String, delete, func, select, update
 from sqlalchemy.orm import Mapped, mapped_column
 
 from cappuccino import BaseModel, Plugin
@@ -43,18 +43,23 @@ class Triggers(Plugin):
     def _get_trigger(self, channel: str, trigger: str):
         return self.db_session.scalar(
             select(Trigger.response)
-            .where(func.lower(Trigger.response) == trigger.lower())
+            .where(func.lower(Trigger.trigger) == trigger.lower())
             .where(func.lower(Trigger.channel) == channel.lower())
         )
 
     def _set_trigger(self, channel: str, trigger: str, text: str):
-        if trigger_model := self._get_trigger(channel, trigger):
-            trigger_model.response = text
-            self.db_session.commit()
-            return
+        trigger_model = self.db_session.scalar(
+            update(Trigger)
+            .returning(Trigger)
+            .where(func.lower(Trigger.trigger) == trigger.lower())
+            .where(func.lower(Trigger.channel) == channel.lower())
+            .values(response=text)
+        )
 
-        trigger_model = Trigger(trigger=trigger, channel=channel, response=text)
-        self.db_session.add(trigger_model)
+        if trigger_model is None:
+            trigger_model = Trigger(trigger=trigger, channel=channel, response=text)
+            self.db_session.add(trigger_model)
+
         self.db_session.commit()
 
     def _delete_trigger(self, channel: str, trigger: str) -> bool:
@@ -69,12 +74,11 @@ class Triggers(Plugin):
         )
 
     def _get_triggers_list(self, channel: str) -> list:
-        return [
-            trigger.trigger
-            for trigger in self.db_session.scalars(
-                select(Trigger).where(func.lower(Trigger.channel) == channel.lower())
+        return self.db_session.scalars(
+            select(Trigger.trigger).where(
+                func.lower(Trigger.channel) == channel.lower()
             )
-        ]
+        ).all()
 
     @command(permission="view")
     def trigger(self, mask, target, args):

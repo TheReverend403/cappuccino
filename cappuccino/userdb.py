@@ -26,6 +26,7 @@ from sqlalchemy import (
     inspect,
     nullslast,
     select,
+    update,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -114,37 +115,29 @@ class UserDB(Plugin):
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
-        user = self.db_session.scalar(
-            select(RiceDB).where(func.lower(RiceDB.nick) == username.lower())
+        return self.db_session.scalar(
+            select(RiceDB.__table__.columns[key]).where(
+                func.lower(RiceDB.nick) == username.lower()
+            )
         )
-        if not user:
-            return None
-
-        return getattr(user, key, None)
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
-        user_select = select(RiceDB).where(func.lower(RiceDB.nick) == username.lower())
-        user = self.db_session.scalar(user_select)
-        setattr(user, key, None)
-        self.db_session.commit()
+        self.set_user_value(username, key, None)
 
     @irc3.extend
     def set_user_value(self, username: str, key: str, value=None):
-        existing_user = (
-            self.db_session.scalar(
-                select(RiceDB).where(func.lower(RiceDB.nick) == username.lower())
-            )
-            or None
+        user = self.db_session.scalar(
+            update(RiceDB)
+            .returning(RiceDB)
+            .where(func.lower(RiceDB.nick) == username.lower())
+            .values({key: value})
         )
 
-        if existing_user is None:
+        if user is None:
             user = RiceDB(nick=username, **{key: value})
             self.db_session.add(user)
-            self.db_session.commit()
-            return
 
-        setattr(existing_user, key, value)
         self.db_session.commit()
 
     def _json_dump(self):
@@ -153,7 +146,7 @@ class UserDB(Plugin):
         data = []
         all_users = self.db_session.scalars(
             select(RiceDB).order_by(nullslast(desc(RiceDB.last_seen)))
-        ).all()
+        )
 
         for user in all_users:
             user_dict = {}

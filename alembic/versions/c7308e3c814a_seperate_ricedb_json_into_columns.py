@@ -9,8 +9,10 @@ Create Date: 2020-02-02 20:34:18.585110
 from datetime import UTC, datetime
 
 import sqlalchemy as sa
+from sqlalchemy import select, update
 
 from alembic import op
+from cappuccino.userdb import RiceDB
 
 # revision identifiers, used by Alembic.
 revision = "c7308e3c814a"
@@ -38,8 +40,9 @@ def upgrade():
 
 
 def copy_json_to_columns():
-    ricedb_table = sa.Table(table, sa.MetaData(bind=op.get_bind()), autoload=True)
-    for result in ricedb_table.select().execute():
+    ricedb_table = RiceDB.__table__
+    conn = op.get_bind()
+    for result in conn.execute(select(ricedb_table)):
         user = result[0]
         json_data = result[1]
         last_seen = json_data.get("last_seen")
@@ -61,9 +64,9 @@ def copy_json_to_columns():
             "last_seen": last_seen or None,
         }
 
-        ricedb_table.update().values(values).where(
-            ricedb_table.c.nick == user
-        ).execute()
+        conn.execute(
+            update(ricedb_table).values(values).where(ricedb_table.c.nick == user)
+        )
 
 
 def downgrade():
