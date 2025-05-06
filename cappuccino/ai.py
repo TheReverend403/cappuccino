@@ -86,26 +86,28 @@ class Ai(Plugin):
 
     def _add_line(self, line: str, channel: str):
         line = unstyle(line)
-        corpus_line = CorpusLine(line=line, channel=channel)
         with (
             contextlib.suppress(IntegrityError),
             self.db_session() as session,
             session.begin(),
         ):
-            session.add(corpus_line)
+            ai_channel = session.scalar(
+                select(AIChannel).where(func.lower(AIChannel.name) == channel.lower())
+            )
+            if not ai_channel:
+                ai_channel = AIChannel(name=channel)
+
+            corpus_line = CorpusLine(line=line)
+            ai_channel.lines.append(corpus_line)
+            session.add_all([ai_channel, corpus_line])
 
     def _get_lines(self, channel: str | None = None) -> list[str]:
         select_stmt = select(CorpusLine.line)
         if channel:
-            select_stmt = (
-                select_stmt.where(func.lower(CorpusLine.channel) == channel.lower())
-                .order_by(func.random())
-                .limit(self._max_loaded_lines)
+            select_stmt = select(AIChannel.lines).where(
+                func.lower(AIChannel.name) == channel.lower()
             )
-        else:
-            select_stmt = select_stmt.order_by(func.random()).limit(
-                self._max_loaded_lines
-            )
+        select_stmt = select_stmt.order_by(func.random()).limit(self._max_loaded_lines)
 
         with self.db_session() as session:
             lines = session.scalars(select_stmt).all()
@@ -115,8 +117,13 @@ class Ai(Plugin):
     def _line_count(self, channel: str | None = None) -> int:
         select_stmt = select(func.count()).select_from(CorpusLine)
         if channel:
-            select_stmt = select_stmt.where(
-                func.lower(CorpusLine.channel) == channel.lower()
+            select_stmt = (
+                select(func.count())
+                .select_from(AIChannel)
+                .join(
+                    CorpusLine,
+                    func.lower(AIChannel.name) == func.lower(CorpusLine.channel_name),
+                )
             )
 
         with self.db_session() as session:

@@ -12,8 +12,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
-from sqlalchemy import Boolean, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from cappuccino.db.models import BaseModel
 
@@ -22,11 +22,15 @@ class CorpusLine(BaseModel):
     __tablename__ = "ai_corpus"
 
     line: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
-    channel: Mapped[str] = mapped_column(String(), nullable=False)
+    channel_name: Mapped[str] = mapped_column(
+        ForeignKey("ai_channels.name"), nullable=False
+    )
+    channel: Mapped["AIChannel"] = relationship(back_populates="lines")
 
 
 class AIChannel(BaseModel):
     __tablename__ = "ai_channels"
 
     name: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
-    enabled: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=False)
+    lines: Mapped[list[CorpusLine]] = relationship(back_populates="channel")
