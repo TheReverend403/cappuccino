@@ -147,7 +147,7 @@ class UserDB(Plugin):
         with self.db_session() as session:
             all_users = session.scalars(
                 select(RiceDB).order_by(nullslast(desc(RiceDB.last_seen)))
-            )
+            ).all()
 
         for user in all_users:
             user_dict = {}
