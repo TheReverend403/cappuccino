@@ -9,9 +9,9 @@ Create Date: 2020-02-02 20:34:18.585110
 from datetime import UTC, datetime
 
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy import select, update
 
-from alembic import op
 from cappuccino.userdb import RiceDB
 
 # revision identifiers, used by Alembic.

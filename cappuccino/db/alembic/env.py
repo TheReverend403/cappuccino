@@ -2,10 +2,13 @@ import configparser
 import os
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from alembic import context
-from cappuccino import BaseModel
+from cappuccino.db.models import BaseModel
+from cappuccino.db.models.ai import AIChannel, CorpusLine  # noqa: F401
+from cappuccino.db.models.triggers import Trigger  # noqa: F401
+from cappuccino.db.models.userdb import RiceDB  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

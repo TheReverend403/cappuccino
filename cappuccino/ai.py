@@ -12,6 +12,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
+
 import contextlib
 import random
 import re
@@ -23,11 +24,11 @@ import markovify
 from humanize import intcomma, precisedelta
 from irc3.plugins.command import command
 from irc3.utils import IrcString
-from sqlalchemy import Boolean, String, func, select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Mapped, mapped_column
 
-from cappuccino import BaseModel, Plugin
+from cappuccino import Plugin
+from cappuccino.db.models.ai import AIChannel, CorpusLine
 from cappuccino.util.channel import is_chanop
 from cappuccino.util.formatting import unstyle
 
@@ -47,20 +48,6 @@ def _should_ignore_message(line):
         or line.startswith("[")
         or line.startswith("\x01ACTION ")
     )
-
-
-class CorpusLine(BaseModel):
-    __tablename__ = "ai_corpus"
-
-    line: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
-    channel: Mapped[str] = mapped_column(String(), nullable=False)
-
-
-class AIChannel(BaseModel):
-    __tablename__ = "ai_channels"
-
-    name: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
-    status: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
 
 @irc3.plugin

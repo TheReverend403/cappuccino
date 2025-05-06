@@ -14,13 +14,9 @@
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
 import threading
-from datetime import datetime
 
 import bottle
 from sqlalchemy import (
-    JSON,
-    DateTime,
-    String,
     desc,
     func,
     inspect,
@@ -28,9 +24,9 @@ from sqlalchemy import (
     select,
     update,
 )
-from sqlalchemy.orm import Mapped, mapped_column
 
-from cappuccino import BaseModel, Plugin
+from cappuccino import Plugin
+from cappuccino.db.models.userdb import RiceDB
 from cappuccino.util.formatting import unstyle
 
 try:
@@ -46,52 +42,6 @@ import irc3
 def _strip_path():
     bottle.request.environ["PATH_INFO"] = bottle.request.environ["PATH_INFO"].rstrip(
         "/"
-    )
-
-
-class RiceDB(BaseModel):
-    __tablename__ = "ricedb"
-
-    nick: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
-    dtops: Mapped[JSON | None] = mapped_column(
-        JSON(),
-        nullable=True,
-    )
-    homescreens: Mapped[JSON | None] = mapped_column(
-        JSON(),
-        nullable=True,
-    )
-    stations: Mapped[JSON | None] = mapped_column(
-        JSON(),
-        nullable=True,
-    )
-    pets: Mapped[JSON | None] = mapped_column(
-        JSON(),
-        nullable=True,
-    )
-    dotfiles: Mapped[JSON | None] = mapped_column(
-        JSON(),
-        nullable=True,
-    )
-    handwritings: Mapped[JSON | None] = mapped_column(
-        JSON(),
-        nullable=True,
-    )
-    distros: Mapped[JSON | None] = mapped_column(
-        JSON(),
-        nullable=True,
-    )
-    websites: Mapped[JSON | None] = mapped_column(
-        JSON(),
-        nullable=True,
-    )
-    selfies: Mapped[JSON | None] = mapped_column(
-        JSON(),
-        nullable=True,
-    )
-    lastfm: Mapped[str] = mapped_column(String(), nullable=True)
-    last_seen: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=True, server_default=func.now()
     )
 
 

@@ -21,7 +21,7 @@ import requests
 from requests import Session
 from requests.cookies import RequestsCookieJar
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from cappuccino.util import meta
 
@@ -45,10 +45,6 @@ def _create_requests_session(bot) -> Session:
         }
     )
     return session
-
-
-class BaseModel(DeclarativeBase):
-    pass
 
 
 class Plugin:

@@ -17,20 +17,12 @@ import re
 
 import irc3
 from irc3.plugins.command import command
-from sqlalchemy import String, delete, func, select, update
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import delete, func, select, update
 
-from cappuccino import BaseModel, Plugin
+from cappuccino import Plugin
+from cappuccino.db.models.triggers import Trigger
 from cappuccino.util.channel import is_chanop
 from cappuccino.util.formatting import Color, style
-
-
-class Trigger(BaseModel):
-    __tablename__ = "triggers"
-
-    trigger: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
-    channel: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
-    response: Mapped[str] = mapped_column(String(), nullable=False)
 
 
 @irc3.plugin

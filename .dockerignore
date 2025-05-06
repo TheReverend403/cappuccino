@@ -2,7 +2,6 @@
 
 !docker/rootfs/*
 !cappuccino
-!alembic
 !alembic.ini
 !pyproject.toml
 !uv.lock
