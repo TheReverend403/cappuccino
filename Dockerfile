@@ -26,7 +26,7 @@ RUN --mount=type=cache,target=${UV_CACHE_DIR} \
 
 
 ## Base image
-FROM python-base AS app
+FROM python-base AS app-base
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
     apt-get update && apt-get install --no-install-recommends -y \
@@ -54,3 +54,14 @@ VOLUME ["/config"]
 EXPOSE 1337
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
+
+
+FROM app-base AS development
+
+ENV DEBUG=true
+
+RUN --mount=type=cache,target=${UV_CACHE_DIR} \
+    uv sync --no-install-project --group docker
+
+
+FROM app-base AS production

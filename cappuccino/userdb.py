@@ -115,11 +115,12 @@ class UserDB(Plugin):
 
     @irc3.extend
     def get_user_value(self, username: str, key: str):
-        return self.db_session.scalar(
-            select(RiceDB.__table__.columns[key]).where(
-                func.lower(RiceDB.nick) == username.lower()
+        with self.db_session() as session:
+            return session.scalar(
+                select(RiceDB.__table__.columns[key]).where(
+                    func.lower(RiceDB.nick) == username.lower()
+                )
             )
-        )
 
     @irc3.extend
     def del_user_value(self, username: str, key: str):
@@ -127,26 +128,26 @@ class UserDB(Plugin):
 
     @irc3.extend
     def set_user_value(self, username: str, key: str, value=None):
-        user = self.db_session.scalar(
-            update(RiceDB)
-            .returning(RiceDB)
-            .where(func.lower(RiceDB.nick) == username.lower())
-            .values({key: value})
-        )
+        with self.db_session() as session, session.begin():
+            user = session.scalar(
+                update(RiceDB)
+                .returning(RiceDB)
+                .where(func.lower(RiceDB.nick) == username.lower())
+                .values({key: value})
+            )
 
-        if user is None:
-            user = RiceDB(nick=username, **{key: value})
-            self.db_session.add(user)
-
-        self.db_session.commit()
+            if user is None:
+                user = RiceDB(nick=username, **{key: value})
+                session.add(user)
 
     def _json_dump(self):
         bottle.response.content_type = "application/json"
 
         data = []
-        all_users = self.db_session.scalars(
-            select(RiceDB).order_by(nullslast(desc(RiceDB.last_seen)))
-        )
+        with self.db_session() as session:
+            all_users = session.scalars(
+                select(RiceDB).order_by(nullslast(desc(RiceDB.last_seen)))
+            )
 
         for user in all_users:
             user_dict = {}

@@ -5,6 +5,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
+from cappuccino import BaseModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -15,7 +16,7 @@ config = context.config
 fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
-target_metadata = None
+target_metadata = BaseModel.metadata
 
 
 def run_migrations_offline():

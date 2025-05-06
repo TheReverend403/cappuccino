@@ -18,11 +18,10 @@ import os
 from secrets import randbelow
 
 import requests
-import sqlalchemy.orm
 from requests import Session
 from requests.cookies import RequestsCookieJar
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from cappuccino.util import meta
 
@@ -61,12 +60,12 @@ class Plugin:
         self.requests = _create_requests_session(bot)
 
         db_config = self.bot.config.get("database", {})
-        db_engine = create_engine(
+        db = create_engine(
             db_config.get("uri"),
             pool_size=db_config.get("pool_size", os.cpu_count()),
             max_overflow=db_config.get("max_overflow", os.cpu_count()),
         )
-        self.db_session = sqlalchemy.orm.Session(db_engine)
+        self.db_session = sessionmaker(db)
 
         if self.config:
             # I have no idea where these are coming from but whatever.

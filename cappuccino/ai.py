@@ -12,7 +12,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
-
+import contextlib
 import random
 import re
 from datetime import UTC, datetime
@@ -100,14 +100,15 @@ class Ai(Plugin):
     def _add_line(self, line: str, channel: str):
         line = unstyle(line)
         corpus_line = CorpusLine(line=line, channel=channel)
-        try:
-            self.db_session.add(corpus_line)
-            self.db_session.commit()
-        except IntegrityError:
-            self.db_session.rollback()
+        with (
+            contextlib.suppress(IntegrityError),
+            self.db_session() as session,
+            session.begin(),
+        ):
+            session.add(corpus_line)
 
     def _get_lines(self, channel: str | None = None) -> list[str]:
-        select_stmt = select(CorpusLine)
+        select_stmt = select(CorpusLine.line)
         if channel:
             select_stmt = (
                 select_stmt.where(func.lower(CorpusLine.channel) == channel.lower())
@@ -119,7 +120,9 @@ class Ai(Plugin):
                 self._max_loaded_lines
             )
 
-        lines = [result.line for result in self.db_session.scalars(select_stmt)]
+        with self.db_session() as session:
+            lines = session.scalars(select_stmt).all()
+
         return lines if len(lines) > 0 else None
 
     def _line_count(self, channel: str | None = None) -> int:
@@ -128,32 +131,35 @@ class Ai(Plugin):
             select_stmt = select_stmt.where(
                 func.lower(CorpusLine.channel) == channel.lower()
             )
-        return self.db_session.scalar(select_stmt)
+
+        with self.db_session() as session:
+            return session.scalar(select_stmt)
 
     def _is_active(self, channel: str) -> bool:
         if not IrcString(channel).is_channel:
             return False
 
-        return self.db_session.scalar(
-            select(AIChannel.status).where(
-                func.lower(AIChannel.name) == channel.lower()
+        with self.db_session() as session:
+            return session.scalar(
+                select(AIChannel.status).where(
+                    func.lower(AIChannel.name) == channel.lower()
+                )
             )
-        )
 
     def _toggle(self, channel: str):
         new_status = not self._is_active(channel)
-        ai_channel = self.db_session.scalar(
-            update(AIChannel)
-            .returning(AIChannel)
-            .where(func.lower(AIChannel.name) == channel.lower())
-            .values(status=new_status)
-        )
 
-        if ai_channel is None:
-            ai_channel = AIChannel(name=channel, status=new_status)
-            self.db_session.add(ai_channel)
+        with self.db_session() as session, session.begin():
+            ai_channel = session.scalar(
+                update(AIChannel)
+                .returning(AIChannel)
+                .where(func.lower(AIChannel.name) == channel.lower())
+                .values(status=new_status)
+            )
 
-        self.db_session.commit()
+            if ai_channel is None:
+                ai_channel = AIChannel(name=channel, status=new_status)
+                session.add(ai_channel)
 
     @command()
     def ai(self, mask, target, args):

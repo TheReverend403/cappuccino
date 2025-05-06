@@ -41,44 +41,44 @@ class Triggers(Plugin):
         super().__init__(bot)
 
     def _get_trigger(self, channel: str, trigger: str):
-        return self.db_session.scalar(
-            select(Trigger.response)
-            .where(func.lower(Trigger.trigger) == trigger.lower())
-            .where(func.lower(Trigger.channel) == channel.lower())
-        )
+        with self.db_session() as session:
+            return session.scalar(
+                select(Trigger.response)
+                .where(func.lower(Trigger.trigger) == trigger.lower())
+                .where(func.lower(Trigger.channel) == channel.lower())
+            )
 
     def _set_trigger(self, channel: str, trigger: str, text: str):
-        trigger_model = self.db_session.scalar(
-            update(Trigger)
-            .returning(Trigger)
-            .where(func.lower(Trigger.trigger) == trigger.lower())
-            .where(func.lower(Trigger.channel) == channel.lower())
-            .values(response=text)
-        )
+        with self.db_session() as session, session.begin():
+            trigger_model = session.scalar(
+                update(Trigger)
+                .returning(Trigger)
+                .where(func.lower(Trigger.trigger) == trigger.lower())
+                .where(func.lower(Trigger.channel) == channel.lower())
+                .values(response=text)
+            )
 
-        if trigger_model is None:
-            trigger_model = Trigger(trigger=trigger, channel=channel, response=text)
-            self.db_session.add(trigger_model)
-
-        self.db_session.commit()
+            if trigger_model is None:
+                trigger_model = Trigger(trigger=trigger, channel=channel, response=text)
+                session.add(trigger_model)
 
     def _delete_trigger(self, channel: str, trigger: str) -> bool:
-        return (
-            self.db_session.scalar(
+        with self.db_session() as session, session.begin():
+            trigger_object = session.scalar(
                 delete(Trigger)
                 .where(func.lower(Trigger.trigger) == trigger.lower())
                 .where(func.lower(Trigger.channel) == channel.lower())
-                .returning(Triggers.trigger)
+                .returning(Trigger)
             )
-            is not None
-        )
+            return trigger_object is not None
 
     def _get_triggers_list(self, channel: str) -> list:
-        return self.db_session.scalars(
-            select(Trigger.trigger).where(
-                func.lower(Trigger.channel) == channel.lower()
-            )
-        ).all()
+        with self.db_session() as session:
+            return session.scalars(
+                select(Trigger.trigger).where(
+                    func.lower(Trigger.channel) == channel.lower()
+                )
+            ).all()
 
     @command(permission="view")
     def trigger(self, mask, target, args):
@@ -107,6 +107,7 @@ class Triggers(Plugin):
             )
         elif args["list"]:
             trigger_list = self._get_triggers_list(target)
+            self.logger.debug(trigger_list)
             if trigger_list:
                 trigger_list = ", ".join(trigger_list)
                 response = f"Available triggers for {target}: {trigger_list}"

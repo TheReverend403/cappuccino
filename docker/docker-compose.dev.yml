@@ -31,6 +31,7 @@ services:
       - "1337:1337"
     build:
       context: ../
+      target: development
     deploy:
       resources:
         limits:
