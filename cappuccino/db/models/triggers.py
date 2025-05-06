@@ -22,6 +22,6 @@ from cappuccino.db.models import BaseModel
 class Trigger(BaseModel):
     __tablename__ = "triggers"
 
-    trigger: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
+    name: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
     channel: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
     response: Mapped[str] = mapped_column(String(), nullable=False)
