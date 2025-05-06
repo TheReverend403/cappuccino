@@ -122,30 +122,30 @@ class Ai(Plugin):
         with self.db_session() as session:
             return session.scalar(select_stmt)
 
-    def _is_active(self, channel: str) -> bool:
+    def _is_enabled_for_channel(self, channel: str) -> bool:
         if not IrcString(channel).is_channel:
             return False
 
         with self.db_session() as session:
             return session.scalar(
-                select(AIChannel.status).where(
+                select(AIChannel.enabled).where(
                     func.lower(AIChannel.name) == channel.lower()
                 )
             )
 
     def _toggle(self, channel: str):
-        new_status = not self._is_active(channel)
+        new_status = not self._is_enabled_for_channel(channel)
 
         with self.db_session() as session, session.begin():
             ai_channel = session.scalar(
                 update(AIChannel)
                 .returning(AIChannel)
                 .where(func.lower(AIChannel.name) == channel.lower())
-                .values(status=new_status)
+                .values(enabled=new_status)
             )
 
             if ai_channel is None:
-                ai_channel = AIChannel(name=channel, status=new_status)
+                ai_channel = AIChannel(name=channel, enabled=new_status)
                 session.add(ai_channel)
 
     @command()
@@ -171,7 +171,9 @@ class Ai(Plugin):
                     )
                 )
 
-            ai_status = "enabled" if self._is_active(target) else "disabled"
+            ai_status = (
+                "enabled" if self._is_enabled_for_channel(target) else "disabled"
+            )
             line_counts = f"{intcomma(channel_line_count)}/{intcomma(line_count)}"
             return (
                 f"Chatbot is currently {ai_status} for {target}."
@@ -189,7 +191,11 @@ class Ai(Plugin):
             return f"You must be a channel operator ({op_prefixes}) to do that."
 
         self._toggle(target)
-        return "Chatbot activated." if self._is_active(target) else "Shutting up!"
+        return (
+            "Chatbot activated."
+            if self._is_enabled_for_channel(target)
+            else "Shutting up!"
+        )
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def handle_line(self, target, event, mask, data):
@@ -209,7 +215,7 @@ class Ai(Plugin):
             self._add_line(data, target)
             return
 
-        if not self._is_active(target):
+        if not self._is_enabled_for_channel(target):
             return
 
         start = timer()

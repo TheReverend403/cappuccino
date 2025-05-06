@@ -29,4 +29,4 @@ class AIChannel(BaseModel):
     __tablename__ = "ai_channels"
 
     name: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
-    status: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean(), nullable=False)
