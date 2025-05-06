@@ -29,7 +29,7 @@ class Seen(Plugin):
     requires = ["irc3.plugins.command", "cappuccino.userdb"]
 
     def _get_last_seen(self, nick: str) -> datetime:
-        return self.bot.get_user_value(nick, _DB_KEY).replace(tzinfo=UTC)
+        return self.bot.get_user_value(nick, _DB_KEY)
 
     def _set_last_seen(self, nick: str, timestamp: datetime):
         self.bot.set_user_value(nick, _DB_KEY, timestamp)
