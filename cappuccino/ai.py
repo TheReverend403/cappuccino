@@ -89,7 +89,6 @@ class Ai(Plugin):
         with (
             contextlib.suppress(IntegrityError),
             self.db_session() as session,
-            session.begin(),
         ):
             ai_channel = session.scalar(
                 select(AIChannel).where(func.lower(AIChannel.name) == channel.lower())
@@ -139,7 +138,7 @@ class Ai(Plugin):
     def _toggle(self, channel: str):
         new_status = not self._is_enabled_for_channel(channel)
 
-        with self.db_session() as session, session.begin():
+        with self.db_session() as session:
             ai_channel = session.scalar(
                 update(AIChannel)
                 .returning(AIChannel)

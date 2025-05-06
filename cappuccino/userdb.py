@@ -78,7 +78,7 @@ class UserDB(Plugin):
 
     @irc3.extend
     def set_user_value(self, username: str, key: str, value=None):
-        with self.db_session() as session, session.begin():
+        with self.db_session() as session:
             user = session.scalar(
                 update(RiceDB)
                 .returning(RiceDB)

@@ -41,7 +41,7 @@ class Triggers(Plugin):
             )
 
     def _set_trigger(self, channel: str, name: str, response: str):
-        with self.db_session() as session, session.begin():
+        with self.db_session() as session:
             trigger_model = session.scalar(
                 update(Trigger)
                 .returning(Trigger)
@@ -55,7 +55,7 @@ class Triggers(Plugin):
                 session.add(trigger_model)
 
     def _delete_trigger(self, channel: str, name: str) -> bool:
-        with self.db_session() as session, session.begin():
+        with self.db_session() as session:
             trigger_object = session.scalar(
                 delete(Trigger)
                 .where(func.lower(Trigger.name) == name.lower())
