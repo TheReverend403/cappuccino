@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from cappuccino.db.models import BaseModel
@@ -22,6 +22,6 @@ from cappuccino.db.models import BaseModel
 class Trigger(BaseModel):
     __tablename__ = "triggers"
 
-    name: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
-    channel: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
-    response: Mapped[str] = mapped_column(String(), nullable=False)
+    name: Mapped[str] = mapped_column(Text, nullable=False, primary_key=True)
+    channel: Mapped[str] = mapped_column(Text, nullable=False, primary_key=True)
+    response: Mapped[str] = mapped_column(Text, nullable=False)
