@@ -13,7 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-
 import irc3
 from irc3.plugins.command import command
 
