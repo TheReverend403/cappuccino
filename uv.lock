@@ -53,7 +53,7 @@ wheels = [
 
 [[package]]
 name = "cappuccino"
-version = "1.18.13"
+version = "1.18.14"
 source = { virtual = "." }
 dependencies = [
     { name = "alembic" },

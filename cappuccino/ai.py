@@ -117,14 +117,10 @@ class Ai(Plugin):
     def _line_count(self, channel: str | None = None) -> int:
         select_stmt = select(func.count()).select_from(CorpusLine)
         if channel:
-            select_stmt = (
-                select(func.count())
-                .select_from(AIChannel)
-                .join(
-                    CorpusLine,
-                    func.lower(AIChannel.name) == func.lower(CorpusLine.channel_name),
-                )
+            select_stmt = select_stmt.where(
+                func.lower(CorpusLine.channel_name) == channel.lower(),
             )
+            self.logger.debug(select_stmt)
 
         with self.db_session() as session:
             return session.scalar(select_stmt)
