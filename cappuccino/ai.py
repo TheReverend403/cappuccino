@@ -56,7 +56,7 @@ class CorpusLine(BaseModel):
     channel: Mapped[str] = mapped_column(String(), nullable=False)
 
 
-class CorpusChannel(BaseModel):
+class AIChannel(BaseModel):
     __tablename__ = "ai_channels"
 
     name: Mapped[str] = mapped_column(String(), nullable=False, primary_key=True)
@@ -135,23 +135,23 @@ class Ai(Plugin):
             return False
 
         return self.db_session.scalar(
-            select(CorpusChannel.status).where(
-                func.lower(CorpusChannel.name) == channel.lower()
+            select(AIChannel.status).where(
+                func.lower(AIChannel.name) == channel.lower()
             )
         )
 
     def _toggle(self, channel: str):
         new_status = not self._is_active(channel)
-        corpus_channel = self.db_session.scalar(
-            update(CorpusChannel)
-            .returning(CorpusChannel)
-            .where(func.lower(CorpusChannel.name) == channel.lower())
+        ai_channel = self.db_session.scalar(
+            update(AIChannel)
+            .returning(AIChannel)
+            .where(func.lower(AIChannel.name) == channel.lower())
             .values(status=new_status)
         )
 
-        if corpus_channel is None:
-            corpus_channel = CorpusChannel(name=channel, status=new_status)
-            self.db_session.add(corpus_channel)
+        if ai_channel is None:
+            ai_channel = AIChannel(name=channel, status=new_status)
+            self.db_session.add(ai_channel)
 
         self.db_session.commit()
 
