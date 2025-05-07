@@ -1,75 +1,74 @@
-name: cappuccino
+---
+name: "cappuccino"
 
 services:
   cappuccino:
-    container_name: cappuccino
+    container_name: "cappuccino"
     restart: "no"
     init: true
     read_only: true
-    user: ${PUID:-1000}:${PGID:-1000}
+    user: "${PUID:-1000}:${PGID:-1000}"
     depends_on:
       db:
-        condition: service_healthy
-    env_file: .env
+        condition: "service_healthy"
+    env_file: ".env"
     environment:
-      TZ: UTC
-      CFG_BOT_NICK: ${CFG_BOT_NICK:?}
-      CFG_BOT_REALNAME: cappuccino_dev
-      CFG_BOT_USERNAME: cappuccino_dev
-      CFG_IRC_HOST: ${CFG_IRC_HOST:?}
+      TZ: "UTC"
+      CFG_BOT_NICK: "${CFG_BOT_NICK:?}"
+      CFG_BOT_REALNAME: "cappuccino_dev"
+      CFG_BOT_USERNAME: "cappuccino_dev"
+      CFG_IRC_HOST: "${CFG_IRC_HOST:?}"
       CFG_IRC_PORT: 6697
       CFG_IRC_SSL: true
-      CFG_DB_URI: postgresql://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@${POSTGRES_HOST:-db}/${POSTGRES_DB:-cappuccino}
+      CFG_DB_URI: "postgresql://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@${POSTGRES_HOST:-db}/${POSTGRES_DB:-cappuccino}"
     volumes:
-      - ./config/app:/config
-      - ../:/app
+      - "./config/app:/config"
+      - "../:/app"
     tmpfs:
-      - /tmp
+      - "/tmp"
     networks:
-      - cappuccino
+      - "cappuccino"
     ports:
       - "1337:1337"
     build:
-      context: ../
-      target: development
+      context: "../"
+      target: "development"
     deploy:
       resources:
         limits:
-          cpus: ${CAPPUCCINO_CPU_LIMIT:-${CPU_LIMIT:-0}}
-          memory: ${CAPPUCCINO_MEM_LIMIT:-${MEM_LIMIT:-0}}
+          cpus: "${CAPPUCCINO_CPU_LIMIT:-${CPU_LIMIT:-0}}"
+          memory: "${CAPPUCCINO_MEM_LIMIT:-${MEM_LIMIT:-0}}"
 
   db:
-    image: postgres:17-alpine
-    container_name: cappuccino_db
+    image: "postgres:17-alpine"
+    container_name: "cappuccino_db"
     restart: "no"
     init: true
-    user: ${PUID:-1000}:${PGID:-1000}
-    env_file: .env
+    user: "${PUID:-1000}:${PGID:-1000}"
+    env_file: ".env"
     environment:
-      TZ: UTC
-      POSTGRES_HOST: db
-      POSTGRES_DB: cappuccino
-      POSTGRES_PASSWORD: cappuccino
-      POSTGRES_USER: cappuccino
+      TZ: "UTC"
+      POSTGRES_HOST: "db"
+      POSTGRES_DB: "cappuccino"
+      POSTGRES_PASSWORD: "cappuccino"
+      POSTGRES_USER: "cappuccino"
     volumes:
-      - ./data/postgresql:/var/lib/postgresql/data
+      - "./data/postgresql:/var/lib/postgresql/data"
     networks:
-      - cappuccino
+      - "cappuccino"
     healthcheck:
       test:
-        [
-          "CMD-SHELL",
-          "pg_isready -q --dbname=$$POSTGRES_DB --username=$$POSTGRES_USER --host=$$POSTGRES_HOST",
-        ]
-      start_period: 5s
-      start_interval: 1s
-      interval: 10s
-      timeout: 1s
+        - "CMD-SHELL"
+        - "pg_isready -q --dbname=$$POSTGRES_DB --username=$$POSTGRES_USER --host=$$POSTGRES_HOST"
+      start_period: "5s"
+      start_interval: "1s"
+      interval: "10s"
+      timeout: "1s"
     deploy:
       resources:
         limits:
-          cpus: ${POSTGRES_CPU_LIMIT:-${CPU_LIMIT:-0}}
-          memory: ${POSTGRES_MEM_LIMIT:-${MEM_LIMIT:-0}}
+          cpus: "${POSTGRES_CPU_LIMIT:-${CPU_LIMIT:-0}}"
+          memory: "${POSTGRES_MEM_LIMIT:-${MEM_LIMIT:-0}}"
 
 networks:
   cappuccino:

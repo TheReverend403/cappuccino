@@ -1,50 +1,61 @@
+---
 repos:
-  - repo: local
+  - repo: "local"
     hooks:
-      - id: end-of-file-fixer
-        name: end-of-file-fixer
-        entry: uv run end-of-file-fixer
-        language: system
-        types: [text]
+      - id: "end-of-file-fixer"
+        name: "end-of-file-fixer"
+        entry: "uv run end-of-file-fixer"
+        language: "system"
+        types:
+          - "text"
 
-      - id: trailing-whitespace-fixer
-        name: trailing-whitespace-fixer
-        entry: uv run trailing-whitespace-fixer
-        language: system
-        types: [text]
+      - id: "trailing-whitespace-fixer"
+        name: "trailing-whitespace-fixer"
+        entry: "uv run trailing-whitespace-fixer"
+        language: "system"
+        types:
+          - "text"
 
-      - id: check-yaml
-        name: check-yaml
-        entry: uv run check-yaml
-        language: system
-        types: [yaml]
+      - id: "check-toml"
+        name: "check-toml"
+        entry: "uv run check-toml"
+        language: "system"
+        types:
+          - "toml"
 
-      - id: check-toml
-        name: check-toml
-        entry: uv run check-toml
-        language: system
-        types: [toml]
+      - id: "check-shebang-scripts-are-executable"
+        name: "check-shebang-scripts-are-executable"
+        entry: "uv run check-shebang-scripts-are-executable"
+        language: "system"
+        types:
+          - "text"
 
-      - id: check-shebang-scripts-are-executable
-        name: check-shebang-scripts-are-executable
-        entry: uv run check-shebang-scripts-are-executable
-        language: system
-        types: [text]
+      - id: "yamlfix"
+        name: "yamlfix"
+        entry: "uv run yamlfix"
+        language: "system"
+        types:
+          - "yaml"
 
-      - id: shellcheck
-        name: shellcheck
-        entry: uv run shellcheck
-        language: system
-        types: [shell]
+      - id: "shellcheck"
+        name: "shellcheck"
+        entry: "uv run shellcheck"
+        language: "system"
+        types:
+          - "shell"
 
-      - id: ruff-check
-        name: ruff-check
-        entry: uv run ruff check --fix
-        language: system
-        types: [python]
+      - id: "ruff-check"
+        name: "ruff-check"
+        entry: "uv run ruff check"
+        args:
+          - "--fix"
+        language: "system"
+        types:
+          - "python"
 
-      - id: ruff-format
-        name: ruff-format
-        entry: uv run ruff format
-        language: system
-        types: [python]
+      - id: "ruff-format"
+        name: "ruff-format"
+        entry: "uv run ruff format"
+        language: "system"
+        types:
+          - "python"

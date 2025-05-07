@@ -1,6 +1,8 @@
-name: Lint
+---
+name: "Lint"
 
-on: [workflow_call]
+on:
+  - "workflow_call"
 
 env:
   RUFF_OUTPUT_FORMAT: "github"
@@ -8,22 +10,22 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
+      - uses: "actions/checkout@v4"
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v6"
         with:
           enable-cache: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: "Set up Python"
+        uses: "actions/setup-python@v5"
         with:
           python-version-file: ".python-version"
 
-      - name: Install Python dependencies
-        run: uv sync --group dev
+      - name: "Install Python dependencies"
+        run: "uv sync --group dev"
 
-      - name: Lint
-        uses: pre-commit/action@v3.0.1
+      - name: "Lint"
+        uses: "pre-commit/action@v3.0.1"
