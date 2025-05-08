@@ -22,7 +22,11 @@ import re
 import socket
 import time
 from copy import copy
-from email.headerregistry import ContentDispositionHeader, ContentTypeHeader
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from email.headerregistry import ContentDispositionHeader, ContentTypeHeader
+
 from email.policy import EmailPolicy
 from io import StringIO
 from urllib.parse import urlparse
@@ -62,6 +66,19 @@ def _clean_url(url: str):
     return url
 
 
+def _extract_title_from_soup(soup: bs4.BeautifulSoup):
+    if title_tag := soup.find("meta", property="og:title", content=True):
+        return title_tag.get("content")
+    with contextlib.suppress(AttributeError):
+        return soup.title.string
+
+
+def _extract_site_name_from_soup(soup: bs4.BeautifulSoup):
+    if site_name_tag := soup.find("meta", property="og:site_name", content=True):
+        return site_name_tag.get("content")
+    return None
+
+
 @irc3.plugin
 class UrlInfo(Plugin):
     _max_bytes = 10 * 1000 * 1000  # 10M
@@ -88,10 +105,8 @@ class UrlInfo(Plugin):
         rf"(?iu):(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>#\S+) :(?P<data>.*{_url_regex.pattern}).*"
     )
     def on_url(self, mask, target, data):  # noqa: C901
-        if (
-            mask.nick in self._ignore_nicks
-            or data.startswith(self.bot.config.cmd)
-            or data.startswith(f"{self.bot.nick}: ")
+        if mask.nick in self._ignore_nicks or data.startswith(
+            (self.bot.config.cmd, f"{self.bot.nick}: ")
         ):
             return
 
@@ -181,7 +196,6 @@ class UrlInfo(Plugin):
 
         hostname = urlp.hostname
         self._validate_ip_address(hostname)
-
         hostname = hostname.removeprefix("www.")
 
         # Spoof user agent for certain sites so they give up their secrets.
@@ -237,9 +251,9 @@ class UrlInfo(Plugin):
                 size = len(content.encode("UTF-8"))
 
             soup = bs4.BeautifulSoup(content, "html5lib")
-            title = self._extract_title_from_soup(soup)
+            title = _extract_title_from_soup(soup)
 
-            site_name = self._extract_site_name_from_soup(soup)
+            site_name = _extract_site_name_from_soup(soup)
             if (site_name and len(site_name) < (site_name_max_size := 16)) and (
                 len(site_name) > site_name_max_size
             ):
@@ -254,14 +268,3 @@ class UrlInfo(Plugin):
                 title = truncate_with_ellipsis(title, self._max_title_length)
 
         return title, size
-
-    def _extract_title_from_soup(self, soup: bs4.BeautifulSoup):
-        if title_tag := soup.find("meta", property="og:title", content=True):
-            return title_tag.get("content")
-        with contextlib.suppress(AttributeError):
-            return soup.title.string
-
-    def _extract_site_name_from_soup(self, soup: bs4.BeautifulSoup):
-        if site_name_tag := soup.find("meta", property="og:site_name", content=True):
-            return site_name_tag.get("content")
-        return None

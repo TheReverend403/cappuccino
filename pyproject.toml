@@ -40,23 +40,42 @@ docker = ["jinja2>=3.1.3"]
 force-exclude = true
 extend-exclude = ["docker/data/", "docker/config/"]
 
+[tool.ruff.format]
+line-ending = "lf"
+
 [tool.ruff.lint]
 select = [
     "A",
+    "ARG",
     "B",
     "BLE",
     "C4",
     "C90",
+    "COM",
     "DTZ",
     "E",
     "ERA",
     "F",
+    "FBT",
     "FIX",
+    "FLY",
     "FURB",
+    "G010",
+    "G101",
+    "G201",
+    "G202",
     "I",
+    "ICN",
+    "INP",
+    "ISC",
+    "LOG",
     "N",
+    "PERF",
+    "PIE",
     "PL",
+    "PT",
     "PTH",
+    "PYI",
     "Q",
     "RET",
     "RSE",
@@ -64,21 +83,36 @@ select = [
     "S",
     "SIM",
     "SLF",
+    "SLOT",
     "T10",
     "T20",
+    "TC",
+    "TD",
     "TID",
+    "TRY",
     "UP",
     "W",
     "YTT",
 ]
 
 # ruff format compatibility
-ignore = ["E501"]
+ignore = [
+    "COM812",
+    "COM819",
+    "D206",
+    "D300",
+    "E111",
+    "E114",
+    "E117",
+    "E501",
+    "Q000",
+    "Q001",
+    "Q002",
+    "Q003",
+    "W191",
+]
 
-extend-ignore = ["RUF012", "PLR09", "PLW2901"]
-
-[tool.ruff.format]
-line-ending = "lf"
+extend-ignore = ["ARG002", "TRY003", "RUF012", "PLW2901", "PLR0915", "PLR0912"]
 
 [tool.yamlfix]
 line_length = 120

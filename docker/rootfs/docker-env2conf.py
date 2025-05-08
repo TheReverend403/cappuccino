@@ -57,7 +57,7 @@ def main():
         destination_file.write_text(rendered)
         log.info("Done.")
     except FileNotFoundError as exc:
-        log.error(f"{exc.filename} does not exist.")
+        log.error(f"{exc.filename} does not exist.")  # noqa: TRY400
         sys.exit(errno.ENOENT)
 
 

@@ -26,7 +26,7 @@ from sqlalchemy.orm import sessionmaker
 from cappuccino.util import meta
 
 
-def _create_requests_session(bot) -> Session:
+def _create_requests_session() -> Session:
     requests.packages.urllib3.disable_warnings()
 
     # Accept YouTube consent cookies automatically
@@ -53,7 +53,7 @@ class Plugin:
         self.bot = bot
         self.config: dict = self.bot.config.get(plugin_module, {})
         self.logger = logging.getLogger(f"irc3.{plugin_module}")
-        self.requests = _create_requests_session(bot)
+        self.requests = _create_requests_session()
 
         db_config = self.bot.config.get("database", {})
         db = create_engine(

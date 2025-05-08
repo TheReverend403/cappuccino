@@ -36,10 +36,11 @@ class Color:
     LIGHT_GRAY = ircstyle.colors.light_grey
 
 
-def style(
+def style(  # noqa: PLR0913
     text,
     fg: Color | None = None,
     bg: Color | None = None,
+    *,
     bold=False,
     italics=False,
     underline=False,

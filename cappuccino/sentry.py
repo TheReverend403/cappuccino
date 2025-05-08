@@ -15,7 +15,6 @@
 
 import irc3
 import sentry_sdk
-from irc3.plugins.command import command
 from requests import RequestException
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
@@ -50,11 +49,3 @@ class Sentry(Plugin):
             release=meta.FULL_VERSION,
             integrations=[SqlalchemyIntegration()],
         )
-
-    @command(name="testsentry", permission="admin", show_in_help_list=False)
-    def testsentry(self, mask, target, args):
-        """Force an exception to test Sentry.
-
-        %%testsentry
-        """
-        raise Exception("Sentry test")

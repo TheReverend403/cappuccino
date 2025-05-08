@@ -45,8 +45,7 @@ def _should_ignore_message(line):
         _CMD_PATTERN.match(line)
         or _SED_CHECKER.match(line)
         or _URL_CHECKER.match(line)
-        or line.startswith("[")
-        or line.startswith("\x01ACTION ")
+        or line.startswith(("[", "\x01ACTION "))
     )
 
 
