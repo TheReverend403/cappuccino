@@ -112,7 +112,7 @@ ignore = [
     "W191",
 ]
 
-extend-ignore = ["ARG002", "TRY003", "RUF012", "PLW2901", "PLR0915", "PLR0912"]
+extend-ignore = ["ARG002", "PLR0912", "PLR0915", "PLW2901", "RUF012", "TRY003"]
 
 [tool.yamlfix]
 line_length = 120
