@@ -24,4 +24,4 @@ class Trigger(BaseModel):
 
     name: Mapped[str] = mapped_column(Text, nullable=False, primary_key=True)
     channel: Mapped[str] = mapped_column(Text, nullable=False, primary_key=True)
-    response: Mapped[str] = mapped_column(Text, nullable=False)
+    response: Mapped[str] = mapped_column(Text, nullable=False, unique=False)
