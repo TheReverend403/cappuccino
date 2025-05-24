@@ -34,5 +34,5 @@ uv run pre-commit install
 
 ```sh
 cp docker/.env.example docker/.env # Open and set any empty variables
-docker compose -f docker/docker-compose.dev.yml up --build --pull always
+docker compose -f docker/compose.yaml up --build --pull always
 ```
