@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG DEBIAN_VERSION=bookworm
+ARG DEBIAN_VERSION=trixie
 
 ## Base
 FROM debian:${DEBIAN_VERSION}-slim AS python-base
