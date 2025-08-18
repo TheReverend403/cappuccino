@@ -13,14 +13,14 @@ services:
         condition: "service_healthy"
     env_file: ".env"
     environment:
-      TZ: "UTC"
+      TZ: "${TZ:-UTC}"
       CFG_BOT_NICK: "${CFG_BOT_NICK:?}"
-      CFG_BOT_REALNAME: "cappuccino_dev"
-      CFG_BOT_USERNAME: "cappuccino_dev"
+      CFG_BOT_REALNAME: "${CFG_BOT_REALNAME:-cappuccino_dev}"
+      CFG_BOT_USERNAME: "${CFG_BOT_USERNAME:-cappuccino_dev}"
       CFG_IRC_HOST: "${CFG_IRC_HOST:?}"
-      CFG_IRC_PORT: 6697
-      CFG_IRC_SSL: true
-      CFG_DB_URI: "postgresql://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@${POSTGRES_HOST:-db}/${POSTGRES_DB:-cappuccino}"
+      CFG_IRC_PORT: "${CFG_IRC_PORT:-6697}"
+      CFG_IRC_SSL: "${CFG_IRC_SSL:-true}"
+      CFG_DB_URI: "${CFG_DB_URI:-postgresql://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@${POSTGRES_HOST:-db}/${POSTGRES_DB:-cappuccino}}"
     volumes:
       - "./config/app:/config"
       - "../:/app"
@@ -45,13 +45,12 @@ services:
     restart: "no"
     init: true
     user: "${PUID:-1000}:${PGID:-1000}"
-    env_file: ".env"
     environment:
-      TZ: "UTC"
-      POSTGRES_HOST: "db"
-      POSTGRES_DB: "cappuccino"
-      POSTGRES_PASSWORD: "cappuccino"
-      POSTGRES_USER: "cappuccino"
+      TZ: "${TZ:-UTC}"
+      POSTGRES_HOST: "${POSTGRES_HOST:-db}"
+      POSTGRES_DB: "${POSTGRES_DB:-cappuccino}"
+      POSTGRES_USER: "${POSTGRES_USER:-cappuccino}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-cappuccino}"
     volumes:
       - "./data/postgresql:/var/lib/postgresql/data"
     networks:
