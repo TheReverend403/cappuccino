@@ -18,6 +18,7 @@ import os
 from secrets import randbelow
 
 import requests
+from irc3 import IrcBot
 from requests import Session
 from requests.cookies import RequestsCookieJar
 from sqlalchemy import create_engine
@@ -48,7 +49,7 @@ def _create_requests_session() -> Session:
 
 
 class Plugin:
-    def __init__(self, bot):
+    def __init__(self, bot: IrcBot):
         plugin_module = self.__class__.__module__
         self.bot = bot
         self.config: dict = self.bot.config.get(plugin_module, {})

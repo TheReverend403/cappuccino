@@ -16,7 +16,8 @@
 import asyncio
 
 import irc3
-from httpx import AsyncClient, RequestError
+from httpx import URL, AsyncClient, HTTPError
+from irc3 import rfc
 
 from cappuccino import Plugin
 
@@ -25,29 +26,30 @@ from cappuccino import Plugin
 class UptimeKuma(Plugin):
     def __init__(self, bot):
         super().__init__(bot)
-        self._webhook = self.config.get("webhook", None)
+        self._webhook: str | None = self.config.get("webhook", None)
         self._interval: int = self.config.get("interval", 30)
 
+    @irc3.event(rfc.CONNECTED)
+    def _on_connect(
+        self, srv: str | None = None, me: str | None = None, data: str | None = None
+    ):
         if self._webhook:
-            bot.create_task(self._ping_loop())
-        else:
-            self.logger.warning("No webhook supplied, will not ping Uptime Kuma.")
+            self.bot.create_task(self._ping_loop())
+
+    async def ping(self, message: str = "OK", status: str = "up"):
+        async with AsyncClient(timeout=5) as client:
+            request_params = {"status": status, "msg": message}
+            request_url = URL(self._webhook, params=request_params)
+            self.logger.debug(f"Pinging {request_url}")
+            try:
+                response = await client.get(request_url)
+                response.raise_for_status()
+                self.logger.debug("Ping succeeded.")
+            except HTTPError:
+                self.logger.exception()
 
     async def _ping_loop(self):
-        self.logger.info(f"Started Uptime Kuma ping every {self._interval} seconds.")
-        async with AsyncClient(timeout=5) as client:
-            while True:
-                self.logger.debug("Pinging Uptime Kuma...")
-                try:
-                    request_params = {"status": "up", "msg": "OK"}
-                    response = await client.get(self._webhook, params=request_params)
-                    response_json = response.json()
-                    if response_json.get("ok", False):
-                        self.logger.debug("Pinged Uptime Kuma successfully.")
-                    else:
-                        self.logger.warning(
-                            f"Failed to ping Uptime Kuma: {response_json.get('msg')}"
-                        )
-                except RequestError:
-                    self.logger.exception()
-                await asyncio.sleep(self._interval)
+        self.logger.info(f"Pinging Uptime Kuma every {self._interval} seconds.")
+        while True:
+            await self.ping()
+            await asyncio.sleep(self._interval)
