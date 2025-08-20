@@ -2,7 +2,7 @@
 name = "cappuccino"
 description = "Just another IRC bot."
 authors = [{ name = "Lee Watson", email = "me@lwatson.dev" }]
-version = "1.18.16"
+version = "1.19.0"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.13,<3.14"
@@ -11,6 +11,7 @@ dependencies = [
     "beautifulsoup4>=4.13.4",
     "bottle>=0.13.3",
     "html5lib>=1.1",
+    "httpx[http2]>=0.28.1",
     "humanize>=4.12.3",
     "influxdb-client>=1.48.0",
     "irc3>=1.1.0",
