@@ -46,7 +46,7 @@ class UptimeKuma(Plugin):
                 response.raise_for_status()
                 self.logger.debug("Ping succeeded.")
             except HTTPError:
-                self.logger.exception()
+                self.logger.exception("Ping failed.")
 
     async def _ping_loop(self):
         self.logger.info(f"Pinging Uptime Kuma every {self._interval} seconds.")
