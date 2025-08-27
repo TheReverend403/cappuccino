@@ -30,9 +30,11 @@ repos:
         types:
           - "text"
 
-      - id: "yamlfix"
-        name: "yamlfix"
-        entry: "uv run yamlfix"
+      - id: "yamllint"
+        name: "yamllint"
+        entry: "uv run yamllint"
+        args:
+          - "--strict"
         language: "system"
         types:
           - "yaml"

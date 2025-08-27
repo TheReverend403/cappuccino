@@ -1,0 +1,9 @@
+---
+extends: "default"
+ignore-from-file: ".gitignore"
+rules:
+  line-length: "disable"
+  quoted-strings:
+    quote-type: "double"
+  comments:
+    min-spaces-from-content: 1
