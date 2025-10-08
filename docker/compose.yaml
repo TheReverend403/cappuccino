@@ -20,7 +20,7 @@ services:
       CFG_IRC_HOST: "${CFG_IRC_HOST:?}"
       CFG_IRC_PORT: "${CFG_IRC_PORT:-6697}"
       CFG_IRC_SSL: "${CFG_IRC_SSL:-true}"
-      CFG_DB_URI: "${CFG_DB_URI:-postgresql://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@${POSTGRES_HOST:-db}/${POSTGRES_DB:-cappuccino}}"
+      CFG_DB_URI: "${CFG_DB_URI:-postgresql+psycopg://${POSTGRES_USER:-cappuccino}:${POSTGRES_PASSWORD:-cappuccino}@${POSTGRES_HOST:-db}/${POSTGRES_DB:-cappuccino}}"
     volumes:
       - "./config/app:/config"
       - "../:/app"

@@ -26,7 +26,7 @@ class CorpusLine(BaseModel):
     channel_name: Mapped[str] = mapped_column(
         Text, ForeignKey("ai_channels.name"), nullable=False
     )
-    channel: Mapped["AIChannel"] = relationship(back_populates="lines")
+    channel: Mapped[AIChannel] = relationship(back_populates="lines")
 
 
 class AIChannel(BaseModel):

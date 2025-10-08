@@ -16,15 +16,18 @@
 import logging
 import os
 from secrets import randbelow
+from typing import TYPE_CHECKING
 
 import requests
-from irc3 import IrcBot
 from requests import Session
 from requests.cookies import RequestsCookieJar
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from cappuccino.util import meta
+
+if TYPE_CHECKING:
+    from irc3 import IrcBot
 
 
 def _create_requests_session() -> Session:

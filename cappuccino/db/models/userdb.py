@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
-from datetime import datetime
+from datetime import datetime  # noqa: TC003
 
 from sqlalchemy import JSON, DateTime, Text, func
 from sqlalchemy.orm import Mapped, mapped_column

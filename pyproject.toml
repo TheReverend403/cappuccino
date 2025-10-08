@@ -2,10 +2,10 @@
 name = "cappuccino"
 description = "Just another IRC bot."
 authors = [{ name = "Lee Watson", email = "me@lwatson.dev" }]
-version = "1.19.2"
+version = "1.20.0"
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.13,<3.14"
+requires-python = ">=3.14,<3.15"
 dependencies = [
     "alembic>=1.15.2",
     "beautifulsoup4>=4.13.4",
@@ -17,7 +17,7 @@ dependencies = [
     "irc3>=1.1.0",
     "ircstyle>=0.1.5",
     "markovify>=0.9.4",
-    "psycopg2-binary>=2.9.10",
+    "psycopg[binary,pool]>=3.2.10",
     "pylast>=5.5.0",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
@@ -31,7 +31,7 @@ dependencies = [
 dev = [
     "pre-commit>=4.0.0",
     "pre-commit-hooks>=5.0.0",
-    "ruff>=0.12.0",
+    "ruff>=0.14.0",
     "shellcheck-py>=0.10.0.1",
     "yamllint>=1.37.1",
 ]

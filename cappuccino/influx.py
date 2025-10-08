@@ -14,13 +14,16 @@
 #  along with cappuccino.  If not, see <https://www.gnu.org/licenses/>.
 
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 import irc3
 from influxdb_client import InfluxDBClient, Point
 from irc3 import rfc
-from irc3.utils import IrcString
 
 from cappuccino import Plugin
+
+if TYPE_CHECKING:
+    from irc3.utils import IrcString
 
 
 @irc3.plugin
